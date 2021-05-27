@@ -1,0 +1,21 @@
+.SearchBox {
+    width: 100%;
+    border: 1px grey solid;
+    margin:0;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.InputBase {
+    width: 100%;
+    padding: 0;
+    margin:0;
+    height: 40px;
+    vertical-align: middle;
+}
+
+.IconButton {
+    border-radius: 0px;
+}

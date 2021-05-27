@@ -1,0 +1,10 @@
+.Appbar {
+    padding-top: 10px;
+    width: 100%;
+    overflow:hidden;
+}
+
+.logo {
+    text-align: right;
+    padding-right: 40px
+}

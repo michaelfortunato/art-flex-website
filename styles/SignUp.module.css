@@ -1,0 +1,62 @@
+.container {
+  margin-left: 10%;
+  margin-right: 10%;
+  height: 100%;
+}
+
+.logo {
+  height: 175px;
+  padding: 0;
+  margin: 0;
+}
+
+.divider {
+  margin-top: -40px;
+}
+
+.body {
+  margin-top: 30px;
+}
+
+.sign_up_body {
+  border-radius: 6px;
+  border: 1px solid #eaecef;
+  background-color: #f6f8fa;
+  height: 100%;
+  width: 100%;
+  padding: 20px;
+  padding-top: 10px;
+}
+
+.field_container {
+  text-align: center;
+}
+
+.role_button {
+  height: 40px;
+  text-align: center;
+  border: 1px solid black;
+  border-radius: 6px;
+}
+
+.create_account_button {
+  padding: 20px;
+  width: 100%;
+  height: 56px;
+  border-radius: 6px;
+  background-color: #3b537a;
+}
+
+.back_button_container {
+  text-align: center;
+  padding-top: 60px;
+  display: inline-block;
+}
+.link {
+  padding-top: 10px;
+}
+
+.footer {
+  text-align: center;
+}
+

@@ -1,0 +1,6 @@
+.Filterbar {
+    position: relative;
+    top: 25%;
+    text-align:center;
+    z-index: 0;
+}
