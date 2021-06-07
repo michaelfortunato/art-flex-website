@@ -6,7 +6,7 @@ import { CSSTransition } from "react-transition-group";
 import styled from "styled-components";
 import WelcomeStart from "@components/Welcome/WelcomeStart";
 import WelcomeText from "@components/Welcome/WelcomeText"
-
+import SignUp from '@components/SignIn/SignUp'
 const AnimationContainer = styled.div`
   &.fadeIn-appear {
     opacity: 0;
@@ -37,6 +37,7 @@ const AnimationContainer = styled.div`
 const pages = [
   { number: 0, pageName: "WelcomeStart", Component: WelcomeStart },
   { number: 1, pageName: "WelcomeText", Component: WelcomeText},
+  {number: 2, pageName: "SignUpForm", Component: SignUp}
 ];
 
 export default function WelcomePage() {
@@ -58,7 +59,7 @@ export default function WelcomePage() {
           unmountOnExit
         >
           <AnimationContainer>
-            <Component setCurrentPage = {setCurrentPage}/> 
+            <Component initialDelay = {2000} setCurrentPage = {setCurrentPage}/> 
           </AnimationContainer>
         </CSSTransition>
       )}
