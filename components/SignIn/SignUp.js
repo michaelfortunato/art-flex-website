@@ -4,6 +4,8 @@ import { useTheme } from '@material-ui/core/styles'
 import { ButtonBase, Grid, TextField, Typography, Link, Divider } from '@material-ui/core'
 import { ArrowBackIosOutlined } from '@material-ui/icons'
 import styles from '@styles/SignUp.module.css'
+
+
 const Container = styled.div`
     margin-left: 10%;
     margin-right: 10%;
@@ -75,6 +77,7 @@ const StyledRoleButton = styled(Grid)`
 `
 export default function SignUp(props) {
 
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('')
     const [confirmedPassword, setConfirmedPassword] = useState('')
@@ -95,7 +98,7 @@ export default function SignUp(props) {
                         <Typography style={{ 'margin-top': '-5px', 'color': 'black' }} variant='h4'>Create account</Typography>
                     </Grid>
                     <Grid className = {styles.field_container} item xs={12} style={{ 'margin-top': '0px' }}>
-                        <Form fullWidth size='large' variant='outlined' label='Name'
+                        <TextField fullWidth size='large' variant='outlined' label='Name'
                             onChange={event => ""} />
                     </Grid>
                     <Grid className ={styles.field_container} item xs={12} >
@@ -103,10 +106,10 @@ export default function SignUp(props) {
                             onChange={event => ""} />
                     </Grid>
                     <Grid className = {styles.field_container} item xs={12}>
-                        <Form fullWidth variant='outlined' label='Password' onChange={event => setPassword(event.target.value)} />
+                        <TextField fullWidth variant='outlined' label='Password' onChange={event => setPassword(event.target.value)} />
                     </Grid>
                     <Grid item xs={12}>
-                        <Form fullWidth variant='outlined' label='Confirm Password' onChange={event => setPassword(event.target.value)} />
+                        <TextField fullWidth variant='outlined' label='Confirm Password' onChange={event => setPassword(event.target.value)} />
                     </Grid>
                     <Grid container item xs={12} spacing={2}>
                         <Grid item xs={12}>
@@ -116,7 +119,9 @@ export default function SignUp(props) {
                         <Grid className={styles.role_button} item xs={6}>I am a buyer</Grid>
                     </Grid>
                     <Grid style={{ 'margin-top': '10px' }} item xs={12}>
-                        <ButtonBase className={styles.create_account_button}><Typography variant='body1' style={{ 'color': 'white' }}>Finalize your sign up</Typography></ButtonBase>
+                        <ButtonBase className={styles.create_account_button} style = {{'background-color':theme.palette.primary.main}}>
+                        <Typography variant='body1' style={{ 'color': 'white' }}>Finalize your sign up</Typography>
+                        </ButtonBase>
                     </Grid>
                 </Grid>
                 <Grid className ={styles.back_button_container} item xs={8}>
