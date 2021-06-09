@@ -6,6 +6,7 @@ const StyledGridline = styled.span`
     position: absolute;
     z-index: 0;
     background-color: ${props => props.backgroundColor};
+    height: ${(props) => props.isDot ? '6px': '0px'};
     &.line-appear {
         left: ${(props) => props.isRow ? `${props.floatingPos}%` : `${props.fixedPos}vh`};
         top: ${(props) => props.isRow ? `${props.fixedPos}vh` : `${props.floatingPos}%`};
@@ -16,7 +17,6 @@ const StyledGridline = styled.span`
     }
     
     &.line-appear-active {
-        height: ${(props) => props.isRow ? '6px': '100%'};
         width:  ${(props) => props.isRow ? '100%': '6px'};
         
         left: ${(props) => props.isRow ? '0% !important': ''};
@@ -44,7 +44,6 @@ const StyledGridline = styled.span`
         
     }
     &.line-appear-done{
-        height: ${(props) => props.isRow ? '6px': '100%'};
         width:  ${(props) => props.isRow ? '100%': '6px'};
         left: ${(props) => props.isRow ? '0% !important': `${props.fixedPos}vh`};
         top: ${(props) => props.isRow ? `${props.fixedPos}vh`: '0% !important'};

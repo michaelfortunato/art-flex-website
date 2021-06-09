@@ -11,13 +11,13 @@ const animationDuration = 2000;
 const blurbs = [
   {
     text: "Welcome.",
-    enterTime: 1200 || animationDuration,
+    enterTime: 2000 || animationDuration,
     exitTime: 1200 || animationDuration,
     duration: 2000,
   },
   {
     text: "Art Flex is an online store for art, made with artists in mind. Thank you for considering us and our mission. ",
-    enterTime: 1200 || animationDuration,
+    enterTime: 2000 || animationDuration,
     exitTime: 1200 || animationDuration,
     duration: 4000,
   },
@@ -26,13 +26,13 @@ const blurbs = [
       "It is too difficult for artists to generate consistent income from their works. " +
       "Gallieries charge obscene commisions on sales, and they intimiate new buyers and artists alike." +
       "We want to change that.",
-    enterTime: 1200 || animationDuration,
+    enterTime: 2000 || animationDuration,
     exitTime: 1200 || animationDuration,
     duration: 4000,
   },
   {
     text: "We want to democratize how artists find their fans, and how people discover art. ",
-    enterTime: 1200 || animationDuration,
+    enterTime: 2000 || animationDuration,
     exitTime: 1200 || animationDuration,
     duration: 4000,
   },
@@ -114,7 +114,16 @@ export default function WelcomeText(props) {
                   exit: exitTime,
                 }}
                 onEntered={() => setTimeout(() => setTrigger(false), duration)}
-                onExited={() => setBlurb(blurb + 1)}
+                onExited={() => {
+                  console.log(blurb)
+                  console.log(blurbs.length)
+                  if (blurb + 1 === blurbs.length) {
+                    console.log("here")
+                    props.setCurrentPage(2);
+                  } else {
+                    setBlurb(blurb + 1);
+                  }
+                }}
                 in={blurb === blurbNumber && trigger}
                 appear={blurbNumber === 0}
                 unmountOnExit
