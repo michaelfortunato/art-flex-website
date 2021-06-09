@@ -5,7 +5,7 @@ import styled from "styled-components";
 import Grid from "@material-ui/core/Grid";
 import styles from "@styles/WelcomeText.module.css";
 import Gridline from "@components/Gridline";
-import theme from "@components/theme";
+import theme from "theme";
 const blurbs = [
   {
     text: "Welcome.",
@@ -84,7 +84,7 @@ const AnimationContainer = styled.div`
 export default function WelcomeText(props) {
   const [blurb, setBlurb] = useState(0);
 
-  const animationDuration = 800;
+  const animationDuration = 600;
   return (
     <div>
       <Grid container className={styles.container}>
@@ -122,17 +122,6 @@ export default function WelcomeText(props) {
                 >
                   <div style={{ "position" : "absolute", "text-align": "center", width: "100%" }}>
                     <Typography variant="h1">{text}</Typography>
-                    {blurbNumber === 0 && (
-                      <Gridline
-                        backgroundColor={theme.palette.primary.main}
-                        isRow={true}
-                        duration={1000}
-                        delay={1000}
-                        fixedPos={0}
-                        floatingPos={40}
-                        isDot={true}
-                      />
-                    )}
                   </div>
                 </AnimationContainer>
               </CSSTransition>

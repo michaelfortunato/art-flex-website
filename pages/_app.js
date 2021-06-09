@@ -1,20 +1,28 @@
 import "../styles/globals.css";
 import Head from "next/head";
-import theme from "@components/theme";
+import theme from "theme";
 
-import { ApolloClient, InMemoryCache } from '@apollo/client/core';
+import { ApolloClient, InMemoryCache } from "@apollo/client/core";
 import { ApolloProvider } from "@apollo/client/react";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
 import { ThemeProvider } from "styled-components";
-import { StylesProvider } from '@material-ui/core/styles'
-const GQL_URI = 'https://rickandmortyapi.com/graphql';
+import { StylesProvider } from "@material-ui/core/styles";
+import { useEffect } from "react";
+const GQL_URI = "https://rickandmortyapi.com/graphql";
 
-const client = new ApolloClient( {
-    uri: GQL_URI, 
-    cache: new InMemoryCache()
-})
+const client = new ApolloClient({
+  uri: GQL_URI,
+  cache: new InMemoryCache(),
+});
 
 function MyApp({ Component, pageProps }) {
+  useEffect(() => {
+    // Remove the server-side injected CSS.
+    const jssStyles = document.querySelector("#jss-server-side");
+    if (jssStyles) {
+      jssStyles.parentElement.removeChild(jssStyles);
+    }
+  }, []);
   return (
     <div>
       <Head>
@@ -31,7 +39,7 @@ function MyApp({ Component, pageProps }) {
                   <Component {...pageProps} />
                 </ThemeProvider>
               </MuiThemeProvider>
-              </StylesProvider>
+            </StylesProvider>
           </ApolloProvider>
         </div>
       </main>
