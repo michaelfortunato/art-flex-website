@@ -7,7 +7,9 @@ import styled from "styled-components";
 import WelcomeStart from "@components/Welcome/WelcomeStart";
 import WelcomeText from "@components/Welcome/WelcomeText"
 import SignUp from '@components/SignIn/SignUp'
+
 const AnimationContainer = styled.div`
+  overflow: hidden;
   &.fadeIn-appear {
     opacity: 0;
   }
@@ -48,6 +50,7 @@ export default function WelcomePage() {
   const [entered, setEntered] = useState(false)
 
   return (
+    <div className={styles.root}>
     <div className={styles.WelcomePage}>
       {pages.map(({ number, pageName, Component }) => 
         <CSSTransition
@@ -63,6 +66,7 @@ export default function WelcomePage() {
           </AnimationContainer>
         </CSSTransition>
       )}
+    </div>
     </div>
   );
 }

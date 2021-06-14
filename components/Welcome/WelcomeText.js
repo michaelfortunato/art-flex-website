@@ -6,20 +6,35 @@ import Grid from "@material-ui/core/Grid";
 import styles from "@styles/WelcomeText.module.css";
 import Gridline from "@components/Gridline";
 import theme from "theme";
-
+import Lottie from "lottie-react";
+import BrushStroke from "@components/Welcome/BrushStroke"
+import Stroke1 from '/public/animationData.json'
+import Stroke2 from '/public/Page2.json'
+import React from "react";
+import { Brush } from "@material-ui/icons";
 const animationDuration = 2000;
 const blurbs = [
   {
     text: "Welcome.",
-    enterTime: 2000 || animationDuration,
+    enterTime: 1000 || animationDuration,
     exitTime: 1200 || animationDuration,
-    duration: 2000,
+    duration: 1200,
+    left: 39,
+    top: 30,
+    height: 600,
+    width: 800,
+    animationData: Stroke1
   },
   {
     text: "Art Flex is an online store for art, made with artists in mind. Thank you for considering us and our mission. ",
     enterTime: 2000 || animationDuration,
     exitTime: 1200 || animationDuration,
-    duration: 4000,
+    duration: 800000,
+    left: 15,
+    top: 0,
+    height: 2000,
+    width: 2000,
+    animationData: Stroke2
   },
   {
     text:
@@ -28,13 +43,13 @@ const blurbs = [
       "We want to change that.",
     enterTime: 2000 || animationDuration,
     exitTime: 1200 || animationDuration,
-    duration: 4000,
+    duration: 8000,
   },
   {
     text: "We want to democratize how artists find their fans, and how people discover art. ",
     enterTime: 2000 || animationDuration,
     exitTime: 1200 || animationDuration,
-    duration: 4000,
+    duration: 8000,
   },
   {
     text:
@@ -42,7 +57,7 @@ const blurbs = [
       "We are putting the artist first, with the goal of connecting you to as many buyers as possible, and to growing your popularity through the power of the internet. ",
     enterTime: 2000 || animationDuration,
     exitTime: 1200 || animationDuration,
-    duration: 4000,
+    duration: 8000,
   },
   {
     text:
@@ -51,12 +66,10 @@ const blurbs = [
       "Thank you.",
     enterTime: 2000 || animationDuration,
     exitTime: 1200 || animationDuration,
-    duration: 4000,
+    duration: 8000,
   },
 ];
 const AnimationContainer = styled.div`
-  position: absolute;
-  width: 100%;
   &.fadeIn-appear {
     opacity: 0;
   }
@@ -97,59 +110,68 @@ export default function WelcomeText(props) {
   const [blurb, setBlurb] = useState(0);
   const [trigger, setTrigger] = useState(true);
   useEffect(() => setTrigger(true), [blurb]);
+
+  const paintBrushRefs = blurbs.map(() => React.createRef(null));
+
+  function onEntered(i, duration) {
+    paintBrushRefs[i].current.play()
+    setTimeout(() => setTrigger(false), duration)
+  }
+
+
   const animationDuration = 2000;
   return (
-    <div>
-      <Grid container className={styles.container}>
-        <Grid item xs={12} />
-        <Grid item xs={12} style={{ position: "relative" }}>
-          {blurbs.map(
-            ({ text, enterTime, exitTime, duration }, blurbNumber) => (
-              <CSSTransition
-                key={blurbNumber}
-                classNames="fadeIn"
-                timeout={{
-                  appear: enterTime,
-                  enter: enterTime,
-                  exit: exitTime,
-                }}
-                onEntered={() => setTimeout(() => setTrigger(false), duration)}
-                onExited={() => {
-                  console.log(blurb)
-                  console.log(blurbs.length)
-                  if (blurb + 1 === blurbs.length) {
-                    console.log("here")
-                    props.setCurrentPage(2);
-                  } else {
-                    setBlurb(blurb + 1);
-                  }
-                }}
-                in={blurb === blurbNumber && trigger}
-                appear={blurbNumber === 0}
-                unmountOnExit
+    <Grid container className={styles.container}>
+      <Grid item xs={12} />
+      <Grid item xs={12}>
+        {blurbs.map(
+          ({ text, enterTime, exitTime, duration, animationData, left, top, height, width }, blurbNumber) => (
+            <CSSTransition
+              key={blurbNumber}
+              classNames="fadeIn"
+              timeout={{
+                appear: enterTime,
+                enter: enterTime,
+                exit: exitTime,
+              }}
+              onEntered={() => onEntered(blurbNumber, duration)}
+              onExited={() => {
+                if (blurb + 1 === blurbs.length) {
+                  props.setCurrentPage(2);
+                } else {
+                  setBlurb(blurb + 1);
+                }
+              }}
+              in={blurb === blurbNumber && trigger}
+              appear={blurbNumber === 0}
+              unmountOnExit
+            >
+              <AnimationContainer
+                enterTime={enterTime}
+                enterDelay={0}
+                exitTime={exitTime}
+                exitDelay={0}
               >
-                <AnimationContainer
-                  enterTime={enterTime}
-                  enterDelay={0}
-                  exitTime={exitTime}
-                  exitDelay={0}
+                <div
+                  style={{
+                    "text-align": "center",
+                  }}
                 >
-                  <div
-                    style={{
-                      position: "absolute",
-                      "text-align": "center",
-                      width: "100%",
-                    }}
-                  >
-                    <Typography variant="h1">{text}</Typography>
-                  </div>
-                </AnimationContainer>
-              </CSSTransition>
-            )
-          )}
-        </Grid>
-        <Grid item xs={12} />
+                  <Typography variant="h1">{text}</Typography>
+                </div>
+                <BrushStroke animationData={animationData}
+                  lottieRef={paintBrushRefs[blurbNumber]}
+                  left={left}
+                  top={top}
+                  height={height}
+                  width={width}
+                />
+              </AnimationContainer>
+            </CSSTransition>
+          )
+        )}
       </Grid>
-    </div>
+      <Grid item xs={12} />
+    </Grid>
   );
 }

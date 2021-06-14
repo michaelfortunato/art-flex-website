@@ -4,7 +4,8 @@ import ProgressBar from "@components/ProgressBar";
 import { useState, useEffect } from "react";
 import Gridline from '@components/Gridline';
 import { useTheme } from '@material-ui/core';
-
+import Lottie from 'lottie-react'
+import animationData from '/public/animationData.json'
 
 
 export default function WelcomeStart(props) {
@@ -14,14 +15,6 @@ export default function WelcomeStart(props) {
     return (
         <div>
           <img src={"MainLogo.svg"} className={styles.logo} />
-          <Gridline 
-            isRow = {true}
-            fixedPos = {80}
-            floatingPos = {50}
-            duration = {1000}
-            delay = {500}
-            backgroundColor = {theme.palette.primary.main}
-            />
           <div className={styles.progressBar}>
           </div>
         </div>
