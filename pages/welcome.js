@@ -47,8 +47,13 @@ export default function WelcomePage() {
   const [isProgressBarDone, setIsProgressBarDone] = useState(false);
   const [componentIsDone, setComponentIsDone] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [trigger, setTrigger] = useState(true);
   const [entered, setEntered] = useState(false)
 
+   useEffect(()=> {
+     console.log("I gotcalled")
+     setTrigger(false)
+   }, [currentPage])
   return (
     <div className={styles.root}>
     <div className={styles.WelcomePage}>
@@ -58,7 +63,8 @@ export default function WelcomePage() {
           classNames="fadeIn"
           timeout={700}
           appear={number == 0}
-          in={currentPage == number}
+          in={currentPage == number && (trigger || number === 0)}
+          onExited = {() => setTrigger(true)}
           unmountOnExit
         >
           <AnimationContainer>

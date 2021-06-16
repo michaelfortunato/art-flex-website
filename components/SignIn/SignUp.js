@@ -113,7 +113,7 @@ export default function SignUp(props) {
                     </Grid>
                     <Grid style={{ 'margin-top': '10px' }} item xs={12}>
                         <ButtonBase className={styles.create_account_button} style = {{'background-color':theme.palette.primary.main}}>
-                        <Typography variant='h5' style={{ 'color': 'white' }}>Finalize your sign up</Typography>
+                        <Typography  style={{ "font-size":"22px" ,'color': 'white' }}>Finalize your sign up</Typography>
                         </ButtonBase>
                     </Grid>
                 </Grid>
