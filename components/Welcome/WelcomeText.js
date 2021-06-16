@@ -11,7 +11,7 @@ import BrushStroke from "@components/Welcome/BrushStroke"
 import animationPage1 from '/public/Welcome-Page1.json'
 import animationPage2 from '/public/Welcome-Page2.json'
 import animationPage3 from '/public/Welcome-Page3.json'
-import animationPage4 from '/public/Welcome-Page4.json'
+import animationPage4 from '/public/Welcome-Page42.json'
 import React from "react";
 
 
@@ -35,7 +35,7 @@ const blurbs = [
     text: "Art Flex is an online store for art, made with artists in mind. Thank you for considering us and our mission. ",
     enterTime: 1000 || animationDuration,
     exitTime: 1200 || animationDuration,
-    duration: 2000,
+    duration: 3000,
     left: 12,
     top: 0,
     height: 75,
@@ -49,7 +49,7 @@ const blurbs = [
       "We want to change that.",
     enterTime: 1000 || animationDuration,
     exitTime: 1000 || animationDuration,
-    duration: 2500,
+    duration: 4000,
     animationData: animationPage3,
     left: 0,
     top: 0,
@@ -69,7 +69,7 @@ const blurbs = [
       "Thank you.",
     enterTime: 800 || animationDuration,
     exitTime: 1000 || animationDuration,
-    duration: 2700,
+    duration: 3000,
     animationData: animationPage4,
     left: -7,
     top: 20,
