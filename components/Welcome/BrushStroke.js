@@ -5,8 +5,8 @@ import styled from 'styled-components'
 const PaintBrushContainer = styled.div`
 	left: ${props => props.left}%;
 	top: ${props => props.top}%;
-	height: ${props => props.height}px;
-	width: ${props => props.width}px;
+	height: ${props => props.height}%;
+	width: ${props => props.width}%;
 	position: absolute;
 	z-index: -1;
 `

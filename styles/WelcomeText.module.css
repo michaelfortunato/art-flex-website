@@ -2,3 +2,13 @@
     height: 100vh;
     overflow: hidden;
 }
+
+.footer {
+    position: absolute;
+    left: 0%;
+    top: 85%;
+    width: 100%;
+}
+.dotsContainer {
+    text-align: center;
+}

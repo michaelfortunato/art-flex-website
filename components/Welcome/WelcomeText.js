@@ -6,67 +6,75 @@ import Grid from "@material-ui/core/Grid";
 import styles from "@styles/WelcomeText.module.css";
 import Gridline from "@components/Gridline";
 import theme from "theme";
-import Lottie from "lottie-react";
+import ProgressDots from '@components/Welcome/ProgressDots'
 import BrushStroke from "@components/Welcome/BrushStroke"
-import Stroke1 from '/public/animationData.json'
-import Stroke2 from '/public/Page2.json'
+import animationPage1 from '/public/Welcome-Page1.json'
+import animationPage2 from '/public/Welcome-Page2.json'
+import animationPage3 from '/public/Welcome-Page3.json'
+import animationPage4 from '/public/Welcome-Page4.json'
 import React from "react";
+
+
+
+
 import { Brush } from "@material-ui/icons";
 const animationDuration = 2000;
 const blurbs = [
   {
     text: "Welcome.",
     enterTime: 1000 || animationDuration,
-    exitTime: 1200 || animationDuration,
-    duration: 1200,
-    left: 39,
-    top: 30,
-    height: 600,
-    width: 800,
-    animationData: Stroke1
+    exitTime: 1000 || animationDuration,
+    duration: 1000,
+    left: 28,
+    top: 18,
+    height: 50,
+    width: 50,
+    animationData: animationPage1
   },
   {
     text: "Art Flex is an online store for art, made with artists in mind. Thank you for considering us and our mission. ",
-    enterTime: 2000 || animationDuration,
+    enterTime: 1000 || animationDuration,
     exitTime: 1200 || animationDuration,
-    duration: 800000,
-    left: 15,
+    duration: 1600,
+    left: 12,
     top: 0,
-    height: 2000,
-    width: 2000,
-    animationData: Stroke2
+    height: 75,
+    width: 75,
+    animationData: animationPage2
   },
   {
     text:
       "It is too difficult for artists to generate consistent income from their works. " +
-      "Gallieries charge obscene commisions on sales, and they intimiate new buyers and artists alike." +
+      "Gallieries charge obscene commisions on sales. They intimiate new buyers and artists alike. " +
       "We want to change that.",
-    enterTime: 2000 || animationDuration,
-    exitTime: 1200 || animationDuration,
-    duration: 8000,
-  },
-  {
-    text: "We want to democratize how artists find their fans, and how people discover art. ",
-    enterTime: 2000 || animationDuration,
-    exitTime: 1200 || animationDuration,
-    duration: 8000,
-  },
-  {
-    text:
-      "Art Flex is an online store for art, and we want to do it right. " +
-      "We are putting the artist first, with the goal of connecting you to as many buyers as possible, and to growing your popularity through the power of the internet. ",
-    enterTime: 2000 || animationDuration,
-    exitTime: 1200 || animationDuration,
-    duration: 8000,
+    enterTime: 1000 || animationDuration,
+    exitTime: 1000 || animationDuration,
+    duration: 2200,
+    animationData: animationPage3,
+    left: 0,
+    top: 0,
+    height: 100,
+    width: 100
   },
   {
     text:
-      "We need your help to get this right, and we can use all the advice available. " +
+      "We are putting the artist first, with the goal of connecting you to as many buyers as possible through the power of the internet. ",
+    enterTime: 1000 || animationDuration,
+    exitTime: 1000 || animationDuration,
+    duration: 2000,
+  },
+  {
+    text:
       "Please consider signing up below to become a founding user. " +
       "Thank you.",
-    enterTime: 2000 || animationDuration,
-    exitTime: 1200 || animationDuration,
-    duration: 8000,
+    enterTime: 800 || animationDuration,
+    exitTime: 1000 || animationDuration,
+    duration: 2700,
+    animationData: animationPage4,
+    left: -7,
+    top: 20,
+    height: 100,
+    width: 100
   },
 ];
 const AnimationContainer = styled.div`
@@ -118,6 +126,13 @@ export default function WelcomeText(props) {
     setTimeout(() => setTrigger(false), duration)
   }
 
+  function onExited() {
+    if (blurb + 1 === blurbs.length) {
+      props.setCurrentPage(2);
+    } else {
+      setBlurb(blurb + 1);
+    }
+  }
 
   const animationDuration = 2000;
   return (
@@ -135,13 +150,7 @@ export default function WelcomeText(props) {
                 exit: exitTime,
               }}
               onEntered={() => onEntered(blurbNumber, duration)}
-              onExited={() => {
-                if (blurb + 1 === blurbs.length) {
-                  props.setCurrentPage(2);
-                } else {
-                  setBlurb(blurb + 1);
-                }
-              }}
+              onExited={onExited}
               in={blurb === blurbNumber && trigger}
               appear={blurbNumber === 0}
               unmountOnExit
@@ -172,6 +181,11 @@ export default function WelcomeText(props) {
         )}
       </Grid>
       <Grid item xs={12} />
+      <div className={styles.footer}>
+        <div className = {styles.dotsContainer}>
+        <ProgressDots currentDot={blurb} numDots={blurbs.length} />
+        </div>
+      </div>
     </Grid>
   );
 }
