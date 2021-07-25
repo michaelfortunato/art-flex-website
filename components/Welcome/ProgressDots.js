@@ -10,8 +10,8 @@ const Dot = styled.div`
 	display: inline-block;
 	border: 2px grey solid;
 	border-radius: 50%;
-	width: 20px;
-	height: 20px;
+	width: 15px;
+	height: 15px;
 	margin: 50px;
 
 	&.fill-dot-appear {
@@ -39,7 +39,6 @@ const Dot = styled.div`
 
 `
 export default function ProgressDots(props) {
-	const arr = [...Array(props.numDots)]
 	return (
 		<DotsContainer >
 			{[...Array(props.numDots)].map((_, ithDot) =>

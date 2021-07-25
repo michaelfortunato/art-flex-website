@@ -22,6 +22,7 @@ const animationDuration = 2000;
 const blurbs = [
   {
     text: "Welcome.",
+    size: "h2",
     enterTime: 1000 || animationDuration,
     exitTime: 1000 || animationDuration,
     duration: 1200,
@@ -33,9 +34,10 @@ const blurbs = [
   },
   {
     text: "Art Flex is an online store for art, made with artists in mind. Thank you for considering us and our mission. ",
+    size: "h5",
     enterTime: 1000 || animationDuration,
     exitTime: 1200 || animationDuration,
-    duration: 3000,
+    duration: 3000000,
     left: 12,
     top: 0,
     height: 75,
@@ -47,6 +49,7 @@ const blurbs = [
       "It is too difficult for artists to generate consistent income from their works. " +
       "Gallieries charge obscene commisions on sales. They intimiate new buyers and artists alike. " +
       "We want to change that.",
+    size: "h4",
     enterTime: 1000 || animationDuration,
     exitTime: 1000 || animationDuration,
     duration: 4000,
@@ -59,6 +62,7 @@ const blurbs = [
   {
     text:
       "We are putting the artist first, with the goal of connecting you to as many buyers as possible through the power of the internet. ",
+    size: "h4",
     enterTime: 1000 || animationDuration,
     exitTime: 1000 || animationDuration,
     duration: 2300,
@@ -67,6 +71,7 @@ const blurbs = [
     text:
       "Please consider signing up below to become a founding user. " +
       "Thank you.",
+    size: "h4",
     enterTime: 800 || animationDuration,
     exitTime: 1000 || animationDuration,
     duration: 3000,
@@ -122,7 +127,7 @@ export default function WelcomeText(props) {
   const paintBrushRefs = blurbs.map(() => React.createRef(null));
 
   function onEntered(i, duration) {
-    paintBrushRefs[i].current.play()
+    //paintBrushRefs[i].current.play()
     setTimeout(() => setTrigger(false), duration)
   }
 
@@ -136,11 +141,11 @@ export default function WelcomeText(props) {
 
   const animationDuration = 2000;
   return (
-    <Grid container className={styles.container}>
-      <Grid item xs={12} />
-      <Grid item xs={12}>
+    <div>
+    <Grid container justify = "center" className={styles.container}>
+      <Grid item xs={12} md = {8} sm = {10} style = {{"position": "relative", "top": "42%"}}>
         {blurbs.map(
-          ({ text, enterTime, exitTime, duration, animationData, left, top, height, width }, blurbNumber) => (
+          ({ text, enterTime, exitTime, duration, size, animationData, left, top, height, width }, blurbNumber) => (
             <CSSTransition
               key={blurbNumber}
               classNames="fadeIn"
@@ -166,26 +171,26 @@ export default function WelcomeText(props) {
                     "text-align": "center",
                   }}
                 >
-                  <Typography variant="h1">{text}</Typography>
+                  <Typography variant={size}>{text}</Typography>
                 </div>
-                <BrushStroke animationData={animationData}
+                { /*<BrushStroke animationData={animationData}
                   lottieRef={paintBrushRefs[blurbNumber]}
                   left={left}
                   top={top}
                   height={height}
                   width={width}
-                />
+                /> */ } 
               </AnimationContainer>
             </CSSTransition>
           )
         )}
       </Grid>
-      <Grid item xs={12} />
+      </Grid>
       <div className={styles.footer}>
         <div className = {styles.dotsContainer}>
         <ProgressDots currentDot={blurb} numDots={blurbs.length} />
         </div>
       </div>
-    </Grid>
+      </div>
   );
 }

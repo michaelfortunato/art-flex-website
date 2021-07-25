@@ -1,13 +1,11 @@
 .container {
-    height: 100vh;
-    overflow: hidden;
+    min-height: 85vh;
+    height: 85vh;
 }
 
 .footer {
-    position: absolute;
+    position: relative;
     left: 0%;
-    top: 85%;
-    width: 100%;
 }
 .dotsContainer {
     text-align: center;

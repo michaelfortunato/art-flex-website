@@ -4,7 +4,7 @@ import theme from "theme";
 
 import { ApolloClient, InMemoryCache } from "@apollo/client/core";
 import { ApolloProvider } from "@apollo/client/react";
-import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
+import { ThemeProvider as MuiThemeProvider, responsiveFontSizes } from "@material-ui/core/styles";
 import { ThemeProvider } from "styled-components";
 import { StylesProvider } from "@material-ui/core/styles";
 import { useEffect } from "react";
@@ -16,6 +16,8 @@ const client = new ApolloClient({
 });
 
 function MyApp({ Component, pageProps }) {
+  theme = responsiveFontSizes(theme);
+
   useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector("#jss-server-side");
