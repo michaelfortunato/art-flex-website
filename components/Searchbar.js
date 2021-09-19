@@ -7,7 +7,7 @@ import styles from '@styles/Searchbar.module.css'
 export default function Searchbar() {
     return (
         <div>
-            <Paper className = {styles.SearchBox}>
+            <Paper elevation = {0} className = {styles.SearchBox}>
                 <InputBase className = {styles.InputBase} startAdornment = {
                     <IconButton className = {styles.IconButton} type='submit'>
                         <SearchIcon />

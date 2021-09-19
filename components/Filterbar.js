@@ -67,7 +67,6 @@ const genres = [
 
 
 export default function Filterbar(props) {
-    console.log(styles.Filterbar)
     return (
     <div className = {styles.Filterbar}> 
         <TextField

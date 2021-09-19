@@ -148,13 +148,13 @@ export default function SignUp(props) {
       <Grid
         container
         item
-        lg = {6}
+        lg = {4}
         xs={12}
         justify="center"
         spacing={5}
         className={styles.sign_up_body}
       >
-        <Grid item xs={12}>
+        <Grid item xs={12} md = {8}>
           <Typography
             style={{ "margin-top": "-5px", color: "black" }}
             variant="h4"
@@ -166,6 +166,7 @@ export default function SignUp(props) {
           className={styles.field_container}
           item
           xs={12}
+          md = {8}
           style={{ "margin-top": "0px" }}
         >
           <TextField
@@ -176,7 +177,7 @@ export default function SignUp(props) {
             onChange={(event) => setName(event.target.value)}
           />
         </Grid>
-        <Grid className={styles.field_container} item xs={12}>
+        <Grid className={styles.field_container} item xs={12} md = {8}>
           <TextField
             fullWidth
             variant="outlined"
@@ -185,23 +186,23 @@ export default function SignUp(props) {
             onChange={(event) => handleEmail(event.target.value)}
           />
         </Grid>
-        <Grid className={styles.field_container} item xs={12}>
+        <Grid className={styles.field_container} item xs={12} md = {8}>
           <PasswordField
             label="Password"
             password={password}
             setPassword={() => setPassword(event.target.value)}
           />
         </Grid>
-        <Grid container item xs={12} spacing={2}>
+        <Grid container item xs={12} spacing={2} md = {8}>
           {ValidationStatuses.map(
             ({ Component, stateKey, text }, ithValCheck) => (
-              <Grid key={ithValCheck} item xs={12}>
+              <Grid key={ithValCheck} item xs={12}  >
                 <Component isValid={validationStates[stateKey]} text={text} />
               </Grid>
             )
           )}
         </Grid>
-        <Grid style={{ "margin-top": "10px" }} item lg = {4} md = {8} xs={12}>
+        <Grid style={{ "margin-top": "10px" }} item lg = {8} md = {8} xs={12}>
           <ButtonBase
             className={styles.create_account_button}
             style={{ backgroundColor: theme.palette.primary.main }}

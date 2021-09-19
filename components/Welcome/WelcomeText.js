@@ -37,7 +37,7 @@ const blurbs = [
     size: "h5",
     enterTime: 1000 || animationDuration,
     exitTime: 1200 || animationDuration,
-    duration: 3000000,
+    duration: 3000,
     left: 12,
     top: 0,
     height: 75,

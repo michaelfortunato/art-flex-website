@@ -22,7 +22,6 @@ export default function SignIn() {
     // 3. Open sign in 
     // 4. clos sign in, you should see a flicker. moving useMediaQuery up to the parent component of backdrop fixes it. 
     const mddown = useMediaQuery(theme => theme.breakpoints.down("md"));
-    console.log(mddown)
     return (
            <React.Fragment> 
             <Button className={styles.SignInButton} onClick={() => setOpen(true)}> 

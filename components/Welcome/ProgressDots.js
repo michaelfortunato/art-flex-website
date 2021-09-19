@@ -14,6 +14,9 @@ const Dot = styled.div`
 	height: 15px;
 	margin: 50px;
 
+	margin-left: 5%;
+	margin-right: 5%;
+
 	&.fill-dot-appear {
 		background-color: ""
 	}

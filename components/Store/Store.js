@@ -11,28 +11,30 @@ export default function Store() {
     const [sizeFilter, setSizeFilter] = useState('');
     const [genreFilter, setGenreFilter] = useState('');
     const filter = {
-            "fil": {
-                "gender": priceFilter,
-                "status": sizeFilter,
-                "name": genreFilter
-            }
-        };
+        "fil": {
+            "gender": priceFilter,
+            "status": sizeFilter,
+            "name": genreFilter
+        }
+    };
 
     return (
         <Grid container spacing={8}>
-            <Grid item xs = {12}>
-            <Filter priceFilter={priceFilter}
-                setPriceFilter={setPriceFilter}
-                sizeFilter={sizeFilter}
-                setSizeFilter={setSizeFilter}
-                genreFilter={genreFilter}
-                setGenreFilter={setGenreFilter}
-            />
+            <Grid item xs={12}>
+                <Filter priceFilter={priceFilter}
+                    setPriceFilter={setPriceFilter}
+                    sizeFilter={sizeFilter}
+                    setSizeFilter={setSizeFilter}
+                    genreFilter={genreFilter}
+                    setGenreFilter={setGenreFilter}
+                />
             </Grid>
-            <Grid item xs = {12}>
-            <Divider />
+            <Grid item xs={12}>
+                <Divider />
             </Grid>
-            <StoreBody variables={filter} />
+            <Grid item container xs={12} spacing={3} justifyContent="center">
+                <StoreBody pageNumber={0} variables={filter} />
+            </Grid>
         </Grid>
     );
 }

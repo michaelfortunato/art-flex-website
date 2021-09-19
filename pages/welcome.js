@@ -6,6 +6,7 @@ import { CSSTransition } from "react-transition-group";
 import styled from "styled-components";
 import WelcomeStart from "@components/Welcome/WelcomeStart";
 import WelcomeText from "@components/Welcome/WelcomeText"
+import WelcomeSignUp from "@components/Welcome/WelcomeSignUp"
 import SignUp from '@components/SignIn/SignUp'
 
 const AnimationContainer = styled.div`
@@ -36,10 +37,16 @@ const AnimationContainer = styled.div`
   }
 `;
 
+const StyledWelcomeSignUp = props => (
+  <div style = {{position: "relative", "top": "50%"}}>
+    <WelcomeSignUp />
+  </div>
+);
+
 const pages = [
   { number: 0, pageName: "WelcomeStart", Component: WelcomeStart },
   { number: 1, pageName: "WelcomeText", Component: WelcomeText},
-  {number: 2, pageName: "SignUpForm", Component: SignUp}
+  {number: 2, pageName: "SignUpForm", Component: StyledWelcomeSignUp}
 ];
 
 export default function WelcomePage() {

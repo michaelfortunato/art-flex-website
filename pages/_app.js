@@ -8,6 +8,7 @@ import { ThemeProvider as MuiThemeProvider, responsiveFontSizes } from "@materia
 import { ThemeProvider } from "styled-components";
 import { StylesProvider } from "@material-ui/core/styles";
 import { useEffect } from "react";
+import { SWRConfig } from "swr";
 const GQL_URI = "https://rickandmortyapi.com/graphql";
 
 const client = new ApolloClient({
@@ -35,6 +36,9 @@ function MyApp({ Component, pageProps }) {
       <main>
         <div>
           <ApolloProvider client={client}>
+            <SWRConfig value = {{
+              fetcher: (url) => fetch(url).then(res => res.json())
+            }}>
             <StylesProvider injectFirst>
               <MuiThemeProvider theme={theme}>
                 <ThemeProvider theme={theme}>
@@ -42,6 +46,7 @@ function MyApp({ Component, pageProps }) {
                 </ThemeProvider>
               </MuiThemeProvider>
             </StylesProvider>
+            </SWRConfig>
           </ApolloProvider>
         </div>
       </main>

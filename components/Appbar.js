@@ -7,10 +7,10 @@ import Navigation from '@components/Navigation'
 export default function Appbar() {
     return (
         <div className = {styles.Appbar}>
-            <Grid container justify = 'center'alignItems = 'center' spacing = {0}>
+            <Grid container justifyContent = 'center'alignItems = 'center' spacing = {0}>
                 <Grid item xs md = {2}>
                     <div className = {styles.logo}>
-                        <Typography variant='h1'>AR</Typography>
+                        <Typography variant='h1'>AF</Typography>
                     </div>
                 </Grid>
                 <Hidden smDown>
