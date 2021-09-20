@@ -42,7 +42,7 @@ export default function Store() {
             <Grid item container xs={12} spacing={4} justifyContent="center">
                 {pages.map((page) => <StoreBody key = {page} pageNumber={page} variables={filter} /> )}
             </Grid>
-            <div ref ={bottomPageRef}>Hello</div>
+            <div style = {{opacity:0}} ref ={bottomPageRef}>[Bottom]</div>
         </Grid>
     );
 }
