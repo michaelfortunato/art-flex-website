@@ -15,6 +15,20 @@ const theme = createTheme(
                 main: '#fb8c00',
             },
         },
+        tag : {
+            period: {
+                backgroundColor: '#673ab7',
+                textColor: "white"
+            }, 
+            social: {
+                backgroundColor: '#ffea00',
+                textColor: "white"
+            }, 
+            prominence: {
+                backgroundColor: '#73a3f0',
+                textColor: "white"
+            }
+        }
     }
 );
 

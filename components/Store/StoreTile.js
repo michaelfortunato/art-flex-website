@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from '@styles/StoreTile.module.css'
-import styled from 'styled-components'
+import styled, { useTheme } from 'styled-components'
 import { Paper, Grid, Button, Typography, Divider } from '@material-ui/core'
 import Image from 'next/image';
 const StyledTile = styled(Paper)`
@@ -12,25 +12,70 @@ const StyledTile = styled(Paper)`
     margin: 20;
 
 `
-
-const API_KEY = "sb70i2aruc7yxu95r05fnpoh"
+const Tag = styled.span`
+    display: inline-block;
+    margin: 4px;
+    margin-left: ${props => props.index === 0 ? 0 : 4}px;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 20px;
+    opacity: .8;
+    background-color: ${(props) => props.theme.tag[props.variant].backgroundColor};
+    color: ${(props) => props.theme.tag[props.variant].textColor};
+`
 const imageBaseURL = "https://www.artic.edu/iiif/2"
 export default function StoreTile(props) {
     return (
         <StyledTile square elevation={4}>
             <div>
-                <Image
-                    width={props.image_size.width}
-                    height={props.image_size.height}
-                    src={`${imageBaseURL}/${props.image_url}/full/843,/0/default.jpg`} />
-                <Divider style={{ height: 1, marginTop: 10, marginBottom: 10 }} />
-                <Typography variant='h5'>
-                    {props.artist_name}
-                </Typography>
-                <div style={{ maxHeight: 200, maxWidth: props.image_size.width, overflowY:'scroll'}}>
-                    <Typography variant="body1">
-                        {props.description}
+                <div style={{ textAlign: "center" }}>
+                    <Image
+                        width={props.image_size.width}
+                        height={props.image_size.height}
+                        src={`${imageBaseURL}/${props.image_url}/full/843,/0/default.jpg`} />
+                </div>
+
+                <div style={{ maxWidth: props.image_size.width + 50 }}>
+                    <Divider style={{ height: 1, marginTop: 10, marginBottom: 10 }} />
+                    <div>
+                        <Typography variant='h5'>
+                            {props.artist_name}
+                        </Typography>
+                    </div>
+                    <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+                        <Typography variant="body1">
+                            {props.description}
+                        </Typography>
+                    </div>
+                </div>
+                <div style={{ maxWidth: props.image_size.width + 75, marginTop: '10px' }}>
+                    {props.tags.map((tag, index) => {
+                        return <Tag index={index} variant={{
+                            0: "period",
+                            1: "social",
+                            2: "prominence",
+                            3: "prominence",
+                        }[index] || "period"
+                        }>{tag}</Tag>
+                    })}
+                </div>
+                <div style={{ maxWidth: props.image_size.width + 75, marginTop: '10px' }}>
+                    <Typography variant='subtitle1'>
+                        <i>
+                            {props.artwork_name}
+                        </i>
                     </Typography>
+                </div>
+                <div style={{ maxWidth: props.image_size.width + 75, marginTop: '10px' }}>
+                    {props.rental_pricing.map(({ price, period }) => {
+                        return <Button style={{ marginRight: 10, marginBottom: 10 }}
+                            variant="contained" color="secondary">
+                            {`Rent for $${price} per ${period}`}</Button>
+                    })}
+                    <Button style={{ marginRight: 10, marginBottom: 10 }}
+                        variant="contained" color="primary">
+                        {`Buy for $${props.buy_price}`}</Button>
                 </div>
             </div>
         </StyledTile>
