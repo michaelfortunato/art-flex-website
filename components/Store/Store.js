@@ -8,7 +8,7 @@ import {useInView} from 'react-intersection-observer';
 
 let counter = 0;
 export default function Store() {
-    const [pages, setPages] = useState([0])
+    const [pages, setPages] = useState([20])
     const [priceFilter, setPriceFilter] = useState('');
     const [sizeFilter, setSizeFilter] = useState('');
     const [genreFilter, setGenreFilter] = useState('');
