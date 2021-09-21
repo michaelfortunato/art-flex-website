@@ -26,23 +26,11 @@ export default function Store() {
     };
 
     return (
-        <Grid container spacing={8}>
-            <Grid item xs={12}>
-                <Filter priceFilter={priceFilter}
-                    setPriceFilter={setPriceFilter}
-                    sizeFilter={sizeFilter}
-                    setSizeFilter={setSizeFilter}
-                    genreFilter={genreFilter}
-                    setGenreFilter={setGenreFilter}
-                />
-            </Grid>
-            <Grid item xs={12}>
-                <Divider />
-            </Grid>
-            <Grid item container xs={12} spacing={4} justifyContent="center">
+        <div>
+            <Grid container spacing={6} justifyContent="center">
                 {pages.map((page) => <StoreBody key = {page} pageNumber={page} variables={filter} /> )}
             </Grid>
             <div style = {{opacity:0}} ref ={bottomPageRef}>[Bottom]</div>
-        </Grid>
+        </div>
     );
 }

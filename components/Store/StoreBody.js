@@ -23,7 +23,7 @@ export default function StoreBody(props) {
         style_titles: tags,
         image_id: image_url
     }, index) =>
-        <Grid key={artwork_id} item>
+        <Grid key={index} item>
             <StoreTile artwork_id={artwork_id}
                 artwork_name={artwork_name}
                 artist_id={artist_id}

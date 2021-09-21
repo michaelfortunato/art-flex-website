@@ -51,7 +51,7 @@ export default function StoreTile(props) {
                 </div>
                 <div style={{ maxWidth: props.image_size.width + 75, marginTop: '10px' }}>
                     {props.tags.map((tag, index) => {
-                        return <Tag index={index} variant={{
+                        return <Tag key = {index} index={index} variant={{
                             0: "period",
                             1: "social",
                             2: "prominence",
@@ -68,8 +68,8 @@ export default function StoreTile(props) {
                     </Typography>
                 </div>
                 <div style={{ maxWidth: props.image_size.width + 75, marginTop: '10px' }}>
-                    {props.rental_pricing.map(({ price, period }) => {
-                        return <Button style={{ marginRight: 10, marginBottom: 10 }}
+                    {props.rental_pricing.map(({ price, period }, index) => {
+                        return <Button key = {index} style={{ marginRight: 10, marginBottom: 10 }}
                             variant="contained" color="secondary">
                             {`Rent for $${price} per ${period}`}</Button>
                     })}
