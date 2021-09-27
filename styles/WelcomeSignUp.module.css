@@ -9,7 +9,11 @@
   padding: 0;
   margin: 0;
 }
-
+.root_container {
+  /* add a margin top to get the sign up form more centered
+  */
+  padding-top: 3.5rem;
+}
 .divider {
   margin-top: -40px;
 }
@@ -19,13 +23,22 @@
 }
 
 .sign_up_body {
+  margin: 0px;
   border-radius: 6px;
-  border: 1px solid #eaecef;
-  background-color: #f6f8fa;
-  padding: 20px;
-  padding-top: 10px;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-top: 24px;
+  padding-bottom: 24px;
 }
-
+.title_container {
+  /*
+    Note that marginTop applies to any spacing prop
+    I give to the material UI grid container
+  */
+  margin-top: .5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
 .field_container {
   text-align: center;
 }
@@ -41,7 +54,6 @@
   padding: 20px;
   width: 100%;
   border-radius: 6px;
-  background-color: #3b537a;
 }
 
 .back_button_container {

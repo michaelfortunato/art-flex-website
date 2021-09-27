@@ -1,14 +1,22 @@
 .root {
-  height: 100vh;
-  width: 100vw;
-}
-.WelcomePage {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 1870px;
-  min-height: 100%;
   overflow-x: hidden;
 }
+.WelcomePage {
+}
+
+.header {
+  text-align: center;
+  width: 100%;
+  margin-bottom: 20px;
+  padding-top: .75rem; 
+}
+
+.mobileHeader {
+  text-align: center;
+  height:10%;
+  width:100%;
+}
+
 .content {
   height: 100%;
 }
@@ -16,10 +24,8 @@
   text-align: center;
 }
 .logo {
-  height: 90vh;
-  left: calc((100vw - 90vh)/2);
-  top:calc((100vh - 90vh)/2  2.5vh);
-  position: absolute;
+  height: 80px;
+  cursor: pointer;
 }
 .progressBar {
   position: absolute;
@@ -28,7 +34,14 @@
   left: calc((100vw - 60vh)/2);
 }
 
+.footer {
+  width: 100%;
+}
 
-
-
+.footer_sign_up_page {
+  position: relative;
+}
+.dotsContainer {
+    text-align: center;
+}
 

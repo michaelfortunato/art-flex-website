@@ -4,11 +4,12 @@ export default function TextSection() {
 	return (
                   <div
                     style={{
+                      position: "absolute",
                       "text-align": "center",
                       width: "100%",
                     }}
                   >
-                    <Typography variant="h2">{props.text}</Typography>
+                    <Typography variant="h1">{props.text}</Typography>
                   {artComponent}
                   </div>
 	)

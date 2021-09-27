@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
 import addrs from "email-addresses";
 import styled from "styled-components";
-import { useTheme, makeStyles } from "@material-ui/core/styles";
+import Paper from "@material-ui/core/Paper";
+import { useTheme, makeStyles, withStyles } from "@material-ui/core/styles";
+import GoogleLogin from "react-google-login";
+import Typography from "@material-ui/core/Typography";
+import Divider from "@material-ui/core/Divider";
+import axios from "axios";
 import {
   ButtonBase,
   Grid,
   TextField,
-  Typography,
-  Link,
-  FormControl,
-  InputLabel,
-  Input,
-  Divider,
   InputAdornment,
   IconButton,
 } from "@material-ui/core";
@@ -24,7 +23,19 @@ import {
 } from "@material-ui/icons";
 import styles from "@styles/WelcomeSignUp.module.css";
 
+const validHelperText = (validEntry) =>
+  makeStyles({
+    root: {
+      color: `${validEntry ? "green" : null}`,
+    },
+    contained: {
+      marginLeft: "1px",
+    },
+  });
+
 const PasswordField = (props) => {
+  const helperTextClasses = validHelperText(props.validPassword)();
+
   const [showPassword, setShowPassword] = useState(false);
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -34,11 +45,12 @@ const PasswordField = (props) => {
     <TextField
       fullWidth
       variant="outlined"
+      FormHelperTextProps={{ classes: helperTextClasses }}
       label={props.label}
       error={props.error}
       helperText={props.helperText}
       type={showPassword ? "text" : "password"}
-      onChange={props.setPassword}
+      onChange={(event) => props.setPassword(event.target.value)}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
@@ -56,40 +68,6 @@ const PasswordField = (props) => {
   );
 };
 
-const ValidationStatus = (props) => (
-  <div>
-    {props.isValid ? (
-      <CheckIcon style={{ color: "green", verticalAlign: "middle" }} />
-    ) : (
-      <ClearIcon style={{ color: "red", verticalAlign: "middle" }} />
-    )}
-    <Typography
-      variant="body1"
-      style={{ display: "inline", marginLeft: "4px", verticalAlign: "middle" }}
-    >
-      {props.text}
-    </Typography>
-  </div>
-);
-const ValidationStatuses = [
-  { Component: ValidationStatus, stateKey: "validEmail", text: "Valid email" },
-  {
-    Component: ValidationStatus,
-    stateKey: "passwordLength",
-    text: "Password is at least 8 characters",
-  },
-  {
-    Component: ValidationStatus,
-    stateKey: "passwordUppercase",
-    text: "Password must contain at least one upper-case letter",
-  },
-  {
-    Component: ValidationStatus,
-    stateKey: "passwordNumber",
-    text: "Password must contain at least one number",
-  },
-];
-
 const checkPasswordLength = (password) => {
   return password.length >= 8;
 };
@@ -105,69 +83,142 @@ const checkPasswordNumber = (password) => {
   return pattern.test(password);
 };
 
+const SocialBanner = (props) => (
+  <Grid container item xs={12} justify="center">
+    <Grid container alignItems="center" item xs={5}>
+      <Grid item xs={12}>
+        <Divider />
+      </Grid>
+    </Grid>
+    <Grid style={{ textAlign: "center" }} item xs={1}>
+      <Typography style={{ color: "rgba(0, 0, 0, 0.54)" }} variant="overline">
+        Or
+      </Typography>
+    </Grid>
+    <Grid container alignItems="center" item xs={5}>
+      <Grid item xs={12}>
+        <Divider />
+      </Grid>
+    </Grid>
+  </Grid>
+);
+
+async function PostSignUp(name, email, password) {
+  try {
+    const rootURL = process.env.ROOT_API_URL || "https://api.art-flex.co";
+    const response = await axios.post(rootURL + "/signup/new", {
+      name: name,
+      email: email,
+      password: password,
+    });
+  } catch (error) {
+    if (error.response.status === 401) {
+    } else {
+    }
+  }
+}
+
 export default function SignUp(props) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const validEmail = email !== "";
+  const [validEmail, setValidEmail] = useState(false);
   const [passwordLength, setPasswordLength] = useState(false);
   const [passwordUppercase, setPasswordUppercase] = useState(false);
   const [passwordNumber, setPasswordNumber] = useState(false);
+
+  const [signUpFailed, setSignUpFailed] = useState({
+    status: false,
+    message: "",
+  });
+
+  const theme = useTheme();
+  const emailHelperTextClasses = validHelperText(validEmail)();
 
   const handleEmail = (email) => {
     try {
       const address = addrs.parseOneAddress(email);
       if (address === null) {
-        setEmail("");
+        setValidEmail(false);
+        setEmail(email);
       } else {
+        setValidEmail(true);
         setEmail(address.address);
       }
     } catch (ex) {
-      setEmail("");
+      setValidEmail(false);
+      setEmail(email);
     }
   };
+
+  const PostSignUp = async () => {
+    try {
+      const rootURL = process.env.ROOT_API_URL || "https://api.art-flex.co";
+      /*const response = await axios.post(rootURL + "/signup/new", {
+        name: name,
+        email: email,
+        password: password,
+      });
+      */
+      props.setCurrentPage(5);
+    } catch (error) {
+      console.log(error);
+      if (error.response.status === 401) {
+        setSignUpFailed({
+          status: true,
+          message: "Could not sign up. Email already registered to Art-Flex.",
+        });
+      } else {
+        setSignUpFailed({
+          status: true,
+          message: "Could not sign up. Website is undergong maintenence.",
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     setPasswordLength(checkPasswordLength(password));
     setPasswordUppercase(checkPasswordUppercase(password));
     setPasswordNumber(checkPasswordNumber(password));
   }, [password]);
 
-  // Useful to have this hash table for index over the ValidationStatuses array
-  const validationStates = {
-    validEmail: validEmail,
-    passwordLength: passwordLength,
-    passwordUppercase: passwordUppercase,
-    passwordNumber: passwordNumber,
-  };
+  useEffect(() => {
+    setSignUpFailed({
+      status: false,
+      message: "",
+    });
+  }, [name, email, password]);
 
-  const theme = useTheme();
+  const validSignUp =
+    name !== "" &&
+    validEmail &&
+    passwordLength &&
+    passwordUppercase &&
+    passwordNumber;
 
   return (
-    <Grid container justify="center">
+    <Grid className={styles.root_container} container justify="center">
       <Grid
+        component={Paper}
         container
         item
-        lg = {4}
+        lg={6}
         xs={12}
         justify="center"
-        spacing={5}
+        spacing={3}
         className={styles.sign_up_body}
       >
-        <Grid item xs={12} md = {8}>
-          <Typography
-            style={{ "margin-top": "-5px", color: "black" }}
-            variant="h4"
-          >
-            Create account
-          </Typography>
+        <Grid item xs={12} className={styles.title_container}>
+          <Typography variant="h5">Create your account</Typography>
         </Grid>
         <Grid
           className={styles.field_container}
           item
+          md={8}
           xs={12}
-          md = {8}
-          style={{ "margin-top": "0px" }}
+          style={{ marginTop: "0px" }}
         >
           <TextField
             fullWidth
@@ -177,40 +228,72 @@ export default function SignUp(props) {
             onChange={(event) => setName(event.target.value)}
           />
         </Grid>
-        <Grid className={styles.field_container} item xs={12} md = {8}>
+        <Grid className={styles.field_container} item md={8} xs={12}>
           <TextField
             fullWidth
             variant="outlined"
             label="Email"
+            error={email !== "" && validEmail === false}
+            helperText={
+              email !== "" && validEmail === false ? "Invalid email" : null
+            }
+            FormHelperTextProps={{ classes: emailHelperTextClasses }}
             InputProps={{ spellCheck: false }}
             onChange={(event) => handleEmail(event.target.value)}
           />
         </Grid>
-        <Grid className={styles.field_container} item xs={12} md = {8}>
+        <Grid className={styles.field_container} item md={8} xs={12}>
           <PasswordField
+            error={
+              password !== "" &&
+              (!passwordLength || !passwordUppercase || !passwordNumber)
+            }
+            validPassword={
+              password !== "" &&
+              passwordLength &&
+              passwordUppercase &&
+              passwordNumber
+            }
+            helperText="Password must be (8) characters or longer, contain one capital letter [A-Z], and one number [0-9]."
             label="Password"
             password={password}
-            setPassword={() => setPassword(event.target.value)}
+            setPassword={setPassword}
           />
         </Grid>
-        <Grid container item xs={12} spacing={2} md = {8}>
-          {ValidationStatuses.map(
-            ({ Component, stateKey, text }, ithValCheck) => (
-              <Grid key={ithValCheck} item xs={12}  >
-                <Component isValid={validationStates[stateKey]} text={text} />
-              </Grid>
-            )
-          )}
-        </Grid>
-        <Grid style={{ "margin-top": "10px" }} item lg = {8} md = {8} xs={12}>
+
+        <Grid item lg={6} md={8} xs={12}>
           <ButtonBase
+            onClick={PostSignUp}
             className={styles.create_account_button}
-            style={{ backgroundColor: theme.palette.primary.main }}
+            style={
+              validSignUp
+                ? { backgroundColor: theme.palette.primary.main }
+                : { backgroundColor: "rgba(0, 0, 0, 0.20)" }
+            }
+            disabled={!validSignUp}
           >
-            <Typography variant = "body1" style={{ fontSize: "1.5rem", color: "white" }}>
+            <Typography variant="button" style={{ color: "white" }}>
               Sign up
             </Typography>
           </ButtonBase>
+        </Grid>
+        {signUpFailed.status && (
+          <Grid item xs={12} className={styles.field_container}>
+            <Typography
+              style={{ color: theme.palette.error.main }}
+              variant="body1"
+            >
+              {signUpFailed.message}
+            </Typography>
+          </Grid>
+        )}
+        <SocialBanner />
+        <Grid container justify="center" item xs={12}>
+          <GoogleLogin
+            buttonText="Sign up with Google"
+            theme="dark"
+            uxMode="redirect"
+          />
         </Grid>
       </Grid>
     </Grid>
