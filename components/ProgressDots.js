@@ -1,61 +1,42 @@
-import React from 'react'
-import styled from 'styled-components'
-import { CSSTransition } from 'react-transition-group'
-
-
-const DotsContainer = styled.span`
-
-`
-const Dot = styled.div`
+import React from "react";
+import styled from "styled-components";
+import { CSSTransition } from "react-transition-group";
+import { Grid, useTheme } from "@material-ui/core";
+import { motion } from "framer-motion";
+const DotsContainer = styled(motion.span)``;
+const Dot = styled(motion.div)`
+  ${({ theme }) => `
 	display: inline-block;
-	border: 2px grey solid;
+	border: 1px grey solid;
+	backgroundColor: white;
 	border-radius: 50%;
-	width: 15px;
-	height: 15px;
-	margin: 50px;
+	width: .75rem;
+	height: .75rem;
 
-	margin-left: 5%;
-	margin-right: 5%;
-
-	&.fill-dot-appear {
-		background-color: ""
-	}
-	&.fill-dot-appear-active {
-		background-color: grey;
-		transition-property: all;
-		transition-duration: 1000ms;
-	}
-	&.fill-dot-appear-done {
-		background-color: grey;
-	}
-	&.fill-dot-enter {
-		background-color: ""
-	}
-	&.fill-dot-enter-active {
-		background-color: grey;
-		transition-property: all;
-		transition-duration: 1000ms;
-	}
-	&.fill-dot-enter-done {
-		background-color: grey;
-	}
-
-`
+	margin-left: 1rem;
+	margin-right: 1rem;
+	`}
+`;
 export default function ProgressDots(props) {
-	return (
-		<DotsContainer >
-			{[...Array(props.numDots)].map((_, ithDot) =>
-					<CSSTransition
-						classNames="fill-dot"
-						timeout={1000}
-						appear={ithDot === 0}
-						in={props.currentDot >= ithDot}
-						key={ithDot}
-					>
-						<Dot />
-					</CSSTransition>
-				)
-			}
-		</DotsContainer>
-	)
+  const theme = useTheme();
+  return (
+    <Grid container justifyContent="center">
+      <Grid item>
+        {[...Array(props.numDots)].map((_, ithDot) => (
+          <Dot
+            key={ithDot}
+            initial={false}
+            animate={
+              props.currentDot >= ithDot
+                ? {
+                    backgroundColor: theme.palette.primary.main,
+			border: `1px ${theme.palette.primary.main} solid`
+                  }
+                : null
+            }
+          />
+        ))}
+      </Grid>
+    </Grid>
+  );
 }

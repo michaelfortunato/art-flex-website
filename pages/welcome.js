@@ -23,6 +23,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import { responsiveFontSizes } from "@material-ui/core/styles";
 import { useTheme } from "@material-ui/core";
 import { useMediaQuery } from "@material-ui/core";
+import MainLogo from "../public/MainLogo.svg";
 import React from "react";
 
 const StyledWelcomeSignUp = (props) => (
@@ -52,7 +53,22 @@ const pages = [
 const exitAnimation = {
   opacity: 0,
 };
-
+const StyledWelcomeRoot = styled(motion.div)`
+  overflow-x: hidden;
+`;
+const StyledMobileHeader = styled(motion.div)`
+  text-align: center;
+  height: 10%;
+  width: 100%;
+`;
+const StyledDesktopHeader = styled(motion.div)`
+  text-align: center;
+  height: 10vh;
+  width: 100%;
+`;
+const StyledFooter = styled.div`
+  height: 10vh;
+`
 export default function WelcomePage() {
   const theme = useTheme();
   const [currentPage, setCurrentPage] = useState(0);
@@ -68,59 +84,40 @@ export default function WelcomePage() {
 
   return (
     <MuiThemeProvider theme={WelcomeTheme}>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className={styles.root}
-      >
+      <StyledWelcomeRoot initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <Container maxWidth="lg">
           <AnimatePresence exitBeforeEnter>
-            {currentPage !== 5 ? (
-              <motion.div exit={{ opacity: 0 }}>
-                <div style={{ minHeight: "65vh" }}>
-                  <AnimatePresence>
-                    {currentPage != 4 && (
-                      <motion.div
-                        exit={{ opacity: 0 }}
-                        className={
-                          isMobile ? styles.mobileHeader : styles.header
-                        }
-                      >
-                        <img
-                          src={"MainLogo.svg"}
-                          className={styles.logo}
-                          onClick={() => setCurrentPage(0)}
-                        />
-                        <Divider style={{ marginTop: ".75rem" }} />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                  <AnimatePresence exitBeforeEnter>
-                    {pages.map(
-                      ({ Component, ...props }, pageNumber) =>
-                        currentPage === pageNumber && (
-                          <Component
-                            key={pageNumber}
-                            setCurrentPage={setCurrentPage}
-                            {...props}
-                          />
-                        )
-                    )}
-                  </AnimatePresence>
+            <AnimatePresence key={1}>
+              <StyledDesktopHeader exit={{ opacity: 0 }}>
+                <div onClick = {()=>setCurrentPage(0)} style={{ height: "100%" }}>
+                  <MainLogo weight="100%" height="100%"/>
                 </div>
-                <div className={styles.footer}>
-                  <div className={styles.dotsContainer}>
-                    <ProgressDots
-                      currentDot={currentPage}
-                      numDots={pages.length - 1}
+                <Divider style={{ marginTop: "0.0rem" }} />
+              </StyledDesktopHeader>
+            </AnimatePresence>
+            <AnimatePresence key={2} exitBeforeEnter>
+              <div style = {{height:"80vh"}}>
+              {pages.map(
+                ({ Component, ...props }, pageNumber) =>
+                  currentPage === pageNumber && (
+                    <Component
+                      key={pageNumber}
+                      setCurrentPage={setCurrentPage}
+                      {...props}
                     />
-                  </div>
-                </div>
-              </motion.div>
-            ) : null}
+                  )
+              )}
+              </div>
+            </AnimatePresence>
+            <StyledFooter>
+                <ProgressDots
+                  currentDot={currentPage}
+                  numDots={pages.length - 1}
+                />
+            </StyledFooter>
           </AnimatePresence>
         </Container>
-      </motion.div>
+      </StyledWelcomeRoot>
     </MuiThemeProvider>
   );
 }
