@@ -6,7 +6,9 @@ import { useTheme, makeStyles, withStyles } from "@material-ui/core/styles";
 import GoogleLogin from "react-google-login";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
+import useSWR from "swr";
 import axios from "axios";
+import post from "utils/post";
 import {
   ButtonBase,
   Grid,
@@ -84,7 +86,7 @@ const checkPasswordNumber = (password) => {
 };
 
 const SocialBanner = (props) => (
-  <Grid container item xs={12} justify="center">
+  <Grid container item xs={12} justifyContent="center">
     <Grid container alignItems="center" item xs={5}>
       <Grid item xs={12}>
         <Divider />
@@ -103,23 +105,7 @@ const SocialBanner = (props) => (
   </Grid>
 );
 
-async function PostSignUp(name, email, password) {
-  try {
-    const rootURL = process.env.ROOT_API_URL || "https://api.art-flex.co";
-    const response = await axios.post(rootURL + "/signup/new", {
-      name: name,
-      email: email,
-      password: password,
-    });
-  } catch (error) {
-    if (error.response.status === 401) {
-    } else {
-    }
-  }
-}
-
-const StyledContainer = styled(Grid)`
-`
+const StyledContainer = styled(Grid)``;
 
 export default function SignUp(props) {
   const [name, setName] = useState("");
@@ -157,27 +143,17 @@ export default function SignUp(props) {
 
   const PostSignUp = async () => {
     try {
-      const rootURL = process.env.ROOT_API_URL || "https://api.art-flex.co";
-      /*const response = await axios.post(rootURL + "/signup/new", {
-        name: name,
-        email: email,
-        password: password,
-      });
-      */
+      const response = post("/signup/new", {
+        "name": name,
+        "email": email,
+        "password": password
+      }).then((res) => res.json());
       props.setCurrentPage(5);
     } catch (error) {
-      console.log(error);
-      if (error.response.status === 401) {
-        setSignUpFailed({
-          status: true,
-          message: "Could not sign up. Email already registered to Art-Flex.",
-        });
-      } else {
-        setSignUpFailed({
-          status: true,
-          message: "Could not sign up. Website is undergong maintenence.",
-        });
-      }
+      setSignUpFailed({
+        status: true,
+        message: "Could not sign up. Website is undergong maintenence.",
+      });
     }
   };
 
@@ -202,14 +178,14 @@ export default function SignUp(props) {
     passwordNumber;
 
   return (
-    <StyledContainer container justify="center">
+    <StyledContainer container justifyContent="center">
       <Grid
         component={Paper}
         container
         item
         lg={6}
         xs={12}
-        justify="center"
+        justifyContent="center"
         spacing={3}
         className={styles.sign_up_body}
       >
@@ -291,7 +267,7 @@ export default function SignUp(props) {
           </Grid>
         )}
         <SocialBanner />
-        <Grid container justify="center" item xs={12}>
+        <Grid container justifyContent="center" item xs={12}>
           <GoogleLogin
             buttonText="Sign up with Google"
             theme="dark"

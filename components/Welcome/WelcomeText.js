@@ -276,7 +276,7 @@ export default function WelcomeText(props) {
         initial="initial"
         animate={controlsText}
         container
-        justify="center"
+        justifyContent="center"
         spacing={0}
       >
         {props.configurationNumber === 1 ? artistText : buyerText}

@@ -9,12 +9,8 @@ import { ThemeProvider } from "styled-components";
 import { StylesProvider } from "@material-ui/core/styles";
 import { useEffect } from "react";
 import { SWRConfig } from "swr";
-const GQL_URI = "https://rickandmortyapi.com/graphql";
 
-const client = new ApolloClient({
-  uri: GQL_URI,
-  cache: new InMemoryCache(),
-});
+const ART_FLEX_URL = "https://api.art-flex.co"
 
 function MyApp({ Component, pageProps }) {
   theme = responsiveFontSizes(theme);
@@ -35,9 +31,8 @@ function MyApp({ Component, pageProps }) {
       </Head>
       <main>
         <div>
-          <ApolloProvider client={client}>
             <SWRConfig value = {{
-              fetcher: (url) => fetch(url).then(res => res.json())
+              fetcher: (url) => fetch(ART_FLEX_URL + url).then(res => res.json())
             }}>
             <StylesProvider injectFirst>
               <MuiThemeProvider theme={theme}>
@@ -47,7 +42,6 @@ function MyApp({ Component, pageProps }) {
               </MuiThemeProvider>
             </StylesProvider>
             </SWRConfig>
-          </ApolloProvider>
         </div>
       </main>
     </div>

@@ -15,6 +15,7 @@ import WelcomeStart from "@components/Welcome/WelcomeStart";
 import WelcomeText from "@components/Welcome/WelcomeText";
 import WelcomeChoice from "@components/Welcome/WelcomeChoice";
 import WelcomeSignUp from "@components/Welcome/WelcomeSignUp";
+import SuccessfulSignUp from "@components/Welcome/SuccessfulSignUp";
 import ProgressDots from "@components/ProgressDots";
 import animationPage1 from "/public/Welcome-Page1.json";
 import animationPage2 from "public/Welcome-Page42.json";
@@ -46,6 +47,7 @@ const StyledWelcomeSignUp = (props) => {
 };
 
 const pages = [
+  /*
   { Component: WelcomeStart },
   { Component: WelcomeChoice },
   {
@@ -61,6 +63,8 @@ const pages = [
     exitAnimation: { x: "-150%", transition: { duration: ".25" } },
   },
   { Component: StyledWelcomeSignUp },
+  */
+  { Component: SuccessfulSignUp }
 ];
 
 const exitAnimation = {
