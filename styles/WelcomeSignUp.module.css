@@ -27,7 +27,7 @@
   border-radius: 6px;
   padding-left: 50px;
   padding-right: 50px;
-  padding-top: 2rem;
+  padding-top: 2.5rem;
   padding-bottom: 24px;
 }
 .title_container {
@@ -35,8 +35,7 @@
     Note that marginTop applies to any spacing prop
     I give to the material UI grid container
   */
-  margin-top: .5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   text-align: center;
 }
 .field_container {

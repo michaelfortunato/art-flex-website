@@ -49,7 +49,7 @@ export default function WelcomeChoice(props) {
       <div >
         <Typography variant="h4">Are you an artist or a buyer?</Typography>
       </div>
-      <Grid container justify="space-around" style={{marginTop: "4rem" }}>
+      <Grid container justifyContent="space-around" style={{marginTop: "4rem" }}>
         <Button
           setNextPage={props.setCurrentPage}
           pageNumber={2}

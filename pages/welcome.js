@@ -26,16 +26,24 @@ import { useMediaQuery } from "@material-ui/core";
 import MainLogo from "../public/MainLogo.svg";
 import React from "react";
 
-const StyledWelcomeSignUp = (props) => (
+const StyledWelcomeSignUp = (props) => {
   /* bunch of media queries here */
-  <motion.div
-    style={{ transform: "scale(.9)" }}
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-  >
-    <WelcomeSignUp {...props} />
-  </motion.div>
-);
+  const setScale = () => {
+    if (props.isMobile) return "scale(0.9)";
+    if (props.isLaptop) return "scale(0.9)";
+    if (props.isDesktop) return "scale(1.0)";
+  };
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      style={{ transform: setScale() }}
+    >
+      <WelcomeSignUp {...props} 
+      />
+    </motion.div>
+  );
+};
 
 const pages = [
   { Component: WelcomeStart },
@@ -75,13 +83,14 @@ const StyledFooter = styled.div`
   height: 10vh;
 `;
 export default function WelcomePage() {
-  const theme = useTheme();
+  const theme = responsiveFontSizes(useTheme());
   const [currentPage, setCurrentPage] = useState(0);
   const isMobile = useMediaQuery(theme.breakpoints.down("xs"));
-  const WelcomeTheme = responsiveFontSizes(theme);
+  const isLaptop = useMediaQuery(theme.breakpoints.down("lg"));
+  const isDesktop = useMediaQuery(theme.breakpoints.up("lg"));
 
   return (
-    <MuiThemeProvider theme={WelcomeTheme}>
+    <MuiThemeProvider theme={theme}>
       <StyledWelcomeRoot initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <Container maxWidth="lg">
           <AnimatePresence exitBeforeEnter>
@@ -97,8 +106,12 @@ export default function WelcomePage() {
               </StyledDesktopHeader>
             </AnimatePresence>
             <AnimatePresence key={2} exitBeforeEnter>
-              <div style = {{minHeight: "80vh"}}>
-                <Grid style = {{minHeight: "80vh"}} container justifyContent="center" alignItems="center">
+                <Grid
+                  style={{ minHeight: "80vh" }}
+                  container
+                  justifyContent="center"
+                  alignItems="center"
+                >
                   <Grid item>
                     {pages.map(
                       ({ Component, ...props }, pageNumber) =>
@@ -107,12 +120,14 @@ export default function WelcomePage() {
                             key={pageNumber}
                             setCurrentPage={setCurrentPage}
                             {...props}
+                            isMobile={isMobile}
+                            isLaptop={isLaptop}
+                            isDesktop={isDesktop}
                           />
                         )
                     )}
                   </Grid>
                 </Grid>
-                </div>
             </AnimatePresence>
             <StyledFooter>
               <ProgressDots

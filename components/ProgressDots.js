@@ -25,7 +25,6 @@ export default function ProgressDots(props) {
         {[...Array(props.numDots)].map((_, ithDot) => (
           <Dot
             key={ithDot}
-            initial={false}
             animate={
               props.currentDot >= ithDot
                 ? {
