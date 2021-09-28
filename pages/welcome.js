@@ -27,7 +27,12 @@ import MainLogo from "../public/MainLogo.svg";
 import React from "react";
 
 const StyledWelcomeSignUp = (props) => (
-  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+  /* bunch of media queries here */
+  <motion.div
+    style={{ transform: "scale(.9)" }}
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+  >
     <WelcomeSignUp {...props} />
   </motion.div>
 );
@@ -68,7 +73,7 @@ const StyledDesktopHeader = styled(motion.div)`
 `;
 const StyledFooter = styled.div`
   height: 10vh;
-`
+`;
 export default function WelcomePage() {
   const theme = useTheme();
   const [currentPage, setCurrentPage] = useState(0);
@@ -82,35 +87,38 @@ export default function WelcomePage() {
           <AnimatePresence exitBeforeEnter>
             <AnimatePresence key={1}>
               <StyledDesktopHeader exit={{ opacity: 0 }}>
-                <div onClick = {()=>setCurrentPage(0)} style={{ height: "100%" }}>
-                  <MainLogo weight="100%" height="100%"/>
+                <div
+                  onClick={() => setCurrentPage(0)}
+                  style={{ height: "100%" }}
+                >
+                  <MainLogo weight="100%" height="100%" />
                 </div>
                 <Divider style={{ marginTop: "0.0rem" }} />
               </StyledDesktopHeader>
             </AnimatePresence>
             <AnimatePresence key={2} exitBeforeEnter>
-              <div style = {{height:"80vh"}}>
-                <Grid container justifyContent="center" alignItems="center" style={{height:"80vh"}}>
+              <div style = {{minHeight: "80vh"}}>
+                <Grid style = {{minHeight: "80vh"}} container justifyContent="center" alignItems="center">
                   <Grid item>
-              {pages.map(
-                ({ Component, ...props }, pageNumber) =>
-                  currentPage === pageNumber && (
-                    <Component
-                      key={pageNumber}
-                      setCurrentPage={setCurrentPage}
-                      {...props}
-                    />
-                  )
-              )}
-              </Grid>
-              </Grid>
-              </div>
+                    {pages.map(
+                      ({ Component, ...props }, pageNumber) =>
+                        currentPage === pageNumber && (
+                          <Component
+                            key={pageNumber}
+                            setCurrentPage={setCurrentPage}
+                            {...props}
+                          />
+                        )
+                    )}
+                  </Grid>
+                </Grid>
+                </div>
             </AnimatePresence>
             <StyledFooter>
-                <ProgressDots
-                  currentDot={currentPage}
-                  numDots={pages.length - 1}
-                />
+              <ProgressDots
+                currentDot={currentPage}
+                numDots={pages.length - 1}
+              />
             </StyledFooter>
           </AnimatePresence>
         </Container>

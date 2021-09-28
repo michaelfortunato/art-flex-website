@@ -118,7 +118,8 @@ async function PostSignUp(name, email, password) {
   }
 }
 
-const StyledContainer = styled(Grid)``
+const StyledContainer = styled(Grid)`
+`
 
 export default function SignUp(props) {
   const [name, setName] = useState("");

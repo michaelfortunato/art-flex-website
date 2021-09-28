@@ -8,6 +8,7 @@ import styled from "styled-components";
 const StyledButton = styled(Grid)`
   padding-top: 22px;
   padding-bottom: 22px;
+  margin: 1rem;
   cursor: pointer;
   width: 100%;
   height: 100%;
@@ -21,7 +22,7 @@ function Button(props) {
   return (
     <StyledButton
       xs={10}
-      md={4}
+      md={6}
       component={motion.div}
       whileHover={{
         scale: 1.1,
@@ -45,7 +46,7 @@ export default function WelcomeChoice(props) {
       animate={{ opacity: 1 }}
       exit={{ x: "-150%", transition: { duration: ".25" } }}
     >
-      <div style = {{paddingRight: "20rem", paddingLeft: "20rem"}}>
+      <div >
         <Typography variant="h4">Are you an artist or a buyer?</Typography>
       </div>
       <Grid container justify="space-around" style={{marginTop: "4rem" }}>
