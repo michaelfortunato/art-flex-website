@@ -73,14 +73,7 @@ export default function WelcomePage() {
   const theme = useTheme();
   const [currentPage, setCurrentPage] = useState(0);
   const isMobile = useMediaQuery(theme.breakpoints.down("xs"));
-  const WelcomeTheme = responsiveFontSizes(
-    createMuiTheme({
-      ...theme,
-      typography: {
-        button: {},
-      },
-    })
-  );
+  const WelcomeTheme = responsiveFontSizes(theme);
 
   return (
     <MuiThemeProvider theme={WelcomeTheme}>
@@ -97,6 +90,8 @@ export default function WelcomePage() {
             </AnimatePresence>
             <AnimatePresence key={2} exitBeforeEnter>
               <div style = {{height:"80vh"}}>
+                <Grid container justifyContent="center" alignItems="center" style={{height:"80vh"}}>
+                  <Grid item>
               {pages.map(
                 ({ Component, ...props }, pageNumber) =>
                   currentPage === pageNumber && (
@@ -107,6 +102,8 @@ export default function WelcomePage() {
                     />
                   )
               )}
+              </Grid>
+              </Grid>
               </div>
             </AnimatePresence>
             <StyledFooter>

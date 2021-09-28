@@ -118,6 +118,8 @@ async function PostSignUp(name, email, password) {
   }
 }
 
+const StyledContainer = styled(Grid)``
+
 export default function SignUp(props) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -199,7 +201,7 @@ export default function SignUp(props) {
     passwordNumber;
 
   return (
-    <Grid className={styles.root_container} container justify="center">
+    <StyledContainer container justify="center">
       <Grid
         component={Paper}
         container
@@ -211,7 +213,7 @@ export default function SignUp(props) {
         className={styles.sign_up_body}
       >
         <Grid item xs={12} className={styles.title_container}>
-          <Typography variant="h5">Create your account</Typography>
+          <Typography variant="h2">Create your account</Typography>
         </Grid>
         <Grid
           className={styles.field_container}
@@ -296,6 +298,6 @@ export default function SignUp(props) {
           />
         </Grid>
       </Grid>
-    </Grid>
+    </StyledContainer>
   );
 }
