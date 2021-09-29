@@ -143,7 +143,7 @@ export default function SignUp(props) {
 
   const PostSignUp = async () => {
     try {
-      const response = post("/signup/new", {
+      const response = await post("/signup/new", {
         "name": name,
         "email": email,
         "password": password

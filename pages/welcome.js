@@ -38,16 +38,15 @@ const StyledWelcomeSignUp = (props) => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       style={{ transform: setScale() }}
     >
-      <WelcomeSignUp {...props} 
-      />
+      <WelcomeSignUp {...props} />
     </motion.div>
   );
 };
 
 const pages = [
-  /*
   { Component: WelcomeStart },
   { Component: WelcomeChoice },
   {
@@ -63,8 +62,7 @@ const pages = [
     exitAnimation: { x: "-150%", transition: { duration: ".25" } },
   },
   { Component: StyledWelcomeSignUp },
-  */
-  { Component: SuccessfulSignUp }
+  { Component: SuccessfulSignUp },
 ];
 
 const exitAnimation = {
@@ -110,28 +108,28 @@ export default function WelcomePage() {
               </StyledDesktopHeader>
             </AnimatePresence>
             <AnimatePresence key={2} exitBeforeEnter>
-                <Grid
-                  style={{ minHeight: "80vh" }}
-                  container
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <Grid item>
-                    {pages.map(
-                      ({ Component, ...props }, pageNumber) =>
-                        currentPage === pageNumber && (
-                          <Component
-                            key={pageNumber}
-                            setCurrentPage={setCurrentPage}
-                            {...props}
-                            isMobile={isMobile}
-                            isLaptop={isLaptop}
-                            isDesktop={isDesktop}
-                          />
-                        )
-                    )}
-                  </Grid>
+              <Grid
+                style={{ minHeight: "80vh" }}
+                container
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Grid item>
+                  {pages.map(
+                    ({ Component, ...props }, pageNumber) =>
+                      currentPage === pageNumber && (
+                        <Component
+                          key={pageNumber}
+                          setCurrentPage={setCurrentPage}
+                          {...props}
+                          isMobile={isMobile}
+                          isLaptop={isLaptop}
+                          isDesktop={isDesktop}
+                        />
+                      )
+                  )}
                 </Grid>
+              </Grid>
             </AnimatePresence>
             <StyledFooter>
               <ProgressDots
