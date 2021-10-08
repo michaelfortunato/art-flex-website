@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import { Grid, Typography } from '@material-ui/core'
 import { motion } from 'framer-motion'
 import axios from 'axios'
-import cookie from 'cookie'
 
 //Redux imports
 import { useSelector, useDispatch } from 'react-redux';
