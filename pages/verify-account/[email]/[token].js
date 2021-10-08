@@ -1,45 +1,65 @@
-import post from "@utils/post";
 import { useRouter } from 'next/router'
 import { useEffect } from "react";
 import styled from 'styled-components'
 import { Grid, Typography } from '@material-ui/core'
 import { motion } from 'framer-motion'
+import axios from 'axios'
+import cookie from 'cookie'
+
+//Redux imports
+import { useSelector, useDispatch } from 'react-redux';
+import { signIn, signOut } from '../../../redux-store/features/account/accountSlice'
+import { NoEncryption } from '@material-ui/icons';
 const StyledContainer = styled(motion(Grid))`
   height: 100vh;
   opacity: 0;
 `
 export default function VerifyAccount(props) {
-  console.log(props)
   const router = useRouter();
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    //router.push('/')
+    if (props.success) dispatch(signIn({ email: props.email }))
   }, [])
 
   return <StyledContainer
-  animate = {{opacity:1}}
+    initial={props.success} //only animate if the sign up is successful
+    animate={{ opacity: 1 }}
     container
     justifyContent='center'
     alignItems='center'
-    onAnimationComplete={()=> setTimeout(()=>router.push('/'), 100)}
+    onAnimationComplete={() => setTimeout(() => router.push('/'), 100)}
   >
     <Grid item>
-      <Typography variant = 'h2'> Welcome to Art-Flex, {props.email}.</Typography>
+      {props.success ? <Typography variant='h2'>Welcome to Art-Flex, {props.name}.</Typography> :
+        <Typography variant='h4'>{props.statusMessage}</Typography>
+      }
     </Grid>
   </StyledContainer>;
 }
 export async function getServerSideProps(context) {
-  const { email, token } = context.params;
-  let prop;
+  let props = { name: null, email: null, success: null, statusMessage: null }
   try {
-    /*
-    const response = await post(`/signup/verify/${email}/${token}`, {}).then(
-      (res) => res.json()
-    );
-    console.log(response);
-    */
-  } catch (ex) {
-    prop = ex
-    console.log(ex);
+    const { email, token } = context.params;
+    const response = await axios.post(`/signup/verify`, { email, token }, { withCredentials: true })
+
+    response.headers['set-cookie'].forEach(cookieString => {
+      // Cookie parser does not parse options! wow. We have to re-set httpOnly !
+      const [cookieName, cookieValue] = Object.entries(cookie.parse(cookieString))[0]
+      context.res.setHeader('Set-Cookie', cookie.serialize(cookieName, cookieValue, { domain: 'api.artflex.co', path: '/', httpOnly: true, sameSite: 'none', secure: 'true' }))
+    })
+    props = { name: response.data.name, email: response.data.email, success: true, statusMessage: response.data.statusMessage }
+  } catch (error) {
+    console.log(error)
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      let { statusMessage } = error.response.data
+      props = { ...props, success: false, statusMessage }
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      props = { ...props, success: false, statusMessage: "Art Flex is undergoing maintenence. Try again later." }
+    }
   }
-  return { props: { email, token } };
+  return { props };
 }

@@ -3,7 +3,9 @@ import React, { useEffect, useRef } from "react";
 import CheckCircleGreen from "../../public/check-circle-green.svg";
 import gsap from "gsap";
 import { motion } from "framer-motion";
+import { useRouter } from "next/router";
 export default function SuccessfulSignUp(props) {
+  const router = useRouter()
   const theme = useTheme();
   const tl = useRef(null);
   const circleRef = useRef(null);
@@ -31,6 +33,7 @@ export default function SuccessfulSignUp(props) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
+      onAnimationComplete={()=> setTimeout(()=> router.push('/'), 100)}
       style={{ textAlign: "center" }}
     >
       <div>

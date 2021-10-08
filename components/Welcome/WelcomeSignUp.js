@@ -8,7 +8,6 @@ import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import useSWR from "swr";
 import axios from "axios";
-import post from "utils/post";
 import {
   ButtonBase,
   Grid,
@@ -143,17 +142,28 @@ export default function SignUp(props) {
 
   const PostSignUp = async () => {
     try {
-      const response = await post("/signup/new", {
+      const response = await axios.post("/signup/new", {
         "name": name,
         "email": email,
         "password": password
-      }).then((res) => res.json());
+      }, { withCredentials: true })
+      console.log(response)
       props.setCurrentPage(5);
     } catch (error) {
-      setSignUpFailed({
-        status: true,
-        message: "Could not sign up. Website is undergong maintenence.",
-      });
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        setSignUpFailed({
+          status: true,
+          message: error.response.data.statusMessage,
+        });
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setSignUpFailed({
+          status: true,
+          message: "Could not sign up. Website is undergong maintenence.",
+        });
+      }
     }
   };
 
