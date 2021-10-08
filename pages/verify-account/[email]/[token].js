@@ -46,6 +46,8 @@ export async function getServerSideProps(context) {
     response.headers['set-cookie'].forEach(cookieString => {
       // Cookie parser does not parse options! wow. We have to re-set httpOnly !
       const [cookieName, cookieValue] = Object.entries(cookie.parse(cookieString))[0]
+      // If we set the cookie here without specifying the subdomain api, then the cookie will not be sent to the subdomain
+      // as this function is executed on the server with domain art-flex.co (not api.artflex.co)
       context.res.setHeader('Set-Cookie', cookie.serialize(cookieName, cookieValue, { domain: 'api.artflex.co', path: '/', httpOnly: true, sameSite: 'none', secure: 'true' }))
     })
     props = { name: response.data.name, email: response.data.email, success: true, statusMessage: response.data.statusMessage }
