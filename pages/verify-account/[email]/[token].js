@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { Grid, Typography } from '@material-ui/core'
 import { motion } from 'framer-motion'
 import axios from 'axios'
+import cookie from 'cookie'
 
 //Redux imports
 import { useSelector, useDispatch } from 'react-redux';
@@ -43,7 +44,10 @@ export async function getServerSideProps(context) {
     const response = await axios.post(`/signup/verify`, { email, token }, { withCredentials: true })
 
     response.headers['set-cookie'].forEach(cookieString => {
-      context.res.setHeader('Set-Cookie', cookieString)
+      const [cookieName, cookieValue] = Object.entries(cookie.parse(cookieString))[0]
+      // If we set the cookie here without specifying the subdomain api, then the cookie will not be sent to the subdomain
+      // as this function is executed on the server with domain art-flex.co (not api.artflex.co)
+      context.res.setHeader('Set-Cookie', cookie.serialize(cookieName, cookieValue, { domain: 'api.artflex.co', path: '/', httpOnly: true, sameSite: 'none', secure: 'true' }))
     })
     props = { name: response.data.name, email: response.data.email, success: true, statusMessage: response.data.statusMessage }
   } catch (error) {
