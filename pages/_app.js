@@ -10,11 +10,11 @@ import { StylesProvider } from "@material-ui/core/styles";
 import { useEffect } from "react";
 import { SWRConfig } from "swr";
 
+import store from '../redux-store/store'
+import { Provider } from 'react-redux'
 const ART_FLEX_URL = "https://api.art-flex.co"
 
 function MyApp({ Component, pageProps }) {
-  theme = responsiveFontSizes(theme);
-
   useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector("#jss-server-side");
@@ -31,17 +31,19 @@ function MyApp({ Component, pageProps }) {
       </Head>
       <main>
         <div>
-            <SWRConfig value = {{
+          <Provider store={store}>
+            <SWRConfig value={{
               fetcher: (url) => fetch(ART_FLEX_URL + url).then(res => res.json())
             }}>
-            <StylesProvider injectFirst>
-              <MuiThemeProvider theme={theme}>
-                <ThemeProvider theme={theme}>
-                  <Component {...pageProps} />
-                </ThemeProvider>
-              </MuiThemeProvider>
-            </StylesProvider>
+              <StylesProvider injectFirst>
+                <MuiThemeProvider theme={theme}>
+                  <ThemeProvider theme={theme}>
+                    <Component {...pageProps} />
+                  </ThemeProvider>
+                </MuiThemeProvider>
+              </StylesProvider>
             </SWRConfig>
+          </Provider>
         </div>
       </main>
     </div>
