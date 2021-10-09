@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useRouter } from 'next/router'
 import {
   Container,
   createMuiTheme,
@@ -5,27 +7,21 @@ import {
   Grid,
   MuiThemeProvider,
   Typography,
+  useMediaQuery,
+  useTheme
 } from "@material-ui/core";
-import styles from "@styles/WelcomePage.module.css";
-import ProgressBar from "@components/ProgressBar";
-import { useState, useEffect } from "react";
-import { CSSTransition } from "react-transition-group";
-import styled, { ThemeProvider } from "styled-components";
+import styled from "styled-components";
 import WelcomeStart from "@components/Welcome/WelcomeStart";
 import WelcomeText from "@components/Welcome/WelcomeText";
 import WelcomeChoice from "@components/Welcome/WelcomeChoice";
-import WelcomeSignUp from "@components/Welcome/WelcomeSignUp";
+import SignUp from "@components/SignIn/SignUp";
 import SuccessfulSignUp from "@components/Welcome/SuccessfulSignUp";
 import ProgressDots from "@components/ProgressDots";
 import animationPage1 from "/public/Welcome-Page1.json";
 import animationPage2 from "public/Welcome-Page42.json";
 import { motion, AnimatePresence } from "framer-motion";
-import makeStyles from "@material-ui/core/styles/makeStyles";
 import { responsiveFontSizes } from "@material-ui/core/styles";
-import { useTheme } from "@material-ui/core";
-import { useMediaQuery } from "@material-ui/core";
 import MainLogo from "../public/MainLogo.svg";
-import React from "react";
 
 const StyledWelcomeSignUp = (props) => {
   /* bunch of media queries here */
@@ -41,10 +37,18 @@ const StyledWelcomeSignUp = (props) => {
       exit={{ opacity: 0 }}
       style={{ transform: setScale() }}
     >
-      <WelcomeSignUp {...props} />
+      <SignUp signUpCallback={() => props.setCurrentPage(5)} {...props} />
     </motion.div>
   );
 };
+
+const StyledSuccessfulSignUp = (props) => {
+  const router = useRouter();
+  const small = props.isMobile
+  return <SuccessfulSignUp small={small}
+    onAnimationComplete={() => setTimeout(() => router.push('/'), 100)}
+  />
+}
 
 const pages = [
   { Component: WelcomeStart },
@@ -62,7 +66,7 @@ const pages = [
     exitAnimation: { x: "-150%", transition: { duration: ".25" } },
   },
   { Component: StyledWelcomeSignUp },
-  { Component: SuccessfulSignUp },
+  { Component: StyledSuccessfulSignUp },
 ];
 
 const exitAnimation = {

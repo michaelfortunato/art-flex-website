@@ -1,15 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react'
-import Paper from '@material-ui/core/Paper'
+import { Grid, Paper } from '@material-ui/core'
 import styled from 'styled-components'
-import { Typography } from '@material-ui/core';
 import { CSSTransition } from 'react-transition-group'
 import SignInHome from '@components/SignIn/SignInHome';
 import EmailSignIn from '@components/SignIn/SignInEmail'
 import SignUp from '@components/SignIn/SignUp'
+import { AnimatePresence, motion } from 'framer-motion';
+import SuccessfulSignUp from '@components/Welcome/SuccessfulSignUp';
 const WrappedPaper = ({ mdDown, ...props }) => (<Paper {...props} />)
 
 const Pane = styled(Paper)`
-    width: ${(props) => props.mdDown ? '900px' : '900px'};
+    width: ${(props) => props.mddown ? '900px' : '900px'};
     height: 900px; 
     padding-top:0px;
     overflow-x: hidden;
@@ -71,6 +72,21 @@ const AnimatedContainer = styled.div`
         transform: ${props => props.forward ? `translateX(-100%)` : `translateX(100%)`};
     }
  `
+
+const StyledSignUp = (props) => {
+    const [successfulSignUp, setSuccessfulSignUp] = useState(false)
+    return <Grid container justifyContent='center' alignItems='center' style={{ height: '100%' }}>
+        <Grid item>
+            <AnimatePresence exitBeforeEnter>
+                {!successfulSignUp ?
+                    <motion.div exit={{ opacity: 0 }}>
+                        <SignUp signUpCallback={() => setSuccessfulSignUp(true)} {...props} />
+                    </motion.div>
+                    : <SuccessfulSignUp small onAnimationComplete={() => setTimeout(() => props.setOpen(false), 800)} />}
+            </AnimatePresence>
+        </Grid>
+    </Grid>
+}
 const pages = [
     {
         number: 0,
@@ -83,7 +99,7 @@ const pages = [
     }, {
         number: 2,
         pageName: "SignUp",
-        Component: SignUp
+        Component: StyledSignUp
     }
 ]
 
@@ -107,7 +123,7 @@ const SignInPane = React.forwardRef((props, ref) => {
                     unmountOnExit
                 >
                     <AnimatedContainer forward={pageNumber > prevPageNumber ? true : false}>
-                        <Component pageNumber={pageNumber} setPageNumber={setPageNumber} />
+                        <Component setOpen={props.setOpen} pageNumber={pageNumber} setPageNumber={setPageNumber} />
                     </AnimatedContainer>
                 </CSSTransition>
             ))}

@@ -33,14 +33,14 @@ export default function SuccessfulSignUp(props) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      onAnimationComplete={()=> setTimeout(()=> router.push('/'), 100)}
+      onAnimationComplete={props.onAnimationComplete}
       style={{ textAlign: "center" }}
     >
       <div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           height="100%"
-          width={props.isMobile ? "200px" : "400px"}
+          width={props.small ? "200px" : "400px"}
           viewBox="0 0 24 24"
           fill={theme.valid.color}
         >
@@ -52,10 +52,10 @@ export default function SuccessfulSignUp(props) {
         </svg>
       </div>
       <div style={{ marginBottom: "1rem" }}>
-        <Typography variant="h2">Thanks for signing up {props.name}</Typography>
+        <Typography variant={props.small ? 'h4' : 'h2'}>Thanks for signing up {props.name}</Typography>
       </div>
       <div>
-        <Typography variant="h2">
+        <Typography variant={props.small ? 'h4' : 'h2'}>
           A verification email has been sent to {props.email} to confirm your
           account
         </Typography>

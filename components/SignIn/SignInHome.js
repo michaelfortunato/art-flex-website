@@ -59,7 +59,7 @@ const Buttons = [<GoogleSignIn />, <EmailSignInButton />]
 export default function SignInHome(props) {
     return (
         <Container>
-            <Grid container justify='center' alignItems='center'>
+            <Grid container justifyContent='center' alignItems='center'>
                 <Grid item xs={12}>
                     <StyledHeader variant='h4'>Welcome back.</StyledHeader>
                 </Grid>
