@@ -5,14 +5,8 @@ import {
     Paper,
     Typography,
     useTheme,
-    InputBase,
-    InputAdornment,
-    IconButton,
 } from '@material-ui/core'
-import {
-    Visibility,
-    VisibilityOff,
-} from "@material-ui/icons";
+import {StandardForm, PasswordField} from '@components/Library'
 import styled from 'styled-components'
 import { CSSTransition } from 'react-transition-group'
 import SignInHome from '@components/SignIn/SignInHome';
@@ -59,38 +53,6 @@ const Pane = styled(Paper)`
     } 
 
 `
-const AnimatedContainer = styled.div`
-    width: 100%;
-    height: 100%;
-
-    &.ani-enter {
-        opacity: 0;
-        transform: ${props => props.forward ? `translateX(100%)` : `translateX(-100%)`};
-    }
-    &.ani-enter-active {
-        opacity: 1;
-        transform: translateX(0);
-        transition: all 500ms;
-    }
-    &.ani-enter-done {
-        opacity: 1;
-        transform: translateX(0);
-    }  
-
-    &.ani-exit {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    &.ani-exit-active {
-        opacity: 0;
-        transform: ${props => props.forward ? `translateX(-100%)` : `translateX(100%)`};
-        transition: all 500ms;
-    } 
-    &.ani-exit-done {
-        opacity: 0; 
-        transform: ${props => props.forward ? `translateX(-100%)` : `translateX(100%)`};
-    }
- `
 
 const StyledSignUp = (props) => {
     const [successfulSignUp, setSuccessfulSignUp] = useState(false)
@@ -106,140 +68,6 @@ const StyledSignUp = (props) => {
         </Grid>
     </Grid>
 }
-const pages = [
-    {
-        number: 0,
-        pageName: "SignInHome",
-        Component: SignInHome
-    }, {
-        number: 1,
-        pageName: "SignInEmail",
-        Component: EmailSignIn
-    }, {
-        number: 2,
-        pageName: "SignUp",
-        Component: StyledSignUp
-    }
-]
-
-
-const GridRow = styled(Grid)`
-    margin-top: 30px;
-    overflow: 
-`
-
-const SocialButton = styled.div`
-    border-radius: 24px;
-    border-color: black;
-    border-width: 2px;
-    border-style: solid;
-`
-const StyledInput = styled(InputBase)
-    `
-    -webkit-appearance: none;
-    -ms-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background: #FFFFFF;
-    box-shadow: 0 1px 4px 0 rgb(34 34 34 / 10%) inset;
-    border-color: rgba(34, 34, 34, 0.15);
-    border-style: solid;
-    border-width: 1px;
-    border-radius: 6px;
-    color: #222222;
-    display: block;
-    font-family: inherit;
-    font-size: 16px;
-    line-height: 28px;
-    height: 48px;
-    outline: none;
-    padding-top: 9px;
-    padding-bottom: 9px;
-    padding-left: 12px;
-    padding-right: 12px;
-    width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-    `
-
-/*
-    Material ui styles.
-`
-    color: rgba(0, 0, 0, 0.87);
-    cursor: text;
-    display: inline-flex;
-    position: relative;
-    font-size: 1rem;
-    box-sizing: border-box;
-    align-items: center;
-    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-    font-weight: 400;
-    line-height: 1.1876em;
-    letter-spacing: 0.00938em;
-
-`
-*/
-const PasswordField = (props) => {
-    const [showPassword, setShowPassword] = useState(false);
-    const handleMouseDownPassword = (event) => {
-        event.preventDefault();
-    };
-
-    return (
-        <StyledInput
-            style={{ cursor: 'text', display: 'inline-flex' }}
-            fullWidth
-            type={showPassword ? "text" : "password"}
-            onChange={(event) => props.setPassword(event.target.value)}
-            endAdornment={<InputAdornment position="end">
-                <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={() => setShowPassword(!showPassword)}
-                    onMouseDown={handleMouseDownPassword}
-                >
-                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                </IconButton>
-            </InputAdornment>
-            }
-        />
-    );
-};
-
-
-const StyledStandardForm = styled(InputBase)
-    `
-    -webkit-appearance: none;
-    -ms-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background: #FFFFFF;
-    box-shadow: 0 1px 4px 0 rgb(34 34 34 / 10%) inset;
-    border-color: rgba(34, 34, 34, 0.15);
-    border-style: solid;
-    border-width: 1px;
-    border-radius: 6px;
-    color: #222222;
-    display: block;
-    font-family: inherit;
-    font-size: 16px;
-    line-height: 28px;
-    height: 48px;
-    outline: none;
-    padding-top: 9px;
-    padding-bottom: 9px;
-    padding-left: 12px;
-    padding-right: 12px;
-    width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-    `
-
-const StandardForm = (props) => {
-    return <>
-        <div style={{ paddingLeft: 2 }}><Typography><b>{props.title}</b></Typography></div>
-        <StyledStandardForm type={props.type} onChange={props.onChange} />
-    </>
-}
 
 const SignInForm = (props) => {
     const [email, setEmail] = useState('');
@@ -248,8 +76,9 @@ const SignInForm = (props) => {
     const theme = useTheme();
     const dispatch = useDispatch()
 
-    const signInSuccess = (data) => {
-        dispatch(signIn({ name: data.name, email: data.email }))
+    const signInSuccess = (res) => {
+        const { data: { name, email } } = res
+        dispatch(signIn({ name, email }))
     }
     const signInFailure = (error) => {
         console.log(error)
@@ -291,13 +120,10 @@ const SignInForm = (props) => {
             </Grid>
         </Grid>
         <GridRow item xs={12}>
-            <div style={{ paddingLeft: 2 }}><Typography><b>Email address</b></Typography></div>
-            <StyledInput type='email' onChange={event => setEmail(event.target.value)} />
+            <StandardForm type='email' text='Email address' onChange={(event) => setEmail(event.target.value)} />
         </GridRow>
         <GridRow item xs={12}>
-            <div style={{ paddingLeft: 2 }}><Typography><b>Password</b></Typography></div>
-            <PasswordField setPassword={setPassword} />
-
+            <PasswordField type='password' text='Password' setPassword={setPassword} />
         </GridRow>
         {signUpFailed.status && (
             <Grid item xs={12} >
@@ -327,6 +153,7 @@ const SignInForm = (props) => {
                 </Typography>
             </StandardButton>
         </GridRow>
+
         <Grid style={{ marginTop: 20 }} item xs={12} >
             <div style={{ marginLeft: -36, marginRight: -36 }}>
                 <SocialBanner fontSize='1rem' />

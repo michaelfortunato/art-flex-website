@@ -55,7 +55,11 @@ const StandardButton = ({ children, ...props }) =>
 const SocialButton = (props) => {
     return (
         <StandardButton
-            onClick={props.onClick}>
+            onClick={props.onClick}
+            animate = {props.animate}
+            animateto = {props.animateTo}
+            styleOverrides = {props.styleOverrides}
+            >
             <StyledIconArea>
                 {props.isSVG ? <img style={{ 'verticalAlign': 'middle', 'height': '1.5rem', 'width': '1.5rem' }} src={props.icon} />
                     : <StyledIconComp as={props.icon} />}
