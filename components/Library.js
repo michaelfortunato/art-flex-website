@@ -12,6 +12,7 @@ import {
     Visibility,
     VisibilityOff,
 } from "@material-ui/icons";
+import { useState } from 'react'
 import styled from 'styled-components'
 
 const StyledStandardForm = styled(InputBase)
@@ -50,7 +51,7 @@ const StandardForm = (props) => {
 
 }
 
-const PasswordField = (props) => {
+const PasswordForm = (props) => {
     const [showPassword, setShowPassword] = useState(false);
     const handleMouseDownPassword = (event) => {
         event.preventDefault();
@@ -76,4 +77,4 @@ const PasswordField = (props) => {
     </div>
 };
 
-export {StandardForm, PasswordField}
+export { StandardForm, PasswordForm }

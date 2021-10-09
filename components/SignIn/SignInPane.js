@@ -6,7 +6,7 @@ import {
     Typography,
     useTheme,
 } from '@material-ui/core'
-import {StandardForm, PasswordField} from '@components/Library'
+import { StandardForm, PasswordForm } from '@components/Library'
 import styled from 'styled-components'
 import { CSSTransition } from 'react-transition-group'
 import SignInHome from '@components/SignIn/SignInHome';
@@ -53,6 +53,9 @@ const Pane = styled(Paper)`
     } 
 
 `
+const GridRow = styled(Grid)` 
+    margin-top: 30px; 
+    overflow: `
 
 const StyledSignUp = (props) => {
     const [successfulSignUp, setSuccessfulSignUp] = useState(false)
@@ -123,7 +126,7 @@ const SignInForm = (props) => {
             <StandardForm type='email' text='Email address' onChange={(event) => setEmail(event.target.value)} />
         </GridRow>
         <GridRow item xs={12}>
-            <PasswordField type='password' text='Password' setPassword={setPassword} />
+            <PasswordForm type='password' text='Password' setPassword={setPassword} />
         </GridRow>
         {signUpFailed.status && (
             <Grid item xs={12} >
