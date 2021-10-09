@@ -41,7 +41,9 @@ export async function getServerSideProps(context) {
   let props = { name: null, email: null, success: null, statusMessage: null }
   try {
     const { email, token } = context.params;
-    const response = await axios.post(`/signup/verify`, { email, token }, { withCredentials: true })
+    // We have to give the baseURL here as this is executed server side and it has
+    // no idea what domain its running on 
+    const response = await axios.post(`https://art-flex.co/api/signup/verify`, { email, token } )
 
     response.headers['set-cookie'].forEach(cookieString => {
       const [cookieName, cookieValue] = Object.entries(cookie.parse(cookieString))[0]
