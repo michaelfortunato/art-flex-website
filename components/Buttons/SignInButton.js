@@ -34,7 +34,7 @@ export default function SignInButton(props) {
                 {props.isSVG ? <img style={{ 'verticalAlign': 'middle', 'height': '1.5rem', 'width': '1.5rem' }} src={props.icon} />
                     : <StyledIconComp as={props.icon} />}
             </StyledIconArea>
-            <Typography variant='subtitle1'>{props.text}</Typography>
+            <Typography style={{textTransform:'none'}} variant='button'>{props.text}</Typography>
         </StyledButton>
     )
 }
