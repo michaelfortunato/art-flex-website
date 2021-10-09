@@ -1,6 +1,15 @@
 import React, { useEffect, useState, useRef, forwardRef } from 'react'
 import Link from 'next/link'
-import { Grid, Paper, Typography, TextField, useTheme } from '@material-ui/core'
+import {
+    Grid,
+    Paper,
+    Typography,
+    TextField,
+    useTheme,
+    FormControl,
+    InputLabel,
+    Input
+} from '@material-ui/core'
 import styled from 'styled-components'
 import { CSSTransition } from 'react-transition-group'
 import SignInHome from '@components/SignIn/SignInHome';
@@ -15,13 +24,13 @@ import { SocialBanner } from './SignUp'
 const WrappedPaper = ({ mdDown, ...props }) => (<Paper {...props} />)
 
 const Pane = styled(Paper)`
-    padding:30px;
+    padding: 30px;
     overflow-x: hidden;
     overflow-y: hidden;
     display: inline;
     border-radius: 24px;
     position: relative;
-    width: 100%
+    width: 100%:
     z-index: 2;
     &.ani-enter {
         opacity: 0;
@@ -109,6 +118,7 @@ const pages = [
 
 const GridRow = styled(Grid)`
     margin-top: 30px;
+    overflow: 
 `
 
 const SocialButton = styled.div`
@@ -117,6 +127,33 @@ const SocialButton = styled.div`
     border-width: 2px;
     border-style: solid;
 `
+const StyledInput = styled.input
+    `
+    -webkit-appearance: none;
+    -ms-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: #FFFFFF;
+    box-shadow: 0 1px 4px 0 rgb(34 34 34 / 10%) inset;
+    border-color: rgba(34, 34, 34, 0.15);
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 6px;
+    color: #222222;
+    display: block;
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 28px;
+    height: 48px;
+    outline: none;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    padding-left: 12px;
+    padding-right: 12px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    `
 
 const SignInPane = forwardRef((props, ref) => {
     const [email, setEmail] = useState(null);
@@ -132,34 +169,26 @@ const SignInPane = forwardRef((props, ref) => {
     const prevPageNumber = prevPageNumberRef.current;
     return (
         <Pane ref={ref} >
-            <Grid container style={{ maxWidth: 384 }} direction="column">
-                <Grid container item xs={12}>
+            <Grid container style={{ maxWidth: 324, padding: 6 }} direction="row">
+                <Grid container item xs={12} alignItems='center'>
                     <Grid item xs={6}>
                         <Typography variant='h5'>Sign in</Typography>
                     </Grid>
                     <Grid item container xs={6} direction='row-reverse'>
-                        <Grid item>
-                            <Typography variant='h5'>Register</Typography>
+                        <Grid item xs='auto'>
+                            <div style={{ borderStyle: 'solid', borderWidth: 2, borderRadius: 24, padding: 8, paddingLeft: 18, paddingRight: 18 }}>
+                                <Typography variant='body1'>Register</Typography>
+                            </div>
                         </Grid>
                     </Grid>
                 </Grid>
                 <GridRow item xs={12}>
-                    <TextField
-                        fullWidth
-                        variant="outlined"
-                        label="Email"
-                        InputProps={{ spellCheck: false }}
-                        onChange={(event) => setEmail(event.target.value)}
-                    />
+                    <div style={{ paddingLeft: 2 }}><Typography><b>Email address</b></Typography></div>
+                    <StyledInput />
                 </GridRow>
                 <GridRow item xs={12}>
-                    <TextField
-                        fullWidth
-                        variant="outlined"
-                        label="Password"
-                        InputProps={{ spellCheck: false }}
-                        onChange={(event) => setPassword(event.target.value)}
-                    />
+                    <div style={{ paddingLeft: 2 }}><Typography><b>Password</b></Typography></div>
+                    <StyledInput/>
                 </GridRow>
                 <GridRow style={{ textAlign: 'center' }} item xs={12}>
                     <Typography variant='body1'>
@@ -167,22 +196,29 @@ const SignInPane = forwardRef((props, ref) => {
                     </Typography>
                 </GridRow>
                 <GridRow style={{ padding: 10, textAlign: 'center', borderRadius: '24px', backgroundColor: theme.palette.primary.main }} item xs={12}>
-                    <Typography style={{ color: 'white' }} variant='body1'>
+                    <Typography style={{ color: 'white', textTransform: 'none' }} variant='button'>
                         Sign in
                     </Typography>
                 </GridRow>
-                <GridRow item xs={12}>
-                    <SocialBanner />
-                </GridRow>
-                <GridRow item xs={12}>
+                <Grid style={{marginTop: 20}} item xs={12} >
+                    <div style={{ marginLeft: -36, marginRight: -36 }}>
+                        <SocialBanner fontSize='1rem' />
+                    </div>
+                </Grid>
+                <Grid style={{ marginTop: 12 }} item xs={12}>
                     <GoogleSignInButton />
-                </GridRow>
+                </Grid>
                 <Grid style={{ marginTop: 12 }} item xs={12}>
                     <FacebookSignInButton />
                 </Grid>
-                <Typography style={{ marginTop: 12, display: 'block' }} variant='body2'>
-                    Messages about Artflex ...
-                </Typography>
+                <div style={{ marginTop: 20 }}>
+                    <Typography style = {{color:'black', opacity:.8}} variant='body2'>
+                        By clicking Sign in, you agree to Art Flex's
+                        <Link href='/legal/term_of_use'><a style={{color:'inherit'}}> Terms of Use</a></Link> and 
+                        <Link href='/legal/privacy_policy'><a style={{color:'inherit'}}> Privacy Policy</a></Link>.
+                        You may change your preferences in your account settings at any time. We will never post or share your information without your permission.
+                    </Typography>
+                </div>
             </Grid>
         </Pane >
     )

@@ -85,18 +85,18 @@ const checkPasswordNumber = (password) => {
 };
 
 const SocialBanner = (props) => (
-    <Grid container item xs={12} justifyContent="center">
-        <Grid container alignItems="center" item xs={5}>
+    <Grid container justifyContent='center' >
+        <Grid container alignItems="center" item xs>
             <Grid item xs={12}>
                 <Divider />
             </Grid>
         </Grid>
-        <Grid style={{ textAlign: "center" }} item xs={2}>
-            <Typography style={{ color: "rgba(0, 0, 0, 0.54)" }} variant="overline">
+        <Grid item xs='auto' style={{paddingLeft:10, paddingRight:10}}>
+            <Typography style={{ color: "rgba(0, 0, 0, 0.54)", fontSize: props.fontSize }} variant="overline">
                 Or
             </Typography>
         </Grid>
-        <Grid container alignItems="center" item xs={5}>
+        <Grid container alignItems="center" item xs>
             <Grid item xs={12}>
                 <Divider />
             </Grid>

@@ -27,7 +27,7 @@ export default function SignIn() {
             <Button className={styles.SignInButton} onClick={() => setOpen(true)}>
                 <Typography>Sign in</Typography>
             </Button>
-            <Backdrop open={open} style={{ zIndex: 1 }}>
+            <Backdrop open={open} style={{ zIndex: 1, padding:12 }}>
                 {open && <ClickAwayListener onClickAway={() => setOpen(false)} children={<SignInPane />} />}
             </Backdrop>
         </>
