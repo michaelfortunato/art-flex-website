@@ -1,14 +1,15 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Grid, Button, ButtonBase, Typography } from '@material-ui/core'
+import { motion } from 'framer-motion'
 import { EmailOutlined } from '@material-ui/icons'
 /*  padding-left: 18px;
     padding-right: 18px;
     padding-top: 12px;
     padding-bottom: 12px;
     */
-   
-const StyledButton = styled(ButtonBase)`
+
+const StyledButton = styled(motion(ButtonBase))`
     position: relative;
     width: 100%;
     padding: 10px;
@@ -16,6 +17,7 @@ const StyledButton = styled(ButtonBase)`
     border-color: #222222;
     border-width: 2px;
     border-style: solid;
+
 `
 const StyledIconArea = styled.div`
     display: inline-block;
@@ -27,14 +29,57 @@ const StyledIconComp = styled.i`
     height: 25px;
     width: 25px; 
 `;
-export default function SignInButton(props) {
+
+const StyledStandardButton = styled(motion.button)`
+    position: relative;
+    width: 100%;
+    padding: 10px;
+    border-radius: 24px;
+    border-color: #222222;
+    border-width: 2px;
+    border-style: solid;
+`
+
+const StandardButton = ({ children, ...props }) => {
+    <StyledButton
+        whileHover={
+            !props.animate && {
+                scale: 1.05,
+                ...props.animateTo
+            }}
+        onClick={props.onClick}
+        style={{ ...props.styleOverides }}>
+        {children}
+    </StyledButton>
+}
+
+const SocialButton = (props) => {
     return (
-        <StyledButton onClick={props.onClick}>
+        <StandardButton
+            onClick={props.onClick}>
             <StyledIconArea>
                 {props.isSVG ? <img style={{ 'verticalAlign': 'middle', 'height': '1.5rem', 'width': '1.5rem' }} src={props.icon} />
                     : <StyledIconComp as={props.icon} />}
             </StyledIconArea>
-            <Typography style={{textTransform:'none'}} variant='button'>{props.text}</Typography>
+            <Typography style={{ textTransform: 'none' }} variant='button'>{props.text}</Typography>
+        </StandardButton>
+    )
+}
+
+export { StandardButton, SocialButton };
+export default function SignInButton(props) {
+    return (
+        <StyledButton
+            whileHover={{
+                scale: 1.05,
+                ...props.animateTo
+            }}
+            onClick={props.onClick}>
+            <StyledIconArea>
+                {props.isSVG ? <img style={{ 'verticalAlign': 'middle', 'height': '1.5rem', 'width': '1.5rem' }} src={props.icon} />
+                    : <StyledIconComp as={props.icon} />}
+            </StyledIconArea>
+            <Typography style={{ textTransform: 'none' }} variant='button'>{props.text}</Typography>
         </StyledButton>
     )
 }

@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit'
 export const accountSlice = createSlice({
 	name: "account",
 	initialState: {
+		name: null,
 		email: null
 	},
 	reducers: {
@@ -12,7 +13,8 @@ export const accountSlice = createSlice({
 			// doesn't actually mutate the state because it uses the Immer library,
 			// which detects changes to a "draft state" and produces a brand new
 			// immutable state based off those changes""
-			state.email = action.payload.email
+			state.name = action.payload.name;
+			state.email = action.payload.email;
 		},
 		signOut: state => {
 			state.email = null
