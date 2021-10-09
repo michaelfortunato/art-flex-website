@@ -200,7 +200,7 @@ export default function SignUp(props) {
         className={styles.sign_up_body}
       >
         <Grid item xs={12} className={styles.title_container}>
-          <Typography variant="h2">Create your account</Typography>
+          <Typography variant="h4">Create your account</Typography>
         </Grid>
         <Grid
           className={styles.field_container}
