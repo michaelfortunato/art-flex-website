@@ -48,7 +48,7 @@ export async function getServerSideProps(context) {
       // If we set the cookie here without specifying the domain , then the cookie will not be sent to the subdomain
       // as this function is executed on the server with domain art-flex.co (not api.artflex.co)
       // We set it to art-flex.co as the browser rejects if we did api.art-flex.co as its out of scope for art-flex.co
-      context.res.setHeader('Set-Cookie', cookie.serialize(cookieName, cookieValue, { domain: 'art-flex.co', path: '/', httpOnly: true, sameSite: 'none', secure: 'true' }))
+      context.res.setHeader('Set-Cookie', cookieString)
     })
     props = { name: response.data.name, email: response.data.email, success: true, statusMessage: response.data.statusMessage }
   } catch (error) {

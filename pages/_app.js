@@ -14,7 +14,7 @@ import { Provider } from 'react-redux'
 
 
 import axios from 'axios'
-const ART_FLEX_URL = "https://api.art-flex.co"
+const ART_FLEX_URL = "/api"
 axios.defaults.baseURL = ART_FLEX_URL
 
 function MyApp({ Component, pageProps }) {
