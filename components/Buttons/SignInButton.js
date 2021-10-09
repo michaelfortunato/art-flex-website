@@ -40,18 +40,17 @@ const StyledStandardButton = styled(motion.button)`
     border-style: solid;
 `
 
-const StandardButton = ({ children, ...props }) => {
+const StandardButton = ({ children, ...props }) =>
     <StyledButton
         whileHover={
-            !props.animate && {
+            props.animate && {
                 scale: 1.05,
                 ...props.animateTo
             }}
         onClick={props.onClick}
-        style={{ ...props.styleOverides }}>
+        style={{ ...props.styleOverrides }}>
         {children}
     </StyledButton>
-}
 
 const SocialButton = (props) => {
     return (

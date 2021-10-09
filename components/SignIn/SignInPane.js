@@ -26,6 +26,7 @@ import { SocialBanner } from './SignUp'
 import axios from 'axios'
 import { signIn } from 'redux-store/features/account/accountSlice'
 import { useDispatch } from 'react-redux'
+import { StandardButton } from '@components/Buttons/SignInButton'
 
 const WrappedPaper = ({ mdDown, ...props }) => (<Paper {...props} />)
 
@@ -204,33 +205,66 @@ const PasswordField = (props) => {
     );
 };
 
+
+const StyledStandardForm = styled(InputBase)
+    `
+    -webkit-appearance: none;
+    -ms-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: #FFFFFF;
+    box-shadow: 0 1px 4px 0 rgb(34 34 34 / 10%) inset;
+    border-color: rgba(34, 34, 34, 0.15);
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 6px;
+    color: #222222;
+    display: block;
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 28px;
+    height: 48px;
+    outline: none;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    padding-left: 12px;
+    padding-right: 12px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    `
+
+const StandardForm = (props) => {
+    return <>
+        <div style={{ paddingLeft: 2 }}><Typography><b>{props.title}</b></Typography></div>
+        <StyledStandardForm type={props.type} onChange={props.onChange} />
+    </>
+}
+
 const SignInForm = (props) => {
-    const [email, setEmail] = useState(null);
-    const [password, setPassword] = useState(null);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [signUpFailed, setSignUpFailed] = useState({ status: false, message: null })
     const theme = useTheme();
     const dispatch = useDispatch()
 
-    useEffect(() => {
-        setSignUpFailed({ status: false, message: null })
-    }, [email, password])
-    const SignInUser = async (props) => {
-        try {
-            console.log(email)
-            const { data: { name, email: normalizedEmail } } = await axios.post('/login', { "email": email, "password": password })
-            dispatch(signIn({ name, email: normalizedEmail }))
-        } catch (error) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            // or something happened in setting up the request that triggered an Error
-            if (error.response) {
-                setSignUpFailed({ status: true, message: error.response.data.statusMessage })
-            } else {
-                setSignUpFailed({ status: true, message: "Internal server error" })
-            }
+    const signInSuccess = (data) => {
+        dispatch(signIn({ name: data.name, email: data.email }))
+    }
+    const signInFailure = (error) => {
+        console.log(error)
+        if (error.response) {
+            setSignUpFailed({ status: true, message: error.response.data.statusMessage })
+        } else {
+            setSignUpFailed({ status: true, message: "Internal server error" })
         }
     }
 
+
+
+    useEffect(() => {
+        setSignUpFailed({ status: false, message: null })
+    }, [email, password])
 
     return (<Grid container style={{ maxWidth: 324, padding: 6 }} direction="row">
         <Grid container item xs={12} alignItems='center'>
@@ -239,21 +273,20 @@ const SignInForm = (props) => {
             </Grid>
             <Grid item container xs={6} direction='row-reverse'>
                 <Grid item xs='auto'>
-                    <motion.button 
-                    whileHover ={{
-                    boxShadow: '0 4px 20px rgb(34 34 34 / 15%)',
-                    scale: 1.01
-                    }}
-                    style={{
-                        cursor: 'pointer', backgroundColor: '#FFFFFF',
-                        borderStyle: 'solid',
-                        borderWidth: 2,
-                        borderRadius: 24,
-                        padding: 8,
-                        paddingLeft: 18, paddingRight: 18
-                    }}>
+                    <StandardButton
+                        animateTo={{
+                            boxShadow: '0 4px 20px rgb(34 34 34 / 15%)',
+                            scale: 1.02
+                        }}
+                        animate={true}
+                        styleOverrides={
+                            {
+                                padding: 8,
+                                paddingLeft: 18,
+                                paddingRight: 18,
+                            }}>
                         <Typography variant='body1'>Register</Typography>
-                    </motion.button>
+                    </StandardButton>
                 </Grid>
             </Grid>
         </Grid>
@@ -264,6 +297,7 @@ const SignInForm = (props) => {
         <GridRow item xs={12}>
             <div style={{ paddingLeft: 2 }}><Typography><b>Password</b></Typography></div>
             <PasswordField setPassword={setPassword} />
+
         </GridRow>
         {signUpFailed.status && (
             <Grid item xs={12} >
@@ -282,16 +316,16 @@ const SignInForm = (props) => {
         </GridRow>
         <GridRow item xs={12}
         >
-            <motion.button
-                whileHover={{
-                    scale: 1.05,
-                }}
-                style={{ width: '100%', cursor: 'pointer', padding: 10, textAlign: 'center', borderRadius: '24px', borderStyle: 'none', backgroundColor: theme.palette.primary.main }}
-            >
-                <Typography style={{ color: 'white', textTransform: 'none' }} onClick={SignInUser} variant='button'>
+            <StandardButton
+                animate
+                styleOverrides={{ width: '100%', textAlign: 'center', borderStyle: 'none', backgroundColor: theme.palette.primary.main }}
+                onClick={async () => axios.post('/login', { email, password })
+                    .then(signInSuccess)
+                    .catch(signInFailure)}>
+                <Typography style={{ color: 'white', textTransform: 'none' }} variant='button'>
                     Sign in
                 </Typography>
-            </motion.button>
+            </StandardButton>
         </GridRow>
         <Grid style={{ marginTop: 20 }} item xs={12} >
             <div style={{ marginLeft: -36, marginRight: -36 }}>
@@ -309,7 +343,7 @@ const SignInForm = (props) => {
                 By clicking Sign in, you agree to Art Flex's
                 <Link href='/legal/term_of_use'><a style={{ color: 'inherit' }}> Terms of Use</a></Link> and
                 <Link href='/legal/privacy_policy'><a style={{ color: 'inherit' }}> Privacy Policy</a></Link>.
-                You may change your preferences in your account settings at any time. We will never post 
+                You may change your preferences in your account settings at any time. We will never post
                 or share your information without your explicit permission.
             </Typography>
         </div>
