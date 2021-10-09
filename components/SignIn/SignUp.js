@@ -91,7 +91,7 @@ const SocialBanner = (props) => (
                 <Divider />
             </Grid>
         </Grid>
-        <Grid style={{ textAlign: "center" }} item xs={1}>
+        <Grid style={{ textAlign: "center" }} item xs={2}>
             <Typography style={{ color: "rgba(0, 0, 0, 0.54)" }} variant="overline">
                 Or
             </Typography>
@@ -105,7 +105,7 @@ const SocialBanner = (props) => (
 );
 
 const StyledContainer = styled(Grid)``;
-
+export { SocialBanner };
 export default function SignUp(props) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
