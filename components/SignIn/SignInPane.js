@@ -7,12 +7,13 @@ import {
     useTheme,
 } from '@material-ui/core'
 import { StandardForm, PasswordForm } from '@components/Library'
+import { SignUpNew } from '@components/SignIn/SignUp'
 import styled from 'styled-components'
 import { CSSTransition } from 'react-transition-group'
 import SignInHome from '@components/SignIn/SignInHome';
 import EmailSignIn from '@components/SignIn/SignInEmail'
 import SignUp from '@components/SignIn/SignUp'
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, AnimateSharedLayout, motion } from 'framer-motion';
 import SuccessfulSignUp from '@components/Welcome/SuccessfulSignUp';
 import GoogleSignInButton from '@components/Buttons/GoogleSignInButton'
 import FacebookSignInButton from '@components/Buttons/FacebookSignInButton'
@@ -24,7 +25,7 @@ import { StandardButton } from '@components/Buttons/SignInButton'
 
 const WrappedPaper = ({ mdDown, ...props }) => (<Paper {...props} />)
 
-const Pane = styled(Paper)`
+const Pane = styled(motion(Paper))`
     padding: 30px;
     overflow-x: hidden;
     overflow-y: hidden;
@@ -64,7 +65,7 @@ const StyledSignUp = (props) => {
             <AnimatePresence exitBeforeEnter>
                 {!successfulSignUp ?
                     <motion.div exit={{ opacity: 0 }}>
-                        <SignUp signUpCallback={() => setSuccessfulSignUp(true)} {...props} />
+                        <SignUpNew />
                     </motion.div>
                     : <SuccessfulSignUp small onAnimationComplete={() => setTimeout(() => props.setOpen(false), 800)} />}
             </AnimatePresence>
@@ -116,7 +117,9 @@ const SignInForm = (props) => {
                                 padding: 8,
                                 paddingLeft: 18,
                                 paddingRight: 18,
-                            }}>
+                            }}
+                        onClick={() => props.setPage('SignUp')}
+                    >
                         <Typography variant='body1'>Register</Typography>
                     </StandardButton>
                 </Grid>
@@ -168,25 +171,41 @@ const SignInForm = (props) => {
         <Grid style={{ marginTop: 12 }} item xs={12}>
             <FacebookSignInButton />
         </Grid>
-        <div style={{ marginTop: 20 }}>
-            <Typography style={{ color: 'black', opacity: .8 }} variant='body2'>
-                By clicking Sign in, you agree to Art Flex's
-                <Link href='/legal/term_of_use'><a style={{ color: 'inherit' }}> Terms of Use</a></Link> and
-                <Link href='/legal/privacy_policy'><a style={{ color: 'inherit' }}> Privacy Policy</a></Link>.
-                You may change your preferences in your account settings at any time. We will never post
-                or share your information without your explicit permission.
-            </Typography>
-        </div>
     </Grid>
     )
 }
 
+const pages = [SignInForm, StyledSignUp]
+
 const SignInPane = forwardRef((props, ref) => {
-    const [pageNumber, setPageNumber] = useState(0);
+    const [page, setPage] = useState('SignIn');
     return (
-        <Pane ref={ref} >
-            <SignInForm />
-        </Pane >
+        <AnimateSharedLayout>
+            <Pane layout ref={ref} >
+                <div style={{ maxWidth: 324 }}>
+                    <AnimatePresence  initial={false}>
+                        {page === 'SignIn' ?
+                            <motion.div key='SignIn' initial={{ x: '-150%' }} animate={{ x: 0 }}>
+                                <SignInForm setPage={setPage} />
+                            </motion.div>
+                            :
+                            <motion.div key='SignUp' initial={{ x: '100%' }} animate={{ x: 0 }}>
+                                <StyledSignUp setPage={setPage} />
+                            </motion.div>
+                        }
+                    </AnimatePresence>
+                    <motion.div layout style={{ marginTop: 20 }}>
+                    <Typography style={{ color: 'black', opacity: .8 }} variant='body2'>
+                        By clicking Sign in, you agree to Art Flex's
+                        <Link href='/legal/term_of_use'><a style={{ color: 'inherit' }}> Terms of Use</a></Link> and
+                        <Link href='/legal/privacy_policy'><a style={{ color: 'inherit' }}> Privacy Policy</a></Link>.
+                        You may change your preferences in your account settings at any time. We will never post
+                        or share your information without your explicit permission.
+                    </Typography>
+                    </motion.div>
+                </div>
+            </Pane >
+        </AnimateSharedLayout>
     )
 })
 export default SignInPane;

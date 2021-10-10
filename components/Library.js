@@ -77,4 +77,4 @@ const PasswordForm = (props) => {
     </div>
 };
 
-export { StandardForm, PasswordForm }
+export { StandardForm, PasswordForm, StyledStandardForm }
