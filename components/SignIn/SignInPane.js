@@ -182,7 +182,7 @@ const SignInPane = forwardRef((props, ref) => {
     return (
         <AnimateSharedLayout>
             <Pane layout ref={ref} >
-                <div style={{ minWidth: 324 }}>
+                <div style={{ maxWidth: 324 }}>
                     <AnimatePresence  initial={false}>
                         {page === 'SignIn' ?
                             <motion.div key='SignIn' initial={{ x: '-150%' }} animate={{ x: 0 }}>
