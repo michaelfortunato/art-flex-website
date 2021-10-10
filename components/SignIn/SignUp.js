@@ -78,19 +78,20 @@ const PasswordField = (props) => {
 
 const PasswordField2 = (props) => {
     const theme = useTheme()
-    const helperTextClasses = validHelperText(props.validPassword)();
-    console.log(helperTextClasses)
     const [showPassword, setShowPassword] = useState(false);
     const handleMouseDownPassword = (event) => {
         event.preventDefault();
     };
+
+    let helperTextColor = 'inherit';
+    if (props.validPassword) helperTextColor = theme.palette.success['main'];
+    else if (props.error) helperTextColor = theme.palette.error['main'];
     return (
-        <>
+        <div>
+            <div style={{ paddingLeft: 2 }}><Typography><b>{props.text}</b></Typography></div>
             <StyledStandardForm
-                FormHelperTextProps={{ classes: helperTextClasses }}
                 label={props.label}
                 error={props.error}
-                helperText={props.helperText}
                 style={{ cursor: 'text', display: 'inline-flex' }}
                 fullWidth
                 type={showPassword ? "text" : "password"}
@@ -107,10 +108,10 @@ const PasswordField2 = (props) => {
                 }
             >
             </StyledStandardForm>
-            <FormHelperText classes={helperTextClasses}>
+            <FormHelperText style={{ color: helperTextColor }}>
                 {props.helperText}
             </FormHelperText>
-        </>
+        </div>
     )
 }
 
@@ -238,9 +239,29 @@ const SignUpNew = (props) => {
             container
             justifyContent="center"
         >
-            <Grid style={{ marginTop: 30 }} container item xs={12} justifyContent='center'>
+            <Grid style={{ marginTop: 30 }} alignItems='center' container item xs={12}>
                 <Grid item xs='auto'>
                     <Typography variant="h5">Create your account</Typography>
+                </Grid>
+                <Grid item xs container justifyContent='flex-end'>
+                    <Grid item xs='auto'>
+                        <StandardButton
+                        animateTo={{
+                            boxShadow: '0 4px 20px rgb(34 34 34 / 15%)',
+                            scale: 1.02
+                        }}
+                        animate={true}
+                        styleOverrides={
+                            {
+                                padding: 8,
+                                paddingLeft: 18,
+                                paddingRight: 18,
+                            }}
+                        onClick={() => props.setPage('SignUp')}
+                    >
+                        <Typography variant='body1'>Register</Typography>
+                    </StandardButton>
+                    </Grid>
                 </Grid>
             </Grid>
             <Grid
@@ -254,7 +275,7 @@ const SignUpNew = (props) => {
                     onChange={(event) => setName(event.target.value)}
                 />
             </Grid>
-            <Grid style={{ marginTop: 30 }} item xs={12}>
+            <Grid style={{ marginTop: 24 }} item xs={12}>
                 <StandardForm
                     fullWidth
                     text='Email address'
@@ -268,8 +289,9 @@ const SignUpNew = (props) => {
                     onChange={(event) => handleEmail(event.target.value)}
                 />
             </Grid>
-            <Grid style={{ marginTop: 30 }} item xs={12}>
+            <Grid style={{ marginTop: 24 }} item xs={12}>
                 <PasswordField2
+                    text='Password'
                     error={
                         password !== "" &&
                         (!passwordLength || !passwordUppercase || !passwordNumber)
@@ -287,7 +309,7 @@ const SignUpNew = (props) => {
                 />
             </Grid>
 
-            <Grid style={{ marginTop: 30 }} item xs={12}>
+            <Grid style={{ marginTop: 34 }} item xs={12}>
                 <StandardButton
                     onClick={PostSignUp}
                     styleOverrides={

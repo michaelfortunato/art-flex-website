@@ -99,7 +99,7 @@ const SignInForm = (props) => {
         setSignUpFailed({ status: false, message: null })
     }, [email, password])
 
-    return (<Grid container style={{ maxWidth: 324, padding: 6 }} direction="row">
+    return (<Grid container style={{ minWidth: 324, padding: 6 }} direction="row">
         <Grid container item xs={12} alignItems='center'>
             <Grid item xs={6}>
                 <Typography variant='h5'>Sign in</Typography>
@@ -182,7 +182,7 @@ const SignInPane = forwardRef((props, ref) => {
     return (
         <AnimateSharedLayout>
             <Pane layout ref={ref} >
-                <div style={{ maxWidth: 324 }}>
+                <div style={{ minWidth: 324 }}>
                     <AnimatePresence  initial={false}>
                         {page === 'SignIn' ?
                             <motion.div key='SignIn' initial={{ x: '-150%' }} animate={{ x: 0 }}>
