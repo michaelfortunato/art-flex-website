@@ -456,9 +456,9 @@ const SignUpNew = (props) => {
                                 paddingLeft: 18,
                                 paddingRight: 18,
                             }}
-                        onClick={() => props.setPage('SignUp')}
+                        onClick={() => props.setPage('SignIn')}
                     >
-                        <Typography variant='body1'>Register</Typography>
+                        <Typography variant='body1'>Sign in</Typography>
                     </StandardButton>
                     </Grid>
                 </Grid>

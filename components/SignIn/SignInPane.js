@@ -65,7 +65,7 @@ const StyledSignUp = (props) => {
             <AnimatePresence exitBeforeEnter>
                 {!successfulSignUp ?
                     <motion.div exit={{ opacity: 0 }}>
-                        <SignUpNew />
+                        <SignUpNew setPage={props.setPage} />
                     </motion.div>
                     : <SuccessfulSignUp small onAnimationComplete={() => setTimeout(() => props.setOpen(false), 800)} />}
             </AnimatePresence>
@@ -183,25 +183,25 @@ const SignInPane = forwardRef((props, ref) => {
         <AnimateSharedLayout>
             <Pane layout ref={ref} >
                 <div style={{ maxWidth: 324 }}>
-                    <AnimatePresence  initial={false}>
+                    <AnimatePresence initial={false}>
                         {page === 'SignIn' ?
-                            <motion.div key='SignIn' initial={{ x: '-150%' }} animate={{ x: 0 }}>
+                            <motion.div key='SignIn' initial={{ x: '-150%' }} animate={{ x: 0}} >
                                 <SignInForm setPage={setPage} />
                             </motion.div>
                             :
-                            <motion.div key='SignUp' initial={{ x: '100%' }} animate={{ x: 0 }}>
+                            <motion.div key='SignUp' initial={{ x: '150%' }} animate={{ x: 0 }} >
                                 <StyledSignUp setPage={setPage} />
                             </motion.div>
                         }
                     </AnimatePresence>
                     <motion.div layout style={{ marginTop: 20 }}>
-                    <Typography style={{ color: 'black', opacity: .8 }} variant='body2'>
-                        By clicking Sign in, you agree to Art Flex's
-                        <Link href='/legal/term_of_use'><a style={{ color: 'inherit' }}> Terms of Use</a></Link> and
-                        <Link href='/legal/privacy_policy'><a style={{ color: 'inherit' }}> Privacy Policy</a></Link>.
-                        You may change your preferences in your account settings at any time. We will never post
-                        or share your information without your explicit permission.
-                    </Typography>
+                        <Typography style={{ color: 'black', opacity: .8 }} variant='body2'>
+                            By clicking Sign in, you agree to Art Flex's
+                            <Link href='/legal/term_of_use'><a style={{ color: 'inherit' }}> Terms of Use</a></Link> and
+                            <Link href='/legal/privacy_policy'><a style={{ color: 'inherit' }}> Privacy Policy</a></Link>.
+                            You may change your preferences in your account settings at any time. We will never post
+                            or share your information without your explicit permission.
+                        </Typography>
                     </motion.div>
                 </div>
             </Pane >
