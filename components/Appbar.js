@@ -16,6 +16,10 @@ const pages = [
     {
         url: "/about",
         name: "About"
+    },{
+        k: 9,
+        url: "/about",
+        name: "About"
     }
 ]
 const StyledMenubar = styled(Grid)`
@@ -69,8 +73,8 @@ export default function Appbar(props) {
                 </Grid>
                 </Grid>
                 <StyledMenubar container item xs={12} justifyContent="space-around">
-                    {pages.map(({ url, name }, index) =>
-                        <Grid style={{ textAlign: 'center', cursor:'pointer' }} key={index} item xs onMouseOut={onMouseOut} onMouseOver={onMouseEnter}>
+                    {pages.map(({ url, name, k }, index) =>
+                        <Grid style={{ textAlign: "", cursor:'pointer' }} key={index} item xs onMouseOut={onMouseOut} onMouseOver={onMouseEnter}>
                             <Link href={url}>
                                 <Typography variant="button">
                                     <a>

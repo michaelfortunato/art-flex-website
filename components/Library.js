@@ -7,12 +7,13 @@ import {
     InputBase,
     InputAdornment,
     IconButton,
+    Button
 } from '@material-ui/core'
 import {
     Visibility,
     VisibilityOff,
 } from "@material-ui/icons";
-import { useState } from 'react'
+import { forwardRef, useState } from 'react'
 import styled from 'styled-components'
 
 const StyledStandardForm = styled(InputBase)
@@ -77,4 +78,22 @@ const PasswordForm = (props) => {
     </div>
 };
 
-export { StandardForm, PasswordForm, StyledStandardForm }
+const StyledAppbarButton = styled(Button)`
+    border-radius: 25px;
+    margin: 10px;
+    text-transform: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+`
+
+const AppbarButton = forwardRef((props, ref) => {
+    return (
+        <StyledAppbarButton ref={ref} onClick={props.onClick}>
+            <Typography variant={props.variant}>{props.text}</Typography>
+        </StyledAppbarButton>)
+});
+
+
+export { StandardForm, PasswordForm, StyledStandardForm, AppbarButton }

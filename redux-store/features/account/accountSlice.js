@@ -22,6 +22,10 @@ export const accountSlice = createSlice({
 	}
 })
 
+// Export actions
 export const {signIn, signOut} = accountSlice.actions;
+
+// Export selectors
+export const selectAccount = state => state.account;
 
 export default accountSlice.reducer;
