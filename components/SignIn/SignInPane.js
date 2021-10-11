@@ -183,7 +183,7 @@ const SignInPane = forwardRef((props, ref) => {
         <AnimateSharedLayout>
             <Pane layout ref={ref} >
                 <div style={{ maxWidth: 324 }}>
-                    <AnimatePresence initial={false}>
+                    <AnimatePresence exitBeforeEnter initial={false}>
                         {page === 'SignIn' ?
                             <motion.div key='SignIn' initial={{ x: '-150%' }} animate={{ x: 0}} >
                                 <SignInForm setPage={setPage} />
