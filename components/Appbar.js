@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react'
-import styles from '@styles/Appbar.module.css'
 import { Divider, Grid, Hidden, Menu, Popper, Typography } from '@material-ui/core';
 import Searchbar from '@components/Searchbar'
 import Navigation from '@components/Navigation'
@@ -48,31 +47,30 @@ export default function Appbar(props) {
         */
     }
     const onMouseOut = () => {
-        
-        clearTimeout(underlineTimer.current)
-        underlineTimer.current = setTimeout(() => 
-        setIsUnderlined(false), 1000)
+        setIsUnderlined(false)
     }
 
     return (
-        <div ref={props.appbarRef} className={styles.Appbar}>
-            <Grid container justifyContent='center' alignItems='center' spacing={0}>
-                <Grid item md={2}>
-                    <div className={styles.logo}>
+        <div ref={props.appbarRef} style={{ paddingTop: 10, marginBottom: 40, backgroundColor: 'white' }} >
+            <Grid container alignItems='center'>
+                <Grid container item xs={12} alignItems="center" spacing={3}>
+                <Grid item xs='auto'>
+                    <div>
                         <Typography variant='h1'>AF</Typography>
                     </div>
                 </Grid>
                 <Hidden smDown>
-                    <Grid item md={8}>
+                    <Grid item xs>
                         <Searchbar />
                     </Grid>
                 </Hidden>
-                <Grid item md={2}>
+                <Grid item xs md='auto'>
                     <Navigation />
                 </Grid>
-                <StyledMenubar container item xs={12} md={8} justifyContent="space-evenly">
+                </Grid>
+                <StyledMenubar container item xs={12} justifyContent="space-around">
                     {pages.map(({ url, name }, index) =>
-                        <Grid key={index} item onMouseOut={onMouseOut} onMouseOver={onMouseEnter}>
+                        <Grid style={{ textAlign: 'center', cursor:'pointer' }} key={index} item xs onMouseOut={onMouseOut} onMouseOver={onMouseEnter}>
                             <Link href={url}>
                                 <Typography variant="button">
                                     <a>
@@ -83,7 +81,7 @@ export default function Appbar(props) {
                         </Grid>
                     )}
                 </StyledMenubar>
-                <Grid ref={greybarRef} item xs={12} style={{ marginTop: 15, height: 3, backgroundColor: "#dedede" }}>
+                <Grid ref={greybarRef} item xs={12} style={{ marginTop: 15, height: 2, backgroundColor: "#dedede" }}>
                     <div style={{ position: 'relative', height: "100%" }}>
                         <AnimatePresence>
                             {isUnderlined &&

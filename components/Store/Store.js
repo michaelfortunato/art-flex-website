@@ -27,7 +27,7 @@ export default function Store() {
 
     return (
         <div>
-            <Grid container spacing={6} justifyContent="center">
+            <Grid container spacing={6} justifyContent="space-between">
                 {pages.map((page) => <StoreBody key = {page} pageNumber={page} variables={filter} /> )}
             </Grid>
             <div style = {{opacity:0}} ref ={bottomPageRef}>[Bottom]</div>

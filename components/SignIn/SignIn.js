@@ -2,13 +2,20 @@ import { useState, useRef, forwardRef } from 'react'
 import Backdrop from '@material-ui/core/Backdrop'
 import Button from '@material-ui/core/Button'
 import { ClickAwayListener } from '@material-ui/core';
-import styled from 'styled-components'
 import SignInPane from '@components/SignIn/SignInPane';
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Typography from '@material-ui/core/Typography'
-import { CSSTransition } from 'react-transition-group'
-import styles from '@styles/SignIn.module.css'
+import styled from 'styled-components'
 
+const StyledButton = styled(Button)`
+    border-radius: 25px;
+    margin: 10px;
+    text-transform: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+`
 
 
 export default function SignIn() {
@@ -24,10 +31,10 @@ export default function SignIn() {
     const mddown = useMediaQuery(theme => theme.breakpoints.down("md"));
     return (
         <>
-            <Button className={styles.SignInButton} onClick={() => setOpen(true)}>
+            <StyledButton onClick={() => setOpen(true)}>
                 <Typography>Sign in</Typography>
-            </Button>
-            <Backdrop open={open} style={{ zIndex: 1, padding:12 }}>
+            </StyledButton>
+            <Backdrop open={open} style={{ zIndex: 1, padding: 12 }}>
                 {open && <ClickAwayListener onClickAway={() => setOpen(false)} children={<SignInPane />} />}
             </Backdrop>
         </>
