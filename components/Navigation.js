@@ -12,6 +12,8 @@ import ShoppingCartOutlinedIcon from "@material-ui/icons/ShoppingCartOutlined";
 import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
 import AccountCircleTwoToneIcon from "@material-ui/icons/AccountCircleTwoTone";
 
+import AccountMenu from "@components/Account/AccountMenu";
+
 import { useSelector } from "react-redux";
 import { selectAccount } from "redux-store/features/account/accountSlice";
 import { AppbarButton } from "@components/Library";
@@ -31,9 +33,7 @@ export default function Navigation() {
       <Grid item xs="auto"></Grid>
       <Grid item xs="auto">
         {email !== null ? (
-          <IconButton color="inherit">
-            <AccountCircleTwoToneIcon fontSize="large" />
-          </IconButton>
+         <AccountMenu /> 
         ) : (
           <SignIn />
         )}
