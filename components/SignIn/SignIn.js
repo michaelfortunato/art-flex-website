@@ -5,6 +5,7 @@ import { ClickAwayListener } from '@material-ui/core';
 import SignInPane from '@components/SignIn/SignInPane';
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Typography from '@material-ui/core/Typography'
+import { CSSTransition } from 'react-transition-group'
 import styled from 'styled-components'
 
 const StyledButton = styled(Button)`

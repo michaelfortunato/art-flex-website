@@ -30,7 +30,6 @@ export default function Navigation() {
           <ShoppingCartOutlinedIcon fontSize="large" />
         </IconButton>
       </Grid>
-      <Grid item xs="auto"></Grid>
       <Grid item xs="auto">
         {email !== null ? (
          <AccountMenu /> 
