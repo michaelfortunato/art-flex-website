@@ -87,7 +87,7 @@ export default function Appbar(props) {
             <Navigation />
           </Grid>
         </Grid>
-        <StyledMenubar style={{zIndex:20}} container item xs={12} justifyContent="space-around">
+        <StyledMenubar style={{zIndex:2}} container item xs={12} justifyContent="space-around">
           {pages.map(({ url, name }, index) => (
             <Grid
               ref={parentBoxRefs[index]}
