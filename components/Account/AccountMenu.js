@@ -62,7 +62,7 @@ export default function AccountMenu() {
                   <Grid item xs={12}>
                     <MenuItem>
                       <AccountCircleTwoToneIcon style={{ marginRight: "10" }} />
-                      <Link href="/profile" passHref>
+                      <Link href="/account" passHref>
                         <StyledLinkText text={"Your profile"} />
                       </Link>
                     </MenuItem>
@@ -72,7 +72,7 @@ export default function AccountMenu() {
                       <AccountBalanceWalletOutlinedIcon
                         style={{ marginRight: "10" }}
                       />
-                      <Link href="/profile/purchased" passHref>
+                      <Link href="/account/purchased" passHref>
                         <StyledLinkText text={"Purchased items"} />
                       </Link>
                     </MenuItem>
@@ -80,7 +80,7 @@ export default function AccountMenu() {
                   <Grid item xs={12}>
                     <MenuItem>
                       <StoreOutlinedIcon style={{ marginRight: "10" }} />
-                      <Link href="/profile/studio/sold" passHref>
+                      <Link href="/account/studio/sold" passHref>
                         <StyledLinkText text={"Sold items"} />
                       </Link>
                     </MenuItem>

@@ -87,7 +87,7 @@ export default function Appbar(props) {
             <Navigation />
           </Grid>
         </Grid>
-        <StyledMenubar style={{zIndex:2}} container item xs={12} justifyContent="space-around">
+        <StyledMenubar container item xs={12} justifyContent="space-around">
           {pages.map(({ url, name }, index) => (
             <Grid
               ref={parentBoxRefs[index]}
@@ -144,11 +144,6 @@ export default function Appbar(props) {
               }}
               ref={underlineRef}
             />
-            <Popper
-              anchorEl={underlineRef.current}
-              open={underlineRef.current !== null}
-              placement="bottom"
-            ></Popper>
           </div>
         </Grid>
       </Grid>

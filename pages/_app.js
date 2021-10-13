@@ -4,18 +4,20 @@ import theme from "theme";
 
 import { ApolloClient, InMemoryCache } from "@apollo/client/core";
 import { ApolloProvider } from "@apollo/client/react";
-import { ThemeProvider as MuiThemeProvider, responsiveFontSizes } from "@material-ui/core/styles";
+import {
+  ThemeProvider as MuiThemeProvider,
+  responsiveFontSizes,
+} from "@material-ui/core/styles";
 import { ThemeProvider } from "styled-components";
 import { StylesProvider } from "@material-ui/core/styles";
 import { useEffect } from "react";
 import { SWRConfig } from "swr";
-import store from '../redux-store/store'
-import { Provider } from 'react-redux'
+import store from "../redux-store/store";
+import { Provider } from "react-redux";
 
-
-import axios from 'axios'
-const ART_FLEX_URL = "/api"
-axios.defaults.baseURL = ART_FLEX_URL
+import axios from "axios";
+const ART_FLEX_URL = "/api";
+axios.defaults.baseURL = ART_FLEX_URL;
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
@@ -25,6 +27,8 @@ function MyApp({ Component, pageProps }) {
       jssStyles.parentElement.removeChild(jssStyles);
     }
   }, []);
+  const getLayout = Component.getLayout || ((page) => page);
+  console.log(getLayout)
   return (
     <div>
       <Head>
@@ -35,13 +39,15 @@ function MyApp({ Component, pageProps }) {
       <main>
         <div>
           <Provider store={store}>
-            <SWRConfig value={{
-              fetcher: (url) => fetch(ART_FLEX_URL + url).then(res => res.json())
-            }}>
+            <SWRConfig
+              value={{
+                fetcher: (url) => axios.get(url).then((res) => res.data),
+              }}
+            >
               <StylesProvider injectFirst>
                 <MuiThemeProvider theme={theme}>
                   <ThemeProvider theme={theme}>
-                    <Component {...pageProps} />
+                    {getLayout(<Component {...pageProps} />)}
                   </ThemeProvider>
                 </MuiThemeProvider>
               </StylesProvider>
