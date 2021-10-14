@@ -34,32 +34,8 @@ import AppsIcon from "@material-ui/icons/Apps";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-
-const Container = styled.div`
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 1870px;
-`;
-const MAX_IMAGES = 5;
-const steps = [
-  {
-    step_title: "Name and description",
-    step_content: "Please enter the title of your piece and give a description",
-  },
-  {
-    step_title: "Upload photos",
-    step_content: `Please upload 2-${MAX_IMAGES} photos of your piece`,
-  },
-  {
-    step_title: "Set your price",
-    step_content:
-      "Set the price for your piece. You can choose to have customers rent it, buy it or both.",
-  },
-  {
-    step_title: "Summary",
-    step_content: "Summary",
-  },
-];
+import { v4 as uuidv4 } from 'uuid';
+import axios from "axios";
 
 const TextArea = () => {
   const ref = useRef();
@@ -98,49 +74,13 @@ const TextArea = () => {
         resize: "vertical",
         minHeight: "1em",
         borderStyle: "none",
+        outline: "none",
       }}
       value={value}
       onChange={(event) => setValue(event.target.value)}
     />
   );
 };
-
-const BlurredImage = styled(Image)`
-  filter: blur(40px);
-`;
-
-const chunked_upload = async () => {};
-
-const getBorderColorOnDrop = (props) => {
-  if (props.isDragAccept) {
-    return "#00e676";
-  }
-  if (props.isDragReject) {
-    return "#ff1744";
-  }
-  if (props.isDragActive) {
-    return "#2196f3";
-  }
-  return "#eeeeee";
-};
-
-const DropzoneContainer = styled(motion.div)`
-  border-style: dashed;
-  border-width: 2px;
-  border-color: ${(props) => getBorderColorOnDrop(props)};
-  outline: none;
-  height: 100%;
-  position: relative;
-`;
-const Overlay = styled(motion.div)`
-  top: 0;
-  left: 0;
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  color: #ffffff;
-  opacity: 0;
-`;
 
 const DragAndDropMenuContainer = styled.div`
   color: #ffffff;
@@ -183,8 +123,6 @@ const reorder = (sourceIndex, destinationIndex, items) => {
 
   return reorderedItems;
 };
-
-console.log(reorder(3, 0, ["a", "b", "c", "d"]));
 
 const DragAndDropMenu = forwardRef((props, containerRef) => {
   const onDragEnd = (result) => {
@@ -241,7 +179,129 @@ const DragAndDropMenu = forwardRef((props, containerRef) => {
   );
 });
 
+const OverlayContainer = styled(motion.div)`
+  top: 0;
+  left: 0;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  color: #ffffff;
+  opacity: 0;
+`;
+
+const Overlay = (props) => {
+  const menuRef = useRef(null);
+  const menuButtonRef = useRef(null);
+  return (
+    <OverlayContainer
+      animate={
+        props.showOverlay || props.menuOpen
+          ? { opacity: 1, backgroundColor: "rgba(0, 0, 0, 0.5)" }
+          : { opacity: 0, backgroundColor: "rgba(0,0,0,0)" }
+      }
+    >
+      <Grid
+        container
+        style={{ height: "100%" }}
+        direction="column"
+        justifyContent="space-between"
+      >
+        <Grid item xs="auto" container justifyContent="space-between">
+          <Grid item xs="auto">
+            <Typography style={{ fontSize: "2rem" }}>
+              {props.selectedImage + 1}/{props.items.length}
+            </Typography>
+          </Grid>
+          <Grid item xs="auto">
+            <span
+              style={{ fontSize: "3rem", cursor: "pointer" }}
+              onClick={(e) => {
+                e.stopPropagation();
+                props.setMenuOpen((menuOpen) => !menuOpen);
+              }}
+            >
+              <AppsIcon ref={menuButtonRef} fontSize="inherit" />
+            </span>
+          </Grid>
+        </Grid>
+        <Grid item xs="auto" container direction="row" justifyContent="center">
+          <Grid item xs="auto">
+            <span
+              style={{
+                marginRight: 30,
+                fontSize: "3rem",
+                cursor: "pointer",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                props.setItemNumber((itemNumber) =>
+                  itemNumber > 0 ? itemNumber - 1 : itemNumber
+                );
+              }}
+            >
+              <ArrowBackIosIcon fontSize="inherit" />
+            </span>
+            <span
+              style={{
+                marginLeft: 30,
+                fontSize: "3rem",
+                cursor: "pointer",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                props.setItemNumber((itemNumber) =>
+                  itemNumber < props.items.length - 1
+                    ? itemNumber + 1
+                    : itemNumber
+                );
+              }}
+            >
+              <ArrowForwardIosIcon fontSize="inherit" />
+            </span>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Popper
+        open={menuButtonRef.current !== null && props.menuOpen}
+        anchorEl={menuButtonRef.current}
+        placement={"right"}
+      >
+        <ClickAwayListener onClickAway={() => props.setMenuOpen(false)}>
+          <DragAndDropMenu
+            items={props.items}
+            setItems={props.setItems}
+            ref={menuRef}
+          />
+        </ClickAwayListener>
+      </Popper>
+    </OverlayContainer>
+  );
+};
+
+const DropzoneContainer = styled(motion.div)`
+  border-style: dashed;
+  border-width: 2px;
+  border-color: ${(props) => getBorderColorOnDrop(props)};
+  outline: none;
+  height: 100%;
+  position: relative;
+`;
+
+const getBorderColorOnDrop = (props) => {
+  if (props.isDragAccept) {
+    return "#00e676";
+  }
+  if (props.isDragReject) {
+    return "#ff1744";
+  }
+  if (props.isDragActive) {
+    return "#2196f3";
+  }
+  return "#eeeeee";
+};
+
 const StyledDropzone = (props) => {
+  const [menuOpen, setMenuOpen] = useState(false);
   const {
     getRootProps,
     getInputProps,
@@ -249,6 +309,7 @@ const StyledDropzone = (props) => {
     isDragAccept,
     isDragReject,
   } = useDropzone({
+    noClick: menuOpen,
     accept: "image/*",
     onDrop: (acceptedFiles) => {
       const additionalImages = acceptedFiles.map((file) =>
@@ -265,45 +326,12 @@ const StyledDropzone = (props) => {
   const [delayOverlay, setDelayOverlay] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [showOverlay, setShowOverlay] = useState(false);
-  const imageMenuRef = useRef(null);
-  const [imageMenuOpen, setImageMenuOpen] = useState(false);
-  const menuRef = useRef(null);
-  const [isOverMenu, setIsOverMenu] = useState(false);
-
-  const isOverMenuTrue = () => {
-    setIsOverMenu(true);
-  };
-  const isOverMenuFalse = () => {
-    setIsOverMenu(false);
-  };
-  const disableClick = (e) => {
-    e.stopPropagation();
-  };
-
-  const closeImageMenu = () => {
-    setImageMenuOpen(false);
-    if (menuRef.current !== null) {
-      menuRef.current.removeEventListener("mouseover", isOverMenuTrue);
-      menuRef.current.addEventListener("mouseout", isOverMenuFalse);
-      menuRef.current.addEventListener("click", disableClick);
-      menuRef.current.addEventListener("mousedown", disableClick);
-    }
-  };
-  useEffect(() => {
-    if (menuRef.current !== null) {
-      menuRef.current.addEventListener("mouseover", isOverMenuTrue);
-      menuRef.current.addEventListener("mouseout", isOverMenuFalse);
-      menuRef.current.addEventListener("click", disableClick);
-    }
-  }, [menuRef.current]);
-
   useEffect(() => {
     setTimeout(() => setDelayOverlay(false), 500);
   }, [delayOverlay]);
 
   return (
     <DropzoneContainer
-      key={1}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -355,88 +383,48 @@ const StyledDropzone = (props) => {
       )}
       <input {...getInputProps()} />
       <Overlay
-        animate={
-          !delayOverlay && showOverlay && !isOverMenu && props.images.length > 0
-            ? { opacity: 1, backgroundColor: "rgba(0, 0, 0, 0.5)" }
-            : { opacity: 0, backgroundColor: "rgba(0,0,0,0)" }
-        }
-      >
-        <Grid
-          container
-          style={{ height: "100%" }}
-          direction="column"
-          justifyContent="space-between"
-        >
-          <Grid item xs="auto" container justifyContent="space-between">
-            <Grid item xs="auto">
-              <Typography style={{ fontSize: "2rem" }}>
-                {selectedImage + 1}/{props.images.length}
-              </Typography>
-            </Grid>
-            <Grid item xs="auto">
-              <span
-                style={{ fontSize: "3rem", cursor: "pointer" }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setImageMenuOpen(true);
-                }}
-              >
-                <AppsIcon ref={imageMenuRef} fontSize="inherit" />
-              </span>
-            </Grid>
-          </Grid>
-          <Grid
-            item
-            xs="auto"
-            container
-            direction="row"
-            justifyContent="center"
-          >
-            <Grid item xs="auto">
-              <span
-                style={{ marginRight: 30, fontSize: "3rem", cursor: "pointer" }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedImage((selectedImage) =>
-                    selectedImage > 0 ? selectedImage - 1 : selectedImage
-                  );
-                }}
-              >
-                <ArrowBackIosIcon fontSize="inherit" />
-              </span>
-              <span
-                style={{ marginLeft: 30, fontSize: "3rem", cursor: "pointer" }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedImage((selectedImage) =>
-                    selectedImage < props.images.length - 1
-                      ? selectedImage + 1
-                      : selectedImage
-                  );
-                }}
-              >
-                <ArrowForwardIosIcon fontSize="inherit" />
-              </span>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Popper
-          open={imageMenuRef.current !== null && imageMenuOpen}
-          anchorEl={imageMenuRef.current}
-          placement={"right"}
-        >
-          <ClickAwayListener onClickAway={closeImageMenu}>
-            <DragAndDropMenu
-              items={props.images}
-              setItems={props.setImages}
-              ref={menuRef}
-            />
-          </ClickAwayListener>
-        </Popper>
-      </Overlay>
+        showOverlay={showOverlay && !delayOverlay && props.images.length > 0}
+        items={props.images}
+        setItems={props.setImages}
+        selectedImage={selectedImage}
+        setItemNumber={setSelectedImage}
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+      />
     </DropzoneContainer>
   );
 };
+
+const Container = styled.div`
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1870px;
+`;
+const MAX_IMAGES = 5;
+const steps = [
+  {
+    step_title: "Name and description",
+    step_content: "Please enter the title of your piece and give a description",
+  },
+  {
+    step_title: "Upload photos",
+    step_content: `Please upload 2-${MAX_IMAGES} photos of your piece`,
+  },
+  {
+    step_title: "Set your price",
+    step_content:
+      "Set the price for your piece. You can choose to have customers rent it, buy it or both.",
+  },
+  {
+    step_title: "Summary",
+    step_content: "Summary",
+  },
+];
+
+
+const upload_post = ({title, description, images}) => {
+  axios
+}
 
 const AnimatedGrid = motion(Grid);
 export default function CreatePost() {
@@ -454,13 +442,13 @@ export default function CreatePost() {
   const handleNext = () => {
     if (activeStep < steps.length - 1) {
       setActiveStep(activeStep + 1);
+    } else {
+      upload
     }
   };
   const handlePrevious = () => {
     setActiveStep(activeStep - 1);
   };
-
-  console.log(images);
   return (
     <>
       <Grid style={{ height: "100%" }} container direction="column" spacing={8}>
@@ -496,7 +484,7 @@ export default function CreatePost() {
                 }}
               >
                 <div>
-                  <motion.div
+                  <div
                     style={{
                       display: "inline-block",
                       height: 440,
@@ -505,7 +493,7 @@ export default function CreatePost() {
                     }}
                   >
                     <AnimatePresence exitBeforeEnter>
-                      {activeStep === 0 && (
+                      {activeStep === 0 ? (
                         <motion.div
                           key={0}
                           initial={{ opacity: 0 }}
@@ -519,23 +507,11 @@ export default function CreatePost() {
                         >
                           <Image src={postPlaceHolderImg} placeholder="blur" />
                         </motion.div>
-                      )}
-                      {activeStep === 1 && (
+                      ) : (
                         <StyledDropzone images={images} setImages={setImages} />
                       )}
-                      {activeStep === 2 && (
-                        <motion.div
-                          key={2}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          style={{ filter: "blur(.5rem)" }}
-                        >
-                          <Image src={postPlaceHolderImg} placeholder="blur" />
-                        </motion.div>
-                      )}
                     </AnimatePresence>
-                  </motion.div>
+                  </div>
                   <Divider
                     style={{ height: 1, marginBottom: 20, marginTop: 10 }}
                   />
@@ -616,16 +592,17 @@ export default function CreatePost() {
                 xs="auto"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                style={{maxWidth: 900}}
               >
                 <Paper>
                   {images.map(({ preview }) => (
                     <div
                       style={{
-                        display:'inline-block',
+                        display: "inline-block",
                         position: "relative",
                         padding: 20,
-                        height: 400,
-                        width: 400,
+                        height: 200,
+                        width: 200,
                       }}
                     >
                       <Image src={preview} objectFit="contain" layout="fill" />
@@ -656,7 +633,7 @@ export default function CreatePost() {
                 color="primary"
                 onClick={handleNext}
               >
-                Next
+                {activeStep < steps.length-1 ? "Next": "Submit"}
               </Button>
             </Grid>
           </AnimatedGrid>
@@ -665,7 +642,7 @@ export default function CreatePost() {
       {activeStep === 0 && (
         <motion.div animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <Popper
-            open={true}
+            open={anchorRef_title.current !== null}
             anchorEl={anchorRef_title.current}
             placement="left"
           >
@@ -674,7 +651,7 @@ export default function CreatePost() {
             </div>
           </Popper>
           <Popper
-            open={title !== ""}
+            open={title !== "" && anchorRef_title.current !== null}
             anchorEl={anchorRef_description.current}
             placement="left"
           >
