@@ -55,6 +55,10 @@ const steps = [
     step_content:
       "Set the price for your piece. You can choose to have customers rent it, buy it or both.",
   },
+  {
+    step_title: "Summary",
+    step_content: "Summary",
+  },
 ];
 
 const TextArea = () => {
@@ -461,169 +465,201 @@ export default function CreatePost() {
     <>
       <Grid style={{ height: "100%" }} container direction="column" spacing={8}>
         <AnimateSharedLayout>
-        <Grid item xs="auto">
-          <Stepper activeStep={activeStep} alternativeLabel>
-            {steps.map(({ step_title, step_content }) => {
-              return (
-                <Step key={step_title}>
-                  <StepLabel>
-                    <Typography>{step_content}</Typography>
-                  </StepLabel>
-                </Step>
-              );
-            })}
-          </Stepper>
-        </Grid>
-        <Grid
-          container
-          item
-          xs
-          justifyContent="space-around"
-          alignItems="center"
-        >
-          <AnimatedGrid item xs="auto" layout>
-            <Paper
-              ref={anchorRef_canvas}
-              elevation={3}
-              style={{ padding: 60, borderRadius: 10, display: "inline-block" }}
-            >
-              <div>
-                <motion.div
-                  style={{
-                    display: "inline-block",
-                    height: 440,
-                    width: 400,
-                    marginBottom: 20,
-                  }}
-                >
-                  <AnimatePresence exitBeforeEnter>
-                    {activeStep === 0 && (
-                      <motion.div
-                        key={0}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        style={{
-                          borderStyle: "solid",
-                          borderColor: "#OOOOOO",
-                          filter: "blur(.5rem)",
-                        }}
-                      >
-                        <Image src={postPlaceHolderImg} placeholder="blur" />
-                      </motion.div>
-                    )}
-                    {activeStep === 1 && (
-                      <StyledDropzone images={images} setImages={setImages} />
-                    )}
-                    {activeStep === 2 && (
-                      <motion.div
-                        key={2}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        style={{ filter: "blur(.5rem)" }}
-                      >
-                        <Image src={postPlaceHolderImg} placeholder="blur" />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-                <Divider
-                  style={{ height: 1, marginBottom: 20, marginTop: 10 }}
-                />
+          <Grid item xs="auto">
+            <Stepper activeStep={activeStep} alternativeLabel>
+              {steps.map(({ step_title, step_content }) => {
+                return (
+                  <Step key={step_title}>
+                    <StepLabel>
+                      <Typography>{step_content}</Typography>
+                    </StepLabel>
+                  </Step>
+                );
+              })}
+            </Stepper>
+          </Grid>
+          <Grid
+            container
+            item
+            xs
+            justifyContent="space-around"
+            alignItems="center"
+          >
+            <AnimatedGrid item xs="auto" layout>
+              <Paper
+                ref={anchorRef_canvas}
+                elevation={3}
+                style={{
+                  padding: 60,
+                  borderRadius: 10,
+                  display: "inline-block",
+                }}
+              >
                 <div>
-                  <Typography variant="h5">Michael Fortunato</Typography>
-                </div>
-                <div
-                  ref={anchorRef_description}
-                  style={{
-                    maxHeight: 100,
-                    overflowY: "auto",
-                    marginTop: 20,
-                    borderStyle: "solid",
-                  }}
-                >
-                  <InputBase
-                    fullWidth
+                  <motion.div
                     style={{
-                      fontSize: "1rem",
-                      overflowY: "auto",
-                      minHeight: 40,
-                      fontStyle: "italic",
+                      display: "inline-block",
+                      height: 440,
+                      width: 400,
+                      marginBottom: 20,
                     }}
-                    autoComplete="title"
-                    autoFocus={true}
-                    placeholder={"Type your description here"}
-                    onChange={(e) => setDescription(e.target.value)}
-                  ></InputBase>
-                </div>
-                <ClickAwayListener onClickAway={() => setIsTitleFocused(false)}>
+                  >
+                    <AnimatePresence exitBeforeEnter>
+                      {activeStep === 0 && (
+                        <motion.div
+                          key={0}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          style={{
+                            borderStyle: "solid",
+                            borderColor: "#OOOOOO",
+                            filter: "blur(.5rem)",
+                          }}
+                        >
+                          <Image src={postPlaceHolderImg} placeholder="blur" />
+                        </motion.div>
+                      )}
+                      {activeStep === 1 && (
+                        <StyledDropzone images={images} setImages={setImages} />
+                      )}
+                      {activeStep === 2 && (
+                        <motion.div
+                          key={2}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          style={{ filter: "blur(.5rem)" }}
+                        >
+                          <Image src={postPlaceHolderImg} placeholder="blur" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                  <Divider
+                    style={{ height: 1, marginBottom: 20, marginTop: 10 }}
+                  />
+                  <div>
+                    <Typography variant="h5">Michael Fortunato</Typography>
+                  </div>
                   <div
-                    ref={anchorRef_title}
-                    style={{ marginTop: 20, borderStyle: "solid" }}
+                    ref={anchorRef_description}
+                    style={{
+                      maxHeight: 100,
+                      overflowY: "auto",
+                      marginTop: 20,
+                      borderStyle: "solid",
+                    }}
                   >
                     <InputBase
-                      style={{ minHeight: 40, fontStyle: "italic" }}
+                      fullWidth
+                      style={{
+                        fontSize: "1rem",
+                        overflowY: "auto",
+                        minHeight: 40,
+                        fontStyle: "italic",
+                      }}
                       autoComplete="title"
                       autoFocus={true}
-                      placeholder={"Type your title here"}
-                      value={title}
-                      onChange={(e) =>
-                        setTitle(
-                          e.target.value
-                            .toLowerCase()
-                            .split(" ")
-                            .map(
-                              (s) => s.charAt(0).toUpperCase() + s.substring(1)
-                            )
-                            .join(" ")
-                        )
-                      }
+                      placeholder={"Type your description here"}
+                      onChange={(e) => setDescription(e.target.value)}
                     ></InputBase>
                   </div>
-                </ClickAwayListener>
-              </div>
-            </Paper>
-          </AnimatedGrid>
-          {activeStep === 2 && (
-            <AnimatedGrid
-              layout
-              item
-              xs="auto"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <Paper>
-                <Typography> Set your rental</Typography>
+                  <ClickAwayListener
+                    onClickAway={() => setIsTitleFocused(false)}
+                  >
+                    <div
+                      ref={anchorRef_title}
+                      style={{ marginTop: 20, borderStyle: "solid" }}
+                    >
+                      <InputBase
+                        style={{ minHeight: 40, fontStyle: "italic" }}
+                        autoComplete="title"
+                        autoFocus={true}
+                        placeholder={"Type your title here"}
+                        value={title}
+                        onChange={(e) =>
+                          setTitle(
+                            e.target.value
+                              .toLowerCase()
+                              .split(" ")
+                              .map(
+                                (s) =>
+                                  s.charAt(0).toUpperCase() + s.substring(1)
+                              )
+                              .join(" ")
+                          )
+                        }
+                      ></InputBase>
+                    </div>
+                  </ClickAwayListener>
+                </div>
               </Paper>
             </AnimatedGrid>
-          )}
-        </Grid>
-        <AnimatedGrid
-          layout
-          container
-          item
-          xs="auto"
-          justifyContent="center"
-          direction="row"
-          spacing={5}
-        >
-          <Grid item xs="auto">
-            <Button disabled={activeStep === 0} onClick={handlePrevious}>
-              Back
-            </Button>
+            {activeStep === 2 && (
+              <AnimatedGrid
+                layout
+                item
+                xs="auto"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <Paper>
+                  <Typography> Set your rental</Typography>
+                </Paper>
+              </AnimatedGrid>
+            )}
+            {activeStep === 3 && (
+              <AnimatedGrid
+                layout
+                item
+                xs="auto"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <Paper>
+                  {images.map(({ preview }) => (
+                    <div
+                      style={{
+                        display:'inline-block',
+                        position: "relative",
+                        padding: 20,
+                        height: 400,
+                        width: 400,
+                      }}
+                    >
+                      <Image src={preview} objectFit="contain" layout="fill" />
+                    </div>
+                  ))}
+                </Paper>
+              </AnimatedGrid>
+            )}
           </Grid>
-          <Grid item xs="auto">
-            <Button
-              disabled={disabled[activeStep]}
-              variant="contained"
-              color="primary"
-              onClick={handleNext}
-            >
-              Next
-            </Button>
-          </Grid>
-        </AnimatedGrid>
+          <AnimatedGrid
+            layout
+            container
+            item
+            xs="auto"
+            justifyContent="center"
+            direction="row"
+            spacing={5}
+          >
+            <Grid item xs="auto">
+              <Button disabled={activeStep === 0} onClick={handlePrevious}>
+                Back
+              </Button>
+            </Grid>
+            <Grid item xs="auto">
+              <Button
+                disabled={disabled[activeStep]}
+                variant="contained"
+                color="primary"
+                onClick={handleNext}
+              >
+                Next
+              </Button>
+            </Grid>
+          </AnimatedGrid>
         </AnimateSharedLayout>
       </Grid>
       {activeStep === 0 && (
