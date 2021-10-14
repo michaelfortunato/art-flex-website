@@ -10,7 +10,7 @@ class ChunkedFile {
   constructor(uploadId, uploadSource, fileInterface) {
     this.uploadId = uploadId;
     this.uploadSource = uploadSource;
-    this.fileInterface = fileInterface
+    this.fileInterface = fileInterface;
   }
 
   async uploadFile() {
@@ -41,13 +41,16 @@ class ChunkedFile {
     });
   }
   async uploadChunk(currentChunk, chunkSize) {
-	const chunk = this.fileInterface.slice(currentChunk, chunkSize)
-	try {
-		await axios.post("/account/studio/upload")
-	} catch (error) {
-
-	}
+    const chunk = this.fileInterface.slice(currentChunk, chunkSize, "application/octet-stream");
+    try {
+      await axios.post("/account/studio/upload", chunk, {
+        headers: {
+          "Content-Range": `bytes ${currentChunk}-${currentChunk + chunkSize}/${
+            this.fileInterface.size
+          }`,
+	  "Content-Type": "application/octet-stream"
+        },
+      });
+    } catch (error) {}
   }
 }
-
-
