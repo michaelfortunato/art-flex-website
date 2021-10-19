@@ -34,7 +34,8 @@ import AppsIcon from "@material-ui/icons/Apps";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
+import ChunkedFile from "@utils/chunked_upload";
 import axios from "axios";
 
 const TextArea = () => {
@@ -421,10 +422,19 @@ const steps = [
   },
 ];
 
-
-const upload_post = ({title, description, images}) => {
-  axios
-}
+const upload_post = async ({ title, description, images }) => {
+  const chunkedFiles = images.map((imageFile) => {
+    console.log(imageFile)
+    return new ChunkedFile(uuidv4(), imageFile);
+  });
+  
+  try {
+     const {status} = await chunkedFiles[0].uploadChunk(0, 200000000)
+     console.log(status)
+  } catch(error) {
+    console.log(error)
+  }
+};
 
 const AnimatedGrid = motion(Grid);
 export default function CreatePost() {
@@ -443,7 +453,7 @@ export default function CreatePost() {
     if (activeStep < steps.length - 1) {
       setActiveStep(activeStep + 1);
     } else {
-      upload
+      upload_post({title, description, images})
     }
   };
   const handlePrevious = () => {
@@ -592,7 +602,7 @@ export default function CreatePost() {
                 xs="auto"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                style={{maxWidth: 900}}
+                style={{ maxWidth: 900 }}
               >
                 <Paper>
                   {images.map(({ preview }) => (
@@ -633,7 +643,7 @@ export default function CreatePost() {
                 color="primary"
                 onClick={handleNext}
               >
-                {activeStep < steps.length-1 ? "Next": "Submit"}
+                {activeStep < steps.length - 1 ? "Next" : "Submit"}
               </Button>
             </Grid>
           </AnimatedGrid>

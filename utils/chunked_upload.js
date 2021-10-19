@@ -1,32 +1,42 @@
 const { default: axios } = require("axios");
 
 class ChunkedFile {
-  static chunkSize = 100000000;
+  static chunkSize = 2000000;
   uploadId = null;
-  uploadSource = null;
-  startChunk = null;
-  endChunk = null;
   fileInterface = null;
-  constructor(uploadId, uploadSource, fileInterface) {
+  numChunks = null;
+  constructor(uploadId, fileInterface) {
     this.uploadId = uploadId;
-    this.uploadSource = uploadSource;
     this.fileInterface = fileInterface;
+    this.numChunks = Math.floor(
+      this.fileInterface.size / ChunkedFile.chunkSize
+    );
   }
 
   async uploadFile() {
-    /* numChunks = Math.floor(fileSize / chunkSize) */
     /* remainderChunk fileSize & chunkSize */
     let uploads = [];
-    for (ithChunk = 1; ithChunk < numChunks; ++ithChunk) {
-      uploads.append(uploadChunk(currentChunk, chunkSize));
+    for (ithChunk = 0; ithChunk < this.numChunks; ++ithChunk) {
+      uploads.append(
+        uploadChunk(
+          ithChunk * ChunkedFile.chunkSize,
+          (ithChunk + 1) * ChunkedFile.chunkSize
+        )
+      );
     }
-    if (remainderChunk !== 0) {
-      uploadChunk(currentChunk, remainderChunk);
+    if (this.fileInterface.size % ChunkedFile.chunkSize !== 0) {
+      uploads.append(
+        uploadChunk(
+          this.numChunks * ChunkedFile.chunkSize,
+          this.fileInterface.size
+        )
+      );
     }
+
     return Promise.all(uploads).then((responses) => {
       const isCompleted = responses.reduce(
         (containsCompleted, { response: { status } }) => {
-          return containsCompleted(status === 200);
+          return containsCompleted || status === 200;
         },
         false
       );
@@ -40,17 +50,25 @@ class ChunkedFile {
       }
     });
   }
-  async uploadChunk(currentChunk, chunkSize) {
-    const chunk = this.fileInterface.slice(currentChunk, chunkSize, "application/octet-stream");
-    try {
-      await axios.post("/account/studio/upload", chunk, {
-        headers: {
-          "Content-Range": `bytes ${currentChunk}-${currentChunk + chunkSize}/${
-            this.fileInterface.size
-          }`,
-	  "Content-Type": "application/octet-stream"
-        },
-      });
-    } catch (error) {}
+  async uploadChunk(chunkStart, chunkEnd) {
+    const chunk = this.fileInterface.slice(
+      chunkStart,
+      chunkEnd,
+      "application/octet-stream"
+    );
+    return await axios.post("/account/create_post", chunk, {
+      headers: {
+        "Content-Range": `bytes ${chunkStart}-${chunkStart + chunkEnd}/${
+          this.fileInterface.size
+        }`,
+        "Content-Type": chunk.type,
+        "Upload-Id": this.uploadId + ":" + this.fileInterface.name,
+        "Current-Chunk-Number": chunkStart / ChunkedFile.chunkSize,
+        "Total-Chunks":
+          Math.floor(this.fileInterface.size / ChunkedFile.chunkSize) + 1,
+      },
+    });
   }
 }
+
+export default ChunkedFile;

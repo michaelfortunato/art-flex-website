@@ -22,6 +22,7 @@ import axios from 'axios'
 import { signIn } from 'redux-store/features/account/accountSlice'
 import { useDispatch } from 'react-redux'
 import { StandardButton } from '@components/Buttons/SignInButton'
+import { useRouter } from 'next/router'
 
 const WrappedPaper = ({ mdDown, ...props }) => (<Paper {...props} />)
 
@@ -65,9 +66,10 @@ const StyledSignUp = (props) => {
             <AnimatePresence exitBeforeEnter>
                 {!successfulSignUp ?
                     <motion.div exit={{ opacity: 0 }}>
-                        <SignUpNew setPage={props.setPage} />
+                        <SignUpNew signUpCallback={()=>void setSuccessfulSignUp(true)} setPage={props.setPage} />
                     </motion.div>
-                    : <SuccessfulSignUp small onAnimationComplete={() => setTimeout(() => props.setOpen(false), 800)} />}
+                    : <SuccessfulSignUp small onAnimationComplete={() => 
+                        setTimeout(()=> props.setOpen(false), 800)} />}
             </AnimatePresence>
         </Grid>
     </Grid>
@@ -190,7 +192,7 @@ const SignInPane = forwardRef((props, ref) => {
                             </motion.div>
                             :
                             <motion.div key='SignUp' initial={{ x: '150%' }} animate={{ x: 0 }} >
-                                <StyledSignUp setPage={setPage} />
+                                <StyledSignUp setPage={setPage} setOpen={props.setOpen}/>
                             </motion.div>
                         }
                     </AnimatePresence>
