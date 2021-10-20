@@ -422,20 +422,74 @@ const steps = [
   },
 ];
 
+const useChunkedUpload = () => {
+  const [isError, setIsError] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  const [numCompletedChunks, setNumCompletedChunks] = useState(0);
+  const [chunkedFileObject, setChunkedFileObject] = useState(null);
 
+  const progress =
+    chunkedFileObject === null
+      ? 0
+      : numCompletedChunks / chunkedFileObject.numChunks;
+  const isLoading = chunkedFileObject !== null;
+
+  const upload = async (url, file) => {
+      if (isComplete || isLoading) return;
+      const chunkedFile = new ChunkedFile(uuidv4(), file);
+      setChunkedFileObject(chunkedFile);
+  };
+
+  useEffect(async () => {
+    if (chunkedFileObject === null) return;
+    try {
+      const promises = await chunkedFileObject.uploadFile();
+      promises.forEach((promise) => {
+        promise
+          .then((response) => {
+            if (response.status === 200) {
+              setIsComplete(true);
+              setNumCompletedChunks(chunkedFileObject.numChunks);
+            } else {
+              setNumCompletedChunks(
+                (numCompletedChunks) => numCompletedChunks + 1
+              );
+            }
+          })
+          .catch((error) => {
+            setIsError(true);
+          });
+      });
+    } catch (error) {
+      setIsError(true)
+    }
+  }, [chunkedFileObject]);
+
+  useEffect(() => {
+    if (
+      chunkedFileObject &&
+      numCompletedChunks === chunkedFileObject.numChunks &&
+      isComplete === false
+    ) {
+      setIsError(true);
+    }
+  }, [numCompletedChunks]);
+
+  return [upload, isComplete, isLoading, isError, progress];
+};
 
 async function upload_post({ title, description, images }) {
   const chunkedFiles = images.map((imageFile) => {
-    console.log(imageFile)
+    console.log(imageFile);
     return new ChunkedFile(uuidv4(), imageFile);
   });
   try {
-    const res = await chunkedFiles[0].uploadFile()
-    console.log(res)
-  } catch(error) {
-    console.log(error)
+    const res = await chunkedFiles[0].uploadFile();
+    console.log(res);
+  } catch (error) {
+    console.log(error);
   }
-};
+}
 
 const AnimatedGrid = motion(Grid);
 export default function CreatePost() {
@@ -449,12 +503,15 @@ export default function CreatePost() {
   const anchorRef_description = useRef(null);
   const [isTitleFocused, setIsTitleFocused] = useState(false);
 
+  const [upload, isComplete, isLoading, isError, progress] = useChunkedUpload();
+  console.log(isComplete, isLoading, isError, progress);
   const disabled = [title === "" || description === "", false, false];
   const handleNext = () => {
     if (activeStep < steps.length - 1) {
       setActiveStep(activeStep + 1);
     } else {
-      upload_post({title, description, images})
+      upload("/account", images[0]);
+      //upload_post({ title, description, images });
     }
   };
   const handlePrevious = () => {
@@ -484,7 +541,7 @@ export default function CreatePost() {
             justifyContent="space-around"
             alignItems="center"
           >
-            <AnimatedGrid item xs="auto" layout>
+            <AnimatedGrid key="front" item xs="auto" layout>
               <Paper
                 ref={anchorRef_canvas}
                 elevation={3}
@@ -585,6 +642,7 @@ export default function CreatePost() {
             </AnimatedGrid>
             {activeStep === 2 && (
               <AnimatedGrid
+                key = "rental"
                 layout
                 item
                 xs="auto"
@@ -598,6 +656,7 @@ export default function CreatePost() {
             )}
             {activeStep === 3 && (
               <AnimatedGrid
+                key="back"
                 layout
                 item
                 xs="auto"
@@ -653,6 +712,7 @@ export default function CreatePost() {
       {activeStep === 0 && (
         <motion.div animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <Popper
+            key = {1}
             open={anchorRef_title.current !== null}
             anchorEl={anchorRef_title.current}
             placement="left"
@@ -662,6 +722,7 @@ export default function CreatePost() {
             </div>
           </Popper>
           <Popper
+            key = {2}
             open={title !== "" && anchorRef_title.current !== null}
             anchorEl={anchorRef_description.current}
             placement="left"

@@ -11,6 +11,7 @@ class ChunkedFile {
     this.fileInterface = fileInterface;
     this.numEvenChunks = Math.floor(fileInterface.size / ChunkedFile.chunkSize);
     this.hasRemainder = fileInterface.size % ChunkedFile.chunkSize !== 0;
+    this.numChunks = this.numEvenChunks + this.hasRemainder;
   }
 
   async createUpload() {
@@ -49,7 +50,8 @@ class ChunkedFile {
         )
       );
     }
-
+    return uploads;
+    /*
     const responses = await Promise.all(uploads);
     const isCompleted = responses.reduce((containsCompleted, { status }) => {
       return containsCompleted || status === 200;
@@ -62,6 +64,7 @@ class ChunkedFile {
     } else {
       throw "Status's did not contain a 200Ok, meaning the api could not complete theu upload";
     }
+    */
   }
   async uploadChunk(chunkStart, chunkEnd) {
     const chunk = this.fileInterface.slice(
