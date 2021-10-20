@@ -422,15 +422,16 @@ const steps = [
   },
 ];
 
-const upload_post = async ({ title, description, images }) => {
+
+
+async function upload_post({ title, description, images }) {
   const chunkedFiles = images.map((imageFile) => {
     console.log(imageFile)
     return new ChunkedFile(uuidv4(), imageFile);
   });
-  
   try {
-     const {status} = await chunkedFiles[0].uploadChunk(0, 200000000)
-     console.log(status)
+    const res = await chunkedFiles[0].uploadFile()
+    console.log(res)
   } catch(error) {
     console.log(error)
   }
