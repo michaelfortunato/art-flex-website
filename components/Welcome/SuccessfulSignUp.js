@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 export default function SuccessfulSignUp(props) {
-  const router = useRouter()
+  const router = useRouter();
   const theme = useTheme();
   const tl = useRef(null);
   const circleRef = useRef(null);
@@ -52,10 +52,12 @@ export default function SuccessfulSignUp(props) {
         </svg>
       </div>
       <div style={{ marginBottom: "1rem" }}>
-        <Typography variant={props.small ? 'h4' : 'h2'}>Thanks for signing up {props.name}</Typography>
+        <Typography variant={props.small ? "h4" : "h2"}>
+          Thanks for signing up {props.name}
+        </Typography>
       </div>
       <div>
-        <Typography variant={props.small ? 'h4' : 'h2'}>
+        <Typography variant={props.small ? "h4" : "h2"}>
           A verification email has been sent to {props.email} to confirm your
           account
         </Typography>

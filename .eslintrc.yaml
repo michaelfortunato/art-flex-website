@@ -1,0 +1,15 @@
+env:
+  commonjs: true
+  es2021: true
+  node: true
+extends:
+  - airbnb-base
+  - airbnb-typescript
+  - "prettier"
+  - "next/core-web-vitals"
+parser: "@typescript-eslint/parser"
+parserOptions:
+  ecmaVersion: 2021
+plugins:
+  - "@typescript-eslint"
+  - "prettier"

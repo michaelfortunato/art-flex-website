@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 import {
   Container,
-  createMuiTheme,
   Divider,
   Grid,
   MuiThemeProvider,
-  Typography,
   useMediaQuery,
   useTheme
 } from "@material-ui/core";
@@ -17,18 +15,17 @@ import WelcomeChoice from "@components/Welcome/WelcomeChoice";
 import SignUp from "@components/SignIn/SignUp";
 import SuccessfulSignUp from "@components/Welcome/SuccessfulSignUp";
 import ProgressDots from "@components/ProgressDots";
-import animationPage1 from "/public/Welcome-Page1.json";
-import animationPage2 from "public/Welcome-Page42.json";
 import { motion, AnimatePresence } from "framer-motion";
 import { responsiveFontSizes } from "@material-ui/core/styles";
 import MainLogo from "../public/MainLogo.svg";
 
-const StyledWelcomeSignUp = (props) => {
+function StyledWelcomeSignUp(props: any) {
   /* bunch of media queries here */
   const setScale = () => {
     if (props.isMobile) return "scale(0.9)";
     if (props.isLaptop) return "scale(0.9)";
-    if (props.isDesktop) return "scale(1.0)";
+    // Otherwise is desktop size
+    return "scale(1.0)";
   };
   return (
     <motion.div
@@ -40,14 +37,17 @@ const StyledWelcomeSignUp = (props) => {
       <SignUp signUpCallback={() => props.setCurrentPage(5)} {...props} />
     </motion.div>
   );
-};
+}
 
-const StyledSuccessfulSignUp = (props) => {
+function StyledSuccessfulSignUp(props: any) {
   const router = useRouter();
-  const small = props.isMobile
-  return <SuccessfulSignUp small={small}
-    onAnimationComplete={() => setTimeout(() => router.push('/'), 100)}
-  />
+  const small = props.isMobile;
+  return (
+    <SuccessfulSignUp
+      small={small}
+      onAnimationComplete={() => setTimeout(() => router.push("/"), 100)}
+    />
+  );
 }
 
 const pages = [
@@ -57,28 +57,20 @@ const pages = [
     Component: WelcomeText,
     configurationNumber: 1,
     nextPageNumber: 4,
-    exitAnimation: { x: "-150%", transition: { duration: ".25" } },
+    exitAnimation: { x: "-150%", transition: { duration: ".25" } }
   },
   {
     Component: WelcomeText,
     configurationNumber: 2,
     nextPageNumber: 4,
-    exitAnimation: { x: "-150%", transition: { duration: ".25" } },
+    exitAnimation: { x: "-150%", transition: { duration: ".25" } }
   },
   { Component: StyledWelcomeSignUp },
-  { Component: StyledSuccessfulSignUp },
+  { Component: StyledSuccessfulSignUp }
 ];
 
-const exitAnimation = {
-  opacity: 0,
-};
 const StyledWelcomeRoot = styled(motion.div)`
   overflow-x: hidden;
-`;
-const StyledMobileHeader = styled(motion.div)`
-  text-align: center;
-  height: 10%;
-  width: 100%;
 `;
 const StyledDesktopHeader = styled(motion.div)`
   text-align: center;

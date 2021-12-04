@@ -1,11 +1,10 @@
 import Store from "@components/Store/Store";
 import Appbar from "@components/Appbar";
-import { useInView } from "react-intersection-observer";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { ReactElement, useEffect } from "react";
 import { signIn } from "redux-store/features/account/accountSlice";
-import styled from 'styled-components'
+import styled from "styled-components";
 
 const Container = styled.div`
   margin-left: auto;
@@ -21,7 +20,7 @@ export default function HomePage() {
       .then(({ data }) =>
         dispatch(signIn({ name: data.name, email: data.email }))
       )
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
       });
   }, []);
@@ -29,7 +28,7 @@ export default function HomePage() {
   return <Store />;
 }
 
-HomePage.getLayout = function getLayout(page) {
+HomePage.getLayout = function getLayout(page: ReactElement) {
   return (
     <Container>
       <Appbar key={1} />

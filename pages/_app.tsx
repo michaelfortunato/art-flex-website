@@ -1,34 +1,44 @@
-import "../styles/globals.css";
 import Head from "next/head";
 import theme from "theme";
-
-import { ApolloClient, InMemoryCache } from "@apollo/client/core";
-import { ApolloProvider } from "@apollo/client/react";
+import { NextPage } from "next";
+import { AppProps } from "next/app";
+import type { ReactElement, ReactNode } from "react";
 import {
   ThemeProvider as MuiThemeProvider,
-  responsiveFontSizes,
+  StylesProvider
 } from "@material-ui/core/styles";
 import { ThemeProvider } from "styled-components";
-import { StylesProvider } from "@material-ui/core/styles";
 import { useEffect } from "react";
 import { SWRConfig } from "swr";
-import store from "../redux-store/store";
-import { Provider } from "react-redux";
-
 import axios from "axios";
+import { Provider } from "react-redux";
+import "../styles/globals.css";
+import store from "../redux-store/store";
+
 const ART_FLEX_URL = "/api";
 axios.defaults.baseURL = ART_FLEX_URL;
 
-function MyApp({ Component, pageProps }) {
+type NextPageWithLayout = NextPage & {
+  // eslint throws some says page is not used, even though it is on line 36
+  // I am moving on ...
+  // eslint-disable-next-line no-unused-vars
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
+
+function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector("#jss-server-side");
     if (jssStyles) {
-      jssStyles.parentElement.removeChild(jssStyles);
+      jssStyles?.parentElement?.removeChild(jssStyles);
     }
   }, []);
-  const getLayout = Component.getLayout || ((page) => page);
-  console.log(getLayout)
+  const getLayout = Component.getLayout || (page => page);
+  console.log(getLayout);
   return (
     <div>
       <Head>
@@ -41,7 +51,7 @@ function MyApp({ Component, pageProps }) {
           <Provider store={store}>
             <SWRConfig
               value={{
-                fetcher: (url) => axios.get(url).then((res) => res.data),
+                fetcher: url => axios.get(url).then(res => res.data)
               }}
             >
               <StylesProvider injectFirst>
