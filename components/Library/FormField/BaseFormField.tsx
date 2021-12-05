@@ -1,13 +1,15 @@
 import { ChangeEventHandler } from "react";
-import { InputBaseProps, Typography } from "@material-ui/core";
+import { InputBase, InputBaseProps, Typography } from "@material-ui/core";
 import * as Styled from "./BaseFormField.styled";
 
-export interface BaseFormFieldInput extends InputBaseProps {
+export interface AFBaseFormFieldInput extends InputBaseProps {
   text: string;
-  type: string;
 }
 
-export default function BaseFormField(props: BaseFormFieldInput) {
+export type FormField = typeof InputBase;
+export type FormConfig = AFBaseFormFieldInput;
+
+export default function AFBaseFormField(props: AFBaseFormFieldInput) {
   return (
     <div>
       <div style={{ paddingLeft: 2 }}>
@@ -15,7 +17,7 @@ export default function BaseFormField(props: BaseFormFieldInput) {
           <b>{props.text}</b>
         </Typography>
       </div>
-      <Styled.BaseForm {...props} />
+      <Styled.AFBaseFormField {...props} />
     </div>
   );
 }

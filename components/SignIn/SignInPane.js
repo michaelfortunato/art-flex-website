@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef, forwardRef } from "react";
 import Link from "next/link";
 import { Grid, Paper, Typography, useTheme } from "@material-ui/core";
 import { StandardForm, PasswordForm } from "@components/Library";
-import { SignUpNew } from "@components/SignIn/SignUp";
 import styled from "styled-components";
 import SignInHome from "@components/SignIn/SignInHome";
 import EmailSignIn from "@components/SignIn/SignInEmail";
@@ -16,7 +15,8 @@ import { signIn } from "redux-store/features/account/accountSlice";
 import { useDispatch } from "react-redux";
 import { StandardButton } from "@components/Buttons/SignInButton";
 import { useRouter } from "next/router";
-
+import { SignUpForm } from "@components/SignIn/SignUp";
+import AFButton from "@components/Library/Button/Button";
 const WrappedPaper = ({ mdDown, ...props }) => <Paper {...props} />;
 
 const Pane = styled(motion(Paper))`
@@ -53,7 +53,135 @@ const GridRow = styled(Grid)`
   overflow: ;
 `;
 
-const StyledSignUp = props => {
+/*
+function SignUpNew(props: any) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [signUpFailed, setSignUpFailed] = useState({
+    status: false,
+    message: ""
+  });
+
+  const theme = useTheme();
+
+  const validSignUp =
+    name !== "" &&
+    checkValidEmail(email) &&
+    checkPasswordLength(password) &&
+    checkPasswordUppercase(password) &&
+    checkPasswordNumber(password);
+
+  return (
+    <Grid container justifyContent="center">
+      <Grid
+        style={{ marginTop: 30 }}
+        alignItems="center"
+        container
+        item
+        xs={12}
+      >
+        <Grid item xs="auto">
+          <Typography variant="h5">Create your account</Typography>
+        </Grid>
+        <Grid item xs container justifyContent="flex-end">
+          <Grid item xs="auto">
+            <AFButton
+              animateTo={{
+                boxShadow: "0 4px 20px rgb(34 34 34 / 15%)",
+                scale: 1.02
+              }}
+              animate={true}
+              styleOverrides={{
+                padding: "8",
+                paddingLeft: "18",
+                paddingRight: "18"
+              }}
+              onClick={() => props.setPage("SignIn")}
+            >
+              <Typography variant="body1">Sign in</Typography>
+            </AFButton>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid item xs={12}>
+        <AFBaseFormField
+          fullWidth
+          text="Name"
+          type="string"
+          onChange={(event: any) => setName(event.target.value)}
+        />
+      </Grid>
+      <Grid style={{ marginTop: 24 }} item xs={12}>
+        <AFBaseFormField
+          fullWidth
+          type="email"
+          text="Email address"
+          error={email !== "" && validEmail === false}
+          inputProps={{ spellCheck: false }}
+          onChange={(event: any) => handleEmail(event.target.value)}
+        />
+      </Grid>
+      <Grid style={{ marginTop: 24 }} item xs={12}>
+        <AFPasswordFormField
+          text="Password"
+          error={
+            password !== "" &&
+            (!passwordLength || !passwordUppercase || !passwordNumber)
+          }
+          validPassword={
+            password !== "" &&
+            passwordLength &&
+            passwordUppercase &&
+            passwordNumber
+          }
+          helperText="Password must be (8) characters or longer, contain one capital letter [A-Z], and one number [0-9]."
+          setPassword={setPassword}
+        />
+      </Grid>
+      <Grid style={{ marginTop: 34 }} item xs={12}>
+        <AFButton
+          onClick={PostSignUp}
+          styleOverrides={
+            validSignUp
+              ? { border: "none", backgroundColor: theme.palette.primary.main }
+              : { border: "none", backgroundColor: "rgba(0, 0, 0, 0.20)" }
+          }
+          disabled={!validSignUp}
+        >
+          <Typography variant="button" style={{ color: "white" }}>
+            Sign up
+          </Typography>
+        </AFButton>
+      </Grid>
+      {signUpFailed.status && (
+        <Grid item xs={12}>
+          <Typography
+            style={{ color: theme.palette.error.main }}
+            variant="body1"
+          >
+            {signUpFailed.message}
+          </Typography>
+        </Grid>
+      )}
+      <Grid item xs={12}>
+        <div style={{ marginLeft: -30, marginRight: -30 }}>
+          <SocialBanner />
+        </div>
+      </Grid>
+      <Grid style={{ marginTop: 12 }} item xs={12}>
+        <GoogleSignInButton text="Sign up with Google" />
+      </Grid>
+      <Grid style={{ marginTop: 12 }} item xs={12}>
+        <FacebookSignInButton text="Sign up with Facebook" />
+      </Grid>
+    </Grid>
+  );
+}
+*/
+
+const SignUpPane = props => {
   const [successfulSignUp, setSuccessfulSignUp] = useState(false);
   return (
     <Grid
@@ -66,10 +194,43 @@ const StyledSignUp = props => {
         <AnimatePresence exitBeforeEnter>
           {!successfulSignUp ? (
             <motion.div exit={{ opacity: 0 }}>
-              <SignUpNew
-                signUpCallback={() => void setSuccessfulSignUp(true)}
-                setPage={props.setPage}
-              />
+              <Grid container justifyContent="center">
+                <Grid
+                  style={{ marginTop: 30 }}
+                  alignItems="center"
+                  container
+                  item
+                  xs={12}
+                >
+                  <Grid item xs="auto">
+                    <Typography variant="h5">Create your account</Typography>
+                  </Grid>
+                  <Grid item xs container justifyContent="flex-end">
+                    <Grid item xs="auto">
+                      <AFButton
+                        animateTo={{
+                          boxShadow: "0 4px 20px rgb(34 34 34 / 15%)",
+                          scale: 1.02
+                        }}
+                        animate={true}
+                        styleOverrides={{
+                          padding: "8px",
+                          paddingLeft: "18px",
+                          paddingRight: "18px"
+                        }}
+                        onClick={() => props.setPage("SignIn")}
+                      >
+                        <Typography variant="body1">Sign in</Typography>
+                      </AFButton>
+                    </Grid>
+                  </Grid>
+                </Grid>
+                <Grid item xs={12}>
+                  <SignUpForm
+                    onSuccess={response => setSuccessfulSignUp(true)}
+                  />
+                </Grid>
+              </Grid>
             </motion.div>
           ) : (
             <SuccessfulSignUp
@@ -214,8 +375,6 @@ const SignInForm = props => {
   );
 };
 
-const pages = [SignInForm, StyledSignUp];
-
 const SignInPane = forwardRef((props, ref) => {
   const [page, setPage] = useState("SignIn");
   return (
@@ -237,7 +396,7 @@ const SignInPane = forwardRef((props, ref) => {
                 initial={{ x: "150%" }}
                 animate={{ x: 0 }}
               >
-                <StyledSignUp setPage={setPage} setOpen={props.setOpen} />
+                <SignUpPane setPage={setPage} setOpen={props.setOpen} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -264,4 +423,135 @@ const SignInPane = forwardRef((props, ref) => {
     </AnimateSharedLayout>
   );
 });
+
+/*
+function SignUpNew(props: any) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [signUpFailed, setSignUpFailed] = useState({
+    status: false,
+    message: ""
+  });
+
+  const theme = useTheme();
+
+  const validSignUp =
+    name !== "" &&
+    checkValidEmail(email) &&
+    checkPasswordLength(password) &&
+    checkPasswordUppercase(password) &&
+    checkPasswordNumber(password);
+
+  return (
+    <Grid container justifyContent="center">
+      <Grid
+        style={{ marginTop: 30 }}
+        alignItems="center"
+        container
+        item
+        xs={12}
+      >
+        <Grid item xs="auto">
+          <Typography variant="h5">Create your account</Typography>
+        </Grid>
+        <Grid item xs container justifyContent="flex-end">
+          <Grid item xs="auto">
+            <AFButton
+              animateTo={{
+                boxShadow: "0 4px 20px rgb(34 34 34 / 15%)",
+                scale: 1.02
+              }}
+              animate={true}
+              styleOverrides={{
+                padding: "8",
+                paddingLeft: "18",
+                paddingRight: "18"
+              }}
+              onClick={() => props.setPage("SignIn")}
+            >
+              <Typography variant="body1">Sign in</Typography>
+            </AFButton>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid item xs={12}>
+        <AFBaseFormField
+          fullWidth
+          text="Name"
+          type="string"
+          onChange={(event: any) => setName(event.target.value)}
+        />
+      </Grid>
+      <Grid style={{ marginTop: 24 }} item xs={12}>
+        <AFBaseFormField
+          fullWidth
+          type="email"
+          text="Email address"
+          error={email !== "" && validEmail === false}
+          inputProps={{ spellCheck: false }}
+          onChange={(event: any) => handleEmail(event.target.value)}
+        />
+      </Grid>
+      <Grid style={{ marginTop: 24 }} item xs={12}>
+        <AFPasswordFormField
+          text="Password"
+          error={
+            password !== "" &&
+            (!passwordLength || !passwordUppercase || !passwordNumber)
+          }
+          validPassword={
+            password !== "" &&
+            passwordLength &&
+            passwordUppercase &&
+            passwordNumber
+          }
+          helperText="Password must be (8) characters or longer, contain one capital letter [A-Z], and one number [0-9]."
+          setPassword={setPassword}
+        />
+      </Grid>
+      <Grid style={{ marginTop: 34 }} item xs={12}>
+        <AFButton
+          onClick={PostSignUp}
+          styleOverrides={
+            validSignUp
+              ? { border: "none", backgroundColor: theme.palette.primary.main }
+              : { border: "none", backgroundColor: "rgba(0, 0, 0, 0.20)" }
+          }
+          disabled={!validSignUp}
+        >
+          <Typography variant="button" style={{ color: "white" }}>
+            Sign up
+          </Typography>
+        </AFButton>
+      </Grid>
+      {signUpFailed.status && (
+        <Grid item xs={12}>
+          <Typography
+            style={{ color: theme.palette.error.main }}
+            variant="body1"
+          >
+            {signUpFailed.message}
+          </Typography>
+        </Grid>
+      )}
+      <Grid item xs={12}>
+        <div style={{ marginLeft: -30, marginRight: -30 }}>
+          <SocialBanner />
+        </div>
+      </Grid>
+      <Grid style={{ marginTop: 12 }} item xs={12}>
+        <GoogleSignInButton text="Sign up with Google" />
+      </Grid>
+      <Grid style={{ marginTop: 12 }} item xs={12}>
+        <FacebookSignInButton text="Sign up with Facebook" />
+      </Grid>
+    </Grid>
+  );
+}
+
+
+
+*/
 export default SignInPane;

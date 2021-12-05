@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Button } from "@material-ui/core";
 
-export const AppbarButton = styled(Button)`
+export const AFAppbarButton = styled(Button)`
   border-radius: 25px;
   margin: 10px;
   text-transform: none;

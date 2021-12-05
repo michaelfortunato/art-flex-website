@@ -7,16 +7,16 @@ import {
   Typography
 } from "@material-ui/core";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
-import BaseFormField, { BaseFormFieldInput } from "../../BaseFormField";
+import AFBaseFormField, { AFBaseFormFieldInput } from "../../BaseFormField";
 
-export interface PasswordFormFieldInput extends BaseFormFieldInput {
+export interface AFPasswordFormFieldInput extends AFBaseFormFieldInput {
   setPassword: (userInput: string) => void;
   validPassword?: boolean;
   error?: boolean;
   helperText?: String;
 }
 
-export default function PasswordForm(props: PasswordFormFieldInput) {
+export default function AFPasswordFormField(props: AFPasswordFormFieldInput) {
   const theme = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const handleMouseDownPassword = (event: any) => {
@@ -30,7 +30,7 @@ export default function PasswordForm(props: PasswordFormFieldInput) {
     : "inherit";
   return (
     <div>
-      <BaseFormField
+      <AFBaseFormField
         text={props.text}
         error={props.error}
         style={{ cursor: "text", display: "inline-flex" }}
@@ -48,7 +48,7 @@ export default function PasswordForm(props: PasswordFormFieldInput) {
             </IconButton>
           </InputAdornment>
         }
-      ></BaseFormField>
+      ></AFBaseFormField>
       {props.helperText && (
         <FormHelperText style={{ color: helperTextColor }}>
           {props.helperText}

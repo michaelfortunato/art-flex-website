@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { motion } from "framer-motion";
 import { ButtonBase } from "@material-ui/core";
 
-export const Button = styled(motion(ButtonBase))`
+export const AFButton = styled(motion(ButtonBase))`
   position: relative;
   width: 100%;
   padding: 10px;

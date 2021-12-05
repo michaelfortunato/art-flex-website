@@ -2,7 +2,7 @@
 import { InputBase } from "@material-ui/core";
 import styled from "styled-components";
 
-export const BaseForm = styled(InputBase)`
+export const AFBaseFormField = styled(InputBase)`
   -webkit-appearance: none;
   -ms-appearance: none;
   -moz-appearance: none;

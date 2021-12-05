@@ -1,10 +1,10 @@
 import { Typography } from "@material-ui/core";
 import * as Styled from "./AppbarButton.styled";
 
-function AppbarButton(props: any) {
+function AFAppbarButton(props: any) {
   return (
-    <Styled.AppbarButton onClick={props.onClick}>
+    <Styled.AFAppbarButton onClick={props.onClick}>
       <Typography variant={props.variant}>{props.text}</Typography>
-    </Styled.AppbarButton>
+    </Styled.AFAppbarButton>
   );
 }

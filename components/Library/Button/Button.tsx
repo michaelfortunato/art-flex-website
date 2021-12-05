@@ -1,29 +1,31 @@
 import { ReactElement, ChangeEventHandler } from "react";
 import CSS from "csstype";
-import * as Styled from "./StandardButton.styled";
+import * as Styled from "./Button.styled";
+import { ButtonBaseProps } from "@material-ui/core";
 
-type ButtonProps = {
+interface AFButtonProps extends ButtonBaseProps {
   children: ReactElement;
-  animate: Boolean;
+  animate?: Boolean;
   animateTo?: {
     boxShadow?: string;
     scale?: 1.02;
   };
   styleOverrides?: CSS.Properties;
-  onClick: () => void;
-};
+}
 
-const StandardButton = (props: ButtonProps) => (
-  <Styled.StandardButton
-    whileHover={
-      props.animate && {
-        scale: 1.05,
-        ...props.animateTo
+export default function AFButton(props: AFButtonProps) {
+  return (
+    <Styled.AFButton
+      whileHover={
+        props.animate && {
+          scale: 1.05,
+          ...props.animateTo
+        }
       }
-    }
-    onClick={props.onClick}
-    style={{ ...props.styleOverrides }}
-  >
-    {props.children}
-  </Styled.StandardButton>
-);
+      onClick={props.onClick}
+      style={{ ...props.styleOverrides }}
+    >
+      {props.children}
+    </Styled.AFButton>
+  );
+}
