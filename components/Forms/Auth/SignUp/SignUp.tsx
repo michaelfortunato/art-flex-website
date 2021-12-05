@@ -1,35 +1,13 @@
-import React, {
-  useState,
-  useEffect,
-  ReactComponentElement,
-  FunctionComponent
-} from "react";
+import React, { useState } from "react";
 import addrs, { ParsedMailbox } from "email-addresses";
-import styled from "styled-components";
-import axios, { AxiosError } from "axios";
-import GoogleLogin from "react-google-login";
-import { useTheme, makeStyles } from "@material-ui/core/styles";
-import {
-  Paper,
-  ButtonBase,
-  Grid,
-  TextField,
-  InputAdornment,
-  IconButton,
-  FormHelperText,
-  Divider,
-  Typography
-} from "@material-ui/core";
-import { Visibility, VisibilityOff } from "@material-ui/icons";
-import { StandardForm, StyledStandardForm } from "@components/Library.js";
-import { StandardButton } from "@components/Buttons/SignInButton";
+import axios from "axios";
+import { useTheme } from "@material-ui/core/styles";
+import { Grid, Typography } from "@material-ui/core";
+import AuthForm, { SocialBanner } from "../AuthForm";
+
 import FacebookSignInButton from "@components/Buttons/FacebookSignInButton";
 import GoogleSignInButton from "@components/Buttons/GoogleSignInButton";
-import styles from "@styles/WelcomeSignUp.module.css";
-import AFBaseFormField, {
-  FormField,
-  FormConfig
-} from "@components/Library/FormField/BaseFormField";
+import AFBaseFormField from "@components/Library/FormField/BaseFormField";
 import AFPasswordFormField from "@components/Library/FormField/Variants/PasswordFormField/PasswordFormField";
 import AFButton from "@components/Library/Button/Button";
 
@@ -59,31 +37,6 @@ function checkPasswordUppercase(password: string) {
 function checkPasswordNumber(password: string) {
   const pattern = /[0-9]/;
   return pattern.test(password);
-}
-
-function SocialBanner(props: { fontSize?: string }) {
-  return (
-    <Grid container justifyContent="center">
-      <Grid container alignItems="center" item xs>
-        <Grid item xs={12}>
-          <Divider />
-        </Grid>
-      </Grid>
-      <Grid item xs="auto" style={{ paddingLeft: 10, paddingRight: 10 }}>
-        <Typography
-          style={{ color: "rgba(0, 0, 0, 0.54)", fontSize: props.fontSize }}
-          variant="overline"
-        >
-          Or
-        </Typography>
-      </Grid>
-      <Grid container alignItems="center" item xs>
-        <Grid item xs={12}>
-          <Divider />
-        </Grid>
-      </Grid>
-    </Grid>
-  );
 }
 
 async function postSignUp(
@@ -128,25 +81,7 @@ function onSignUpFailure(
   }
 }
 
-function AuthForm({ children, props }: { children: any; props?: any }) {
-  return (
-    <Grid container justifyContent="center">
-      <Grid item xs={12}>
-        {children[0]}
-      </Grid>
-      <Grid style={{ marginTop: 16, marginBottom: 16 }} item xs={12}>
-        <div style={{ marginLeft: -36, marginRight: -36 }}>
-          <SocialBanner fontSize="1rem" />
-        </div>
-      </Grid>
-      <Grid item xs={12}>
-        {children[1]}
-      </Grid>
-    </Grid>
-  );
-}
-
-function EmailAuthForm(props: { onSuccess: (response: any) => void }) {
+function EmailSignUpForm(props: { onSuccess: (response: any) => void }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -237,7 +172,7 @@ function EmailAuthForm(props: { onSuccess: (response: any) => void }) {
   );
 }
 
-function SocialMediaAuthForm() {
+function SocialMediaSignUpForm() {
   return (
     <Grid container>
       <Grid item xs={12}>
@@ -253,8 +188,8 @@ function SocialMediaAuthForm() {
 function SignUpForm(props: { onSuccess: (response: any) => void }) {
   return (
     <AuthForm>
-      <EmailAuthForm onSuccess={props.onSuccess} />
-      <SocialMediaAuthForm />
+      <EmailSignUpForm onSuccess={props.onSuccess} />
+      <SocialMediaSignUpForm />
     </AuthForm>
   );
 }
