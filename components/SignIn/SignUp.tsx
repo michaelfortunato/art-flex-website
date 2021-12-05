@@ -128,23 +128,25 @@ function onSignUpFailure(
   }
 }
 
-function AuthPanel(props: { EmailAuthForm: any; SocialMediaAuthForm: any }) {
+function AuthForm({ children, props }: { children: any; props?: any }) {
   return (
     <Grid container justifyContent="center">
       <Grid item xs={12}>
-        <props.EmailAuthForm />
+        {children[0]}
       </Grid>
-      <Grid style={{ marginTop: 20 }} item xs={12}>
+      <Grid style={{ marginTop: 30, marginBottom: 30 }} item xs={12}>
         <div style={{ marginLeft: -36, marginRight: -36 }}>
           <SocialBanner fontSize="1rem" />
         </div>
       </Grid>
-      <Grid style={{ marginTop: 20 }} item xs={12}></Grid>
+      <Grid item xs={12}>
+        {children[1]}
+      </Grid>
     </Grid>
   );
 }
 
-function SignUpForm(props: { onSuccess: (response: any) => void }) {
+function EmailAuthForm(props: { onSuccess: (response: any) => void }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -168,7 +170,7 @@ function SignUpForm(props: { onSuccess: (response: any) => void }) {
   const validSignUp = validName && validEmail && validPassword;
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container>
       <Grid item xs={12}>
         <AFBaseFormField
           fullWidth
@@ -177,7 +179,7 @@ function SignUpForm(props: { onSuccess: (response: any) => void }) {
           onChange={(event: any) => setName(event.target.value)}
         />
       </Grid>
-      <Grid style={{ marginTop: 24 }} item xs={12}>
+      <Grid style={{ marginTop: 30 }} item xs={12}>
         <AFBaseFormField
           fullWidth
           type="email"
@@ -187,7 +189,7 @@ function SignUpForm(props: { onSuccess: (response: any) => void }) {
           onChange={(event: any) => setEmail(event.target.value)}
         />
       </Grid>
-      <Grid style={{ marginTop: 24 }} item xs={12}>
+      <Grid style={{ marginTop: 30 }} item xs={12}>
         <AFPasswordFormField
           text="Password"
           error={password !== "" && !validPassword}
@@ -196,7 +198,7 @@ function SignUpForm(props: { onSuccess: (response: any) => void }) {
           setPassword={setPassword}
         />
       </Grid>
-      <Grid style={{ marginTop: 34 }} item xs={12}>
+      <Grid style={{ marginTop: 30 }} item xs={12}>
         <AFButton
           onClick={() =>
             postSignUp(
@@ -231,11 +233,13 @@ function SignUpForm(props: { onSuccess: (response: any) => void }) {
           </Typography>
         </Grid>
       )}
-      <Grid item xs={12}>
-        <div style={{ marginLeft: -30, marginRight: -30 }}>
-          <SocialBanner fontSize="1rem" />
-        </div>
-      </Grid>
+    </Grid>
+  );
+}
+
+function SocialMediaAuthForm() {
+  return (
+    <Grid container>
       <Grid style={{ marginTop: 12 }} item xs={12}>
         <GoogleSignInButton text="Sign up with Google" />
       </Grid>
@@ -243,6 +247,15 @@ function SignUpForm(props: { onSuccess: (response: any) => void }) {
         <FacebookSignInButton text="Sign up with Facebook" />
       </Grid>
     </Grid>
+  );
+}
+
+function SignUpForm(props: { onSuccess: (response: any) => void }) {
+  return (
+    <AuthForm>
+      <EmailAuthForm onSuccess={props.onSuccess} />
+      <SocialMediaAuthForm />
+    </AuthForm>
   );
 }
 export { SignUpForm, SocialBanner };
