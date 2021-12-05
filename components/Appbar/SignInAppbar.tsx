@@ -14,9 +14,9 @@ import Link from "next/link";
 import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
 
 import SuccessfulSignUp from "@components/Welcome/SuccessfulSignUp";
-import { SignUpForm } from "@components/SignIn/SignUp";
 import AFButton from "@components/Library/Button/Button";
 import SignInForm from "@components/Forms/Auth/SignIn/SignIn";
+import { SignUpForm } from "@components/Forms/Auth/SignUp/SignUp";
 import AppbarButton from "./AppbarButton";
 
 const Pane = styled(motion(Paper))`

@@ -1,10 +1,10 @@
 import Store from "@components/Store/Store";
-import Appbar from "@components/Appbar";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { ReactElement, useEffect } from "react";
 import { signIn } from "redux-store/features/account/accountSlice";
 import styled from "styled-components";
+import Appbar from "@components/Appbar/Appbar";
 
 const Container = styled.div`
   margin-left: auto;

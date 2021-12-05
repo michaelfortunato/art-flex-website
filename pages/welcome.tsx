@@ -12,7 +12,7 @@ import styled from "styled-components";
 import WelcomeStart from "@components/Welcome/WelcomeStart";
 import WelcomeText from "@components/Welcome/WelcomeText";
 import WelcomeChoice from "@components/Welcome/WelcomeChoice";
-import SignUp from "@components/SignIn/SignUp";
+import { SignUpForm as SignUp } from "@components/Forms/Auth/SignUp/SignUp";
 import SuccessfulSignUp from "@components/Welcome/SuccessfulSignUp";
 import ProgressDots from "@components/ProgressDots";
 import { motion, AnimatePresence } from "framer-motion";

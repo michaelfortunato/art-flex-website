@@ -27,13 +27,12 @@ export function SocialBanner(props: { fontSize?: string }) {
 
 export default function AuthForm({
   children,
-  props
+  bannerMarginTop,
+  bannerMarginBottom
 }: {
   children: any;
-  props?: {
-    bannerMarginTop?: Number;
-    bannerMarginBottom?: Number;
-  };
+  bannerMarginTop?: Number;
+  bannerMarginBottom?: Number;
 }) {
   return (
     <Grid container justifyContent="center">
@@ -42,8 +41,8 @@ export default function AuthForm({
       </Grid>
       <Grid
         style={{
-          marginTop: `${props?.bannerMarginTop || 16}px`,
-          marginBottom: `${props?.bannerMarginBottom || 16}px`
+          marginTop: `${bannerMarginTop || 16}px`,
+          marginBottom: `${bannerMarginBottom || 16}px`
         }}
         item
         xs={12}

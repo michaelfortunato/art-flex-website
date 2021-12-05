@@ -1,25 +1,17 @@
 import React from "react";
-import {
-  Button,
-  Grid,
-  IconButton,
-  StylesProvider,
-  Typography
-} from "@material-ui/core";
-import SignInButton from "@components/SignIn/SignIn";
+import { Grid, IconButton } from "@material-ui/core";
 /* Icons */
 import ShoppingCartOutlinedIcon from "@material-ui/icons/ShoppingCartOutlined";
-import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
-import AccountCircleTwoToneIcon from "@material-ui/icons/AccountCircleTwoTone";
+// import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
+// import AccountCircleTwoToneIcon from "@material-ui/icons/AccountCircleTwoTone";
 
+// import { useSelector } from "react-redux";
+// import { selectAccount } from "redux-store/features/account/accountSlice";
 import AccountMenu from "@components/Account/AccountMenu";
-
-import { useSelector } from "react-redux";
-import { selectAccount } from "redux-store/features/account/accountSlice";
 import AppbarButton from "./AppbarButton";
 import SignInAppbar from "./SignInAppbar";
 export default function Navigation() {
-  const { name, email } = useSelector(selectAccount);
+  const email = null;
   return (
     <Grid container justifyContent="space-evenly">
       <Grid item xs="auto">
@@ -36,20 +28,3 @@ export default function Navigation() {
     </Grid>
   );
 }
-/*
-          <StandardButton
-                        animateTo={{
-                            boxShadow: '0 4px 20px rgb(34 34 34 / 15%)',
-                            scale: 1.02
-                        }}
-                        animate={true}
-                        styleOverrides={
-                            {
-                                padding: 8,
-                                paddingLeft: 18,
-                                paddingRight: 18,
-                            }}
-                        onClick={() => props.setPage('SignUp')}
-                    >
-                        <Typography variant='body1'>Sell</Typography>
-                    </StandardButton>*/

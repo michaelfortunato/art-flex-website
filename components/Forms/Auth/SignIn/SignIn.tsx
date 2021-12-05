@@ -1,21 +1,11 @@
 import React, { useEffect, useState, useRef, forwardRef } from "react";
 import Link from "next/link";
-import { Grid, Paper, Typography, useTheme } from "@material-ui/core";
-import { StandardForm, PasswordForm } from "@components/Library";
+import { Grid, Typography, useTheme } from "@material-ui/core";
 import styled from "styled-components";
-import SignInHome from "@components/SignIn/SignInHome";
-import EmailSignIn from "@components/SignIn/SignInEmail";
-import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
-import SuccessfulSignUp from "@components/Welcome/SuccessfulSignUp";
 import GoogleSignInButton from "@components/Buttons/GoogleSignInButton";
 import FacebookSignInButton from "@components/Buttons/FacebookSignInButton";
 import AuthForm, { SocialBanner } from "../AuthForm";
 import axios, { AxiosResponse } from "axios";
-import { signIn } from "redux-store/features/account/accountSlice";
-import { useDispatch } from "react-redux";
-import { StandardButton } from "@components/Buttons/SignInButton";
-import { useRouter } from "next/router";
-import { SignUpForm } from "@components/SignIn/SignUp";
 import AFButton from "@components/Library/Button/Button";
 import AFPasswordFormField from "@components/Library/FormField/Variants/PasswordFormField/PasswordFormField";
 import AFBaseFormField from "@components/Library/FormField/BaseFormField";
@@ -123,7 +113,7 @@ function SocialMediaSignInForm(props: any) {
 
 export default function SignInForm(props: any) {
   return (
-    <AuthForm {...{ bannerMarginTop: 20 }}>
+    <AuthForm bannerMarginTop={16} bannerMarginBottom={-1}>
       <EmailSignInForm />
       <SocialMediaSignInForm />
     </AuthForm>

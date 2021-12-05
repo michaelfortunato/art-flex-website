@@ -9,20 +9,7 @@ import styled from "styled-components";
 import axios, { AxiosError } from "axios";
 import GoogleLogin from "react-google-login";
 import { useTheme, makeStyles } from "@material-ui/core/styles";
-import {
-  Paper,
-  ButtonBase,
-  Grid,
-  TextField,
-  InputAdornment,
-  IconButton,
-  FormHelperText,
-  Divider,
-  Typography
-} from "@material-ui/core";
-import { Visibility, VisibilityOff } from "@material-ui/icons";
-import { StandardForm, StyledStandardForm } from "@components/Library.js";
-import { StandardButton } from "@components/Buttons/SignInButton";
+import { Grid, Divider, Typography } from "@material-ui/core";
 import FacebookSignInButton from "@components/Buttons/FacebookSignInButton";
 import GoogleSignInButton from "@components/Buttons/GoogleSignInButton";
 import styles from "@styles/WelcomeSignUp.module.css";
