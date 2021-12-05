@@ -124,7 +124,7 @@ function SocialMediaSignInForm(props: any) {
 export default function SignInForm(props: any) {
   return (
     <AuthForm {...{ bannerMarginTop: 20 }}>
-      <EmailSignIn />
+      <EmailSignInForm />
       <SocialMediaSignInForm />
     </AuthForm>
   );

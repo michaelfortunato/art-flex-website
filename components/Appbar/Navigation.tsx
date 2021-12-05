@@ -16,8 +16,8 @@ import AccountMenu from "@components/Account/AccountMenu";
 
 import { useSelector } from "react-redux";
 import { selectAccount } from "redux-store/features/account/accountSlice";
-import { AppbarButton } from "@components/Library";
-import { StandardButton } from "./Buttons/SignInButton";
+import AppbarButton from "./AppbarButton";
+import SignInAppbar from "./SignInAppbar";
 export default function Navigation() {
   const { name, email } = useSelector(selectAccount);
   return (
@@ -31,7 +31,7 @@ export default function Navigation() {
         </IconButton>
       </Grid>
       <Grid item xs="auto">
-        {email !== null ? <AccountMenu /> : <SignInButton />}
+        {email !== null ? <AccountMenu /> : <SignInAppbar />}
       </Grid>
     </Grid>
   );

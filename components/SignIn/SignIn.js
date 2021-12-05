@@ -2,7 +2,7 @@ import { useState, useRef, forwardRef } from "react";
 import Backdrop from "@material-ui/core/Backdrop";
 import Button from "@material-ui/core/Button";
 import { ClickAwayListener } from "@material-ui/core";
-import SignInPane from "@components/SignIn/SignInPane";
+import SignInSignUpPane from "@components/SignIn/SignInSignUpPane";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Typography from "@material-ui/core/Typography";
 import { CSSTransition } from "react-transition-group";
@@ -28,7 +28,7 @@ export default function SignIn() {
   // 2. minimize to small size < md.
   // 3. Open sign in
   // 4. clos sign in, you should see a flicker. moving useMediaQuery up to the parent component of backdrop fixes it.
-  const mddown = useMediaQuery((theme) => theme.breakpoints.down("md"));
+  const mddown = useMediaQuery(theme => theme.breakpoints.down("md"));
   return (
     <>
       <StyledButton onClick={() => setOpen(true)}>
@@ -37,7 +37,7 @@ export default function SignIn() {
       <Backdrop open={open} style={{ zIndex: 1, padding: 12 }}>
         {open && (
           <ClickAwayListener onClickAway={() => setOpen(false)}>
-            <SignInPane setOpen={setOpen} />
+            <SignInSignUpPane setOpen={setOpen} />
           </ClickAwayListener>
         )}
       </Backdrop>
