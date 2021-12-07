@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import addrs, { ParsedMailbox } from "email-addresses";
 import axios from "axios";
 import { useTheme } from "@material-ui/core/styles";
@@ -45,8 +45,8 @@ async function postSignUp(
     email: string;
     password: string;
   },
-  onFailure: (error: any) => void,
-  onSuccess: (response: any) => void
+  onSuccess: (response: any) => void,
+  onFailure: (error: any) => void
 ) {
   try {
     const { name, email, password } = payload;
@@ -87,8 +87,12 @@ function EmailSignUpForm(props: { onSuccess: (response: any) => void }) {
   const [password, setPassword] = useState("");
 
   const [signUpFailedMessage, setSignUpFailedMessage] = useState("");
-
   const theme = useTheme();
+  useEffect(() => {
+    if (signUpFailedMessage !== "") {
+      setSignUpFailedMessage("");
+    }
+  }, [name, email, password]);
 
   const validName = name !== "";
   const validEmail = checkValidEmail(email);
@@ -185,7 +189,9 @@ function SocialMediaSignUpForm() {
   );
 }
 
-function SignUpForm(props: { onSuccess: (response: any) => void }) {
+export default function SignUpForm(props: {
+  onSuccess: (response: any) => void;
+}) {
   return (
     <AuthForm>
       <EmailSignUpForm onSuccess={props.onSuccess} />
