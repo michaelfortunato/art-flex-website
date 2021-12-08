@@ -10,8 +10,7 @@ const baseURL = "https://api.artic.edu";
 export default function StoreBody(props) {
   const { data, error } = useSWR(
     `${baseURL}/api/v1/artworks?page=${props.pageNumber}&limit=20`,
-    url => fetch(url).then(res => res.json()),
-    res => console.log(res)
+    url => fetch(url).then(res => res.json())
   );
   console.log(data);
   if (error) return <Typography variant="h2">Error</Typography>;

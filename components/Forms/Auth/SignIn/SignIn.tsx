@@ -1,23 +1,30 @@
-import React, { useEffect, useState, useRef, forwardRef } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Grid, Typography, useTheme } from "@material-ui/core";
 import styled from "styled-components";
+import axios, { AxiosResponse } from "axios";
 import GoogleSignInButton from "@components/Buttons/GoogleSignInButton";
 import FacebookSignInButton from "@components/Buttons/FacebookSignInButton";
-import AuthForm, { SocialBanner } from "../AuthForm";
-import axios, { AxiosResponse } from "axios";
+import { useIsLoggedIn } from "@utils/account-fetcher";
 import AFButton from "@components/Library/Button/Button";
 import AFPasswordFormField from "@components/Library/FormField/Variants/PasswordFormField/PasswordFormField";
 import AFBaseFormField from "@components/Library/FormField/BaseFormField";
-import { useSWRConfig } from "swr";
-import { ScopedMutator } from "swr/dist/types";
+import { KeyedMutator } from "swr/dist/types";
+
+import AuthForm from "../AuthForm";
 
 const GridRow = styled(Grid)`
   margin-top: 30px;
 `;
 
-function signInSuccess(res: AxiosResponse, mutate: ScopedMutator<any>) {
-  mutate("/login");
+async function signInSuccess(res: AxiosResponse, mutate: KeyedMutator<any>) {
+  try {
+    const user = await mutate();
+    console.log(user);
+  } catch (error) {
+    console.log("Could not update mutate");
+    console.log(error);
+  }
 }
 
 function signInFailure(error: any, setSignUpFailed: (message: string) => void) {
@@ -34,7 +41,7 @@ function EmailSignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [signInFailedMessage, setSignInFailedMessage] = useState("");
-  const { mutate } = useSWRConfig();
+  const { mutate } = useIsLoggedIn();
   const theme = useTheme();
 
   useEffect(() => {
@@ -79,12 +86,14 @@ function EmailSignInForm() {
             borderStyle: "none",
             backgroundColor: theme.palette.primary.main
           }}
-          onClick={async () =>
-            axios
-              .post("/login", { email, password })
-              .then(response => signInSuccess(response, mutate))
-              .catch(error => signInFailure(error, setSignInFailedMessage))
-          }
+          onClick={async () => {
+            try {
+              const response = await axios.post("/login", { email, password });
+              await signInSuccess(response, mutate);
+            } catch (error) {
+              signInFailure(error, setSignInFailedMessage);
+            }
+          }}
         >
           <Typography
             style={{ color: "white", textTransform: "none" }}
@@ -98,7 +107,7 @@ function EmailSignInForm() {
   );
 }
 
-function SocialMediaSignInForm(props: any) {
+function SocialMediaSignInForm() {
   return (
     <Grid container>
       <Grid style={{ marginTop: 12 }} item xs={12}>
@@ -111,7 +120,7 @@ function SocialMediaSignInForm(props: any) {
   );
 }
 
-export default function SignInForm(props: any) {
+export default function SignInForm() {
   return (
     <AuthForm bannerMarginTop={16} bannerMarginBottom={-1}>
       <EmailSignInForm />

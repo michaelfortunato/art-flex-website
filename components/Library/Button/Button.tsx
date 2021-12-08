@@ -22,6 +22,7 @@ export default function AFButton(props: AFButtonProps) {
           ...props.animateTo
         }
       }
+      disabled={props.disabled}
       onClick={props.onClick}
       style={{ ...props.styleOverrides }}
     >

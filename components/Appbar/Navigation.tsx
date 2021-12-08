@@ -7,11 +7,13 @@ import ShoppingCartOutlinedIcon from "@material-ui/icons/ShoppingCartOutlined";
 
 // import { useSelector } from "react-redux";
 // import { selectAccount } from "redux-store/features/account/accountSlice";
-import AccountMenu from "@components/Account/AccountMenu";
+import { useIsLoggedIn } from "@utils/account-fetcher";
+import AccountMenu from "./AccountMenu";
 import AppbarButton from "./AppbarButton";
 import SignInAppbar from "./SignInAppbar";
+
 export default function Navigation() {
-  const email = null;
+  const { user } = useIsLoggedIn();
   return (
     <Grid container justifyContent="space-evenly">
       <Grid item xs="auto">
@@ -23,7 +25,7 @@ export default function Navigation() {
         </IconButton>
       </Grid>
       <Grid item xs="auto">
-        {email !== null ? <AccountMenu /> : <SignInAppbar />}
+        {user ? <AccountMenu /> : <SignInAppbar />}
       </Grid>
     </Grid>
   );

@@ -1,10 +1,7 @@
-import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
 import AccountCircleTwoToneIcon from "@material-ui/icons/AccountCircleTwoTone";
 import SettingsIcon from "@material-ui/icons/Settings";
 import StoreOutlinedIcon from "@material-ui/icons/StoreOutlined";
 import AccountBalanceWalletOutlinedIcon from "@material-ui/icons/AccountBalanceWalletOutlined";
-import { useDispatch } from "react-redux";
-import { signOut } from "../../redux-store/features/account/accountSlice";
 import {
   ClickAwayListener,
   IconButton,
@@ -14,13 +11,23 @@ import {
   Paper,
   Typography,
   Grid,
-  Divider,
+  Divider
 } from "@material-ui/core";
-import { useState, useRef, forwardRef } from "react";
+import { useState, useRef, forwardRef, MouseEventHandler } from "react";
 import Link from "next/link";
-import axios from "axios";
+import { signOut, useIsLoggedIn } from "@utils/account-fetcher";
 
-const StyledLinkText = forwardRef(({ href, text }, ref) => {
+function StyledLinkText(
+  {
+    href,
+    text
+  }: {
+    href?: string;
+    text: string;
+    onClick?: MouseEventHandler<HTMLAnchorElement>;
+  },
+  ref: any
+) {
   return (
     <Typography>
       <a
@@ -32,22 +39,17 @@ const StyledLinkText = forwardRef(({ href, text }, ref) => {
       </a>
     </Typography>
   );
-});
+}
 
-const SignOut = async (dispatch) => {
-  dispatch(signOut());
-  axios.post("/logout").then(
-    () => {},
-    (error) => {
-      console.log(error);
-    }
-  );
-};
+const ForwardRefStyledLinkText = forwardRef<
+  any,
+  { href?: any; text: string; onClick?: MouseEventHandler<HTMLAnchorElement> }
+>(StyledLinkText);
 
 export default function AccountMenu() {
-  const dispatch = useDispatch();
+  const { mutate } = useIsLoggedIn();
   const [open, setOpen] = useState(false);
-  const anchorRef = useRef();
+  const anchorRef = useRef<HTMLButtonElement>(null);
   return (
     <>
       <IconButton ref={anchorRef} onClick={() => setOpen(true)} color="inherit">
@@ -63,7 +65,7 @@ export default function AccountMenu() {
                     <MenuItem>
                       <AccountCircleTwoToneIcon style={{ marginRight: "10" }} />
                       <Link href="/account" passHref>
-                        <StyledLinkText text={"Your profile"} />
+                        <ForwardRefStyledLinkText text={"Your profile"} />
                       </Link>
                     </MenuItem>
                   </Grid>
@@ -73,7 +75,7 @@ export default function AccountMenu() {
                         style={{ marginRight: "10" }}
                       />
                       <Link href="/account/purchased" passHref>
-                        <StyledLinkText text={"Purchased items"} />
+                        <ForwardRefStyledLinkText text={"Purchased items"} />
                       </Link>
                     </MenuItem>
                   </Grid>
@@ -81,7 +83,7 @@ export default function AccountMenu() {
                     <MenuItem>
                       <StoreOutlinedIcon style={{ marginRight: "10" }} />
                       <Link href="/account/studio/sold" passHref>
-                        <StyledLinkText text={"Sold items"} />
+                        <ForwardRefStyledLinkText text={"Sold items"} />
                       </Link>
                     </MenuItem>
                   </Grid>
@@ -90,7 +92,7 @@ export default function AccountMenu() {
                   <Divider style={{ backgroundColor: "black" }} />
                 </Grid>
                 <Grid item xs>
-                  <MenuItem onClick={() => SignOut(dispatch)}>
+                  <MenuItem onClick={() => signOut(mutate)}>
                     <SettingsIcon style={{ marginRight: "10" }} />
                     <Typography>Sign out</Typography>
                   </MenuItem>

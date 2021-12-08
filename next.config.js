@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 // Get NODE_ENV="dev" when running npm run dev. Right now it does not.
 const rewrites =
-  process.env.NODE_ENV !== "dev"
+  process.env.NODE_ENV === "development"
     ? [
         {
           source: "/api/:path*",
