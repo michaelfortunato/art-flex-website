@@ -1,8 +1,9 @@
-import React, { useState, useRef, RefObject } from "react";
+import React from "react";
 import { Grid, Hidden, Typography } from "@material-ui/core";
-import Searchbar from "./Searchbar"; // "@components/Appbar/Searchbar";
 import Navigation from "@components/Appbar/Navigation";
+import Searchbar from "./Searchbar"; // "@components/Appbar/Searchbar";
 import Menubar from "./Menubar";
+
 const pages = [
   {
     url: "/art",
@@ -23,7 +24,7 @@ const pages = [
   }
 ];
 
-export default function Appbar(props: any) {
+export default function Appbar() {
   return (
     <div style={{ paddingTop: 10, marginBottom: 40, backgroundColor: "white" }}>
       <Grid container alignItems="center">

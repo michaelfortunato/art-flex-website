@@ -17,14 +17,11 @@ const GridRow = styled(Grid)`
   margin-top: 30px;
 `;
 
-async function signInSuccess(res: AxiosResponse, mutate: KeyedMutator<any>) {
-  try {
-    const user = await mutate();
-    console.log(user);
-  } catch (error) {
-    console.log("Could not update mutate");
-    console.log(error);
-  }
+async function signInSuccess(
+  response: AxiosResponse,
+  mutate: KeyedMutator<any>
+) {
+  mutate(response, false);
 }
 
 function signInFailure(error: any, setSignUpFailed: (message: string) => void) {

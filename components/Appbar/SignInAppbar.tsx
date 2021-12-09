@@ -1,12 +1,9 @@
-import React, { useState, useRef, forwardRef } from "react";
+import React, { useState, forwardRef } from "react";
 import {
-  Button,
   Backdrop,
   Grid,
   Paper,
   Typography,
-  useTheme,
-  useMediaQuery,
   ClickAwayListener
 } from "@material-ui/core";
 import styled from "styled-components";
@@ -48,11 +45,6 @@ const Pane = styled(motion(Paper))`
     } 
 
 `;
-const GridRow = styled(Grid)`
-  margin-top: 30px;
-  overflow: ;
-`;
-
 function SignUpPaneHeader(props: { setPage: (pageName: string) => void }) {
   return (
     <Grid style={{ marginTop: 30 }} alignItems="center" container item xs={12}>
@@ -103,9 +95,7 @@ function SignUpPane(props: {
                   <SignUpPaneHeader setPage={props.setPage} />
                 </Grid>
                 <Grid item xs={12}>
-                  <SignUpForm
-                    onSuccess={response => setSuccessfulSignUp(true)}
-                  />
+                  <SignUpForm onSuccess={() => setSuccessfulSignUp(true)} />
                 </Grid>
               </Grid>
             </motion.div>
@@ -169,7 +159,8 @@ function SignInPane(props: { setPage: (pageName: string) => void }) {
 // am not smart enough to learn it in a reasonable time. Maybe I'll find a
 // youtube video of it on my way to work. This also applies to typing forwardRef
 // as well.
-const SignInSignUpPane = forwardRef<HTMLDivElement, any>((props, ref) => {
+
+function SignInSignUpPane(props: any, ref: any) {
   const [page, setPage] = useState("SignIn");
   return (
     <AnimateSharedLayout>
@@ -199,7 +190,7 @@ const SignInSignUpPane = forwardRef<HTMLDivElement, any>((props, ref) => {
               style={{ color: "black", opacity: 0.8 }}
               variant="body2"
             >
-              By clicking Sign in, you agree to Art Flex's
+              By clicking Sign in, you agree to Art Flex&apos;s
               <Link href="/legal/term_of_use">
                 <a style={{ color: "inherit" }}> Terms of Use</a>
               </Link>{" "}
@@ -216,19 +207,20 @@ const SignInSignUpPane = forwardRef<HTMLDivElement, any>((props, ref) => {
       </Pane>
     </AnimateSharedLayout>
   );
-});
+}
+
+const ForwardRefSignInSignUpPane = forwardRef<HTMLDivElement, any>(
+  SignInSignUpPane
+);
 
 export default function SignInAppbar() {
   const [open, setOpen] = useState(false);
-  const [animationInProgress, setAnimationInProgress] = useState(false);
-  const [animationClass, setAnimationClass] = useState("");
 
   // I think use backdrop fucks up the media query. It a hard corner case to reproduce but there is a flash
   // 1. open ws on full screen
   // 2. minimize to small size < md.
   // 3. Open sign in
   // 4. clos sign in, you should see a flicker. moving useMediaQuery up to the parent component of backdrop fixes it.
-  const mddown = useMediaQuery((theme: any) => theme?.breakpoints.down("md"));
   return (
     <>
       <AppbarButton onClick={() => setOpen(true)} text={"Sign In"}>
@@ -237,7 +229,7 @@ export default function SignInAppbar() {
       <Backdrop open={open} style={{ zIndex: 1, padding: 12 }}>
         {open && (
           <ClickAwayListener onClickAway={() => setOpen(false)}>
-            <SignInSignUpPane setOpen={setOpen} />
+            <ForwardRefSignInSignUpPane setOpen={setOpen} />
           </ClickAwayListener>
         )}
       </Backdrop>

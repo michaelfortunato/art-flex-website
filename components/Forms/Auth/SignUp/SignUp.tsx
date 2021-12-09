@@ -3,22 +3,21 @@ import addrs, { ParsedMailbox } from "email-addresses";
 import axios from "axios";
 import { useTheme } from "@material-ui/core/styles";
 import { Grid, Typography } from "@material-ui/core";
-import AuthForm, { SocialBanner } from "../AuthForm";
 
 import FacebookSignInButton from "@components/Buttons/FacebookSignInButton";
 import GoogleSignInButton from "@components/Buttons/GoogleSignInButton";
 import AFBaseFormField from "@components/Library/FormField/BaseFormField";
 import AFPasswordFormField from "@components/Library/FormField/Variants/PasswordFormField/PasswordFormField";
 import AFButton from "@components/Library/Button/Button";
+import AuthForm, { SocialBanner } from "../AuthForm";
 
 function checkValidEmail(email: string): boolean {
   try {
     const address = (addrs.parseOneAddress(email) as ParsedMailbox) || null;
     if (address !== null) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   } catch (ex) {
     return false;
   }

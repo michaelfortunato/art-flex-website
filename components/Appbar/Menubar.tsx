@@ -2,7 +2,6 @@ import { RefObject, useRef, useState } from "react";
 import { Grid, Typography } from "@material-ui/core";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import * as Styled from "./Menubar.styled";
 
 /*
 function determineIfHTMLDivElement(currentRef: HTMLDivElement | null) {
@@ -36,7 +35,7 @@ function onMouseOver(
     }
     clearTimeout(underlineTimer.current);
     // use event.target.getBoundingClientRect() if you dont want the whole box
-    //event.target.getBoundingClientRect();
+    // event.target.getBoundingClientRect();
 
     const textPos = (
       parentBoxRefs[boxIndex].current as HTMLDivElement
@@ -52,6 +51,7 @@ function onMouseOver(
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function onMouseOut(setIsUnderlined: (isUnderlined: boolean) => void) {
   setIsUnderlined(false);
 }
@@ -67,7 +67,7 @@ export default function Menubar(props: {
     left: 0,
     width: 0
   });
-  const parentBoxRefs = props.pages.map(() => useRef<HTMLDivElement>(null));
+  const parentBoxRefs: any[] = []; // props.pages.map(() => useRef<HTMLDivElement>(null));
 
   const underlineRef = useRef<HTMLSpanElement>(null);
   const underlineTimer = useRef<NodeJS.Timeout>(null);

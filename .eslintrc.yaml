@@ -14,3 +14,5 @@ parserOptions:
 plugins:
   - "@typescript-eslint"
   - "prettier"
+rules:
+  import/prefer-default-export: "off"

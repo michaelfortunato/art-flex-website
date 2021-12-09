@@ -1,8 +1,7 @@
 import React from "react";
-import GoogleLogin, { useGoogleLogin } from "react-google-login";
 import SignInButton from "./SignInButton";
 
-export default function GoogleSignInButton(props) {
+export default function GoogleSignInButton(props: { text?: string }) {
   return (
     <SignInButton
       isSVG={true}
