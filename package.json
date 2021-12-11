@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "@svgr/webpack": "^6.1.0",
+    "@types/bytes": "^3.1.1",
     "@types/node": "16.11.11",
     "@types/react": "17.0.37",
     "@types/styled-components": "^5.1.16",

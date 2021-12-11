@@ -12,7 +12,7 @@ import {
   InputBase,
   capitalize,
   Popper,
-  ClickAwayListener,
+  ClickAwayListener
 } from "@material-ui/core";
 import Image from "next/image";
 import {
@@ -20,7 +20,7 @@ import {
   useRef,
   useEffect,
   useLayoutEffect,
-  forwardRef,
+  forwardRef
 } from "react";
 import { createPortal } from "react-dom";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
@@ -35,7 +35,7 @@ import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { v4 as uuidv4 } from "uuid";
-import ChunkedFile from "@utils/chunked_upload";
+import ChunkedFile from "@utils/chunked-upload";
 import axios from "axios";
 
 const TextArea = () => {
@@ -75,10 +75,10 @@ const TextArea = () => {
         resize: "vertical",
         minHeight: "1em",
         borderStyle: "none",
-        outline: "none",
+        outline: "none"
       }}
       value={value}
-      onChange={(event) => setValue(event.target.value)}
+      onChange={event => setValue(event.target.value)}
     />
   );
 };
@@ -126,7 +126,7 @@ const reorder = (sourceIndex, destinationIndex, items) => {
 };
 
 const DragAndDropMenu = forwardRef((props, containerRef) => {
-  const onDragEnd = (result) => {
+  const onDragEnd = result => {
     if (!result.destination) {
       return;
     }
@@ -150,7 +150,7 @@ const DragAndDropMenu = forwardRef((props, containerRef) => {
           return (
             <DragAndDropMenuContainer
               {...provided.droppableProps}
-              ref={(ref) => setRef(ref, provided)}
+              ref={ref => setRef(ref, provided)}
               isDraggingOver={snapshot.isDraggingOver}
             >
               {props.items.map((item, index) => (
@@ -190,7 +190,7 @@ const OverlayContainer = styled(motion.div)`
   opacity: 0;
 `;
 
-const Overlay = (props) => {
+const Overlay = props => {
   const menuRef = useRef(null);
   const menuButtonRef = useRef(null);
   return (
@@ -216,9 +216,9 @@ const Overlay = (props) => {
           <Grid item xs="auto">
             <span
               style={{ fontSize: "3rem", cursor: "pointer" }}
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
-                props.setMenuOpen((menuOpen) => !menuOpen);
+                props.setMenuOpen(menuOpen => !menuOpen);
               }}
             >
               <AppsIcon ref={menuButtonRef} fontSize="inherit" />
@@ -231,11 +231,11 @@ const Overlay = (props) => {
               style={{
                 marginRight: 30,
                 fontSize: "3rem",
-                cursor: "pointer",
+                cursor: "pointer"
               }}
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
-                props.setItemNumber((itemNumber) =>
+                props.setItemNumber(itemNumber =>
                   itemNumber > 0 ? itemNumber - 1 : itemNumber
                 );
               }}
@@ -246,11 +246,11 @@ const Overlay = (props) => {
               style={{
                 marginLeft: 30,
                 fontSize: "3rem",
-                cursor: "pointer",
+                cursor: "pointer"
               }}
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
-                props.setItemNumber((itemNumber) =>
+                props.setItemNumber(itemNumber =>
                   itemNumber < props.items.length - 1
                     ? itemNumber + 1
                     : itemNumber
@@ -282,13 +282,13 @@ const Overlay = (props) => {
 const DropzoneContainer = styled(motion.div)`
   border-style: dashed;
   border-width: 2px;
-  border-color: ${(props) => getBorderColorOnDrop(props)};
+  border-color: ${props => getBorderColorOnDrop(props)};
   outline: none;
   height: 100%;
   position: relative;
 `;
 
-const getBorderColorOnDrop = (props) => {
+const getBorderColorOnDrop = props => {
   if (props.isDragAccept) {
     return "#00e676";
   }
@@ -301,28 +301,28 @@ const getBorderColorOnDrop = (props) => {
   return "#eeeeee";
 };
 
-const StyledDropzone = (props) => {
+const StyledDropzone = props => {
   const [menuOpen, setMenuOpen] = useState(false);
   const {
     getRootProps,
     getInputProps,
     isDragActive,
     isDragAccept,
-    isDragReject,
+    isDragReject
   } = useDropzone({
     noClick: menuOpen,
     accept: "image/*",
-    onDrop: (acceptedFiles) => {
-      const additionalImages = acceptedFiles.map((file) =>
+    onDrop: acceptedFiles => {
+      const additionalImages = acceptedFiles.map(file =>
         Object.assign(file, {
-          preview: URL.createObjectURL(file),
+          preview: URL.createObjectURL(file)
         })
       );
       setDelayOverlay(true);
-      props.setImages((images) =>
+      props.setImages(images =>
         additionalImages.concat(images).slice(0, MAX_IMAGES)
       );
-    },
+    }
   });
   const [delayOverlay, setDelayOverlay] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -364,7 +364,7 @@ const StyledDropzone = (props) => {
               <div
                 style={{
                   textAlign: "center",
-                  paddingBottom: 40,
+                  paddingBottom: 40
                 }}
               >
                 <Button variant="outlined">Browse</Button>
@@ -405,21 +405,21 @@ const MAX_IMAGES = 5;
 const steps = [
   {
     step_title: "Name and description",
-    step_content: "Please enter the title of your piece and give a description",
+    step_content: "Please enter the title of your piece and give a description"
   },
   {
     step_title: "Upload photos",
-    step_content: `Please upload 2-${MAX_IMAGES} photos of your piece`,
+    step_content: `Please upload 2-${MAX_IMAGES} photos of your piece`
   },
   {
     step_title: "Set your price",
     step_content:
-      "Set the price for your piece. You can choose to have customers rent it, buy it or both.",
+      "Set the price for your piece. You can choose to have customers rent it, buy it or both."
   },
   {
     step_title: "Summary",
-    step_content: "Summary",
-  },
+    step_content: "Summary"
+  }
 ];
 
 const useChunkedUpload = () => {
@@ -435,33 +435,33 @@ const useChunkedUpload = () => {
   const isLoading = chunkedFileObject !== null;
 
   const upload = async (url, file) => {
-      if (isComplete || isLoading) return;
-      const chunkedFile = new ChunkedFile(uuidv4(), file);
-      setChunkedFileObject(chunkedFile);
+    if (isComplete || isLoading) return;
+    const chunkedFile = new ChunkedFile(uuidv4(), file);
+    setChunkedFileObject(chunkedFile);
   };
 
   useEffect(async () => {
     if (chunkedFileObject === null) return;
     try {
       const promises = await chunkedFileObject.uploadFile();
-      promises.forEach((promise) => {
+      promises.forEach(promise => {
         promise
-          .then((response) => {
+          .then(response => {
             if (response.status === 200) {
               setIsComplete(true);
               setNumCompletedChunks(chunkedFileObject.numChunks);
             } else {
               setNumCompletedChunks(
-                (numCompletedChunks) => numCompletedChunks + 1
+                numCompletedChunks => numCompletedChunks + 1
               );
             }
           })
-          .catch((error) => {
+          .catch(error => {
             setIsError(true);
           });
       });
     } catch (error) {
-      setIsError(true)
+      setIsError(true);
     }
   }, [chunkedFileObject]);
 
@@ -479,7 +479,7 @@ const useChunkedUpload = () => {
 };
 
 async function upload_post({ title, description, images }) {
-  const chunkedFiles = images.map((imageFile) => {
+  const chunkedFiles = images.map(imageFile => {
     console.log(imageFile);
     return new ChunkedFile(uuidv4(), imageFile);
   });
@@ -548,7 +548,7 @@ export default function CreatePost() {
                 style={{
                   padding: 60,
                   borderRadius: 10,
-                  display: "inline-block",
+                  display: "inline-block"
                 }}
               >
                 <div>
@@ -557,7 +557,7 @@ export default function CreatePost() {
                       display: "inline-block",
                       height: 440,
                       width: 400,
-                      marginBottom: 20,
+                      marginBottom: 20
                     }}
                   >
                     <AnimatePresence exitBeforeEnter>
@@ -570,7 +570,7 @@ export default function CreatePost() {
                           style={{
                             borderStyle: "solid",
                             borderColor: "#OOOOOO",
-                            filter: "blur(.5rem)",
+                            filter: "blur(.5rem)"
                           }}
                         >
                           <Image src={postPlaceHolderImg} placeholder="blur" />
@@ -592,7 +592,7 @@ export default function CreatePost() {
                       maxHeight: 100,
                       overflowY: "auto",
                       marginTop: 20,
-                      borderStyle: "solid",
+                      borderStyle: "solid"
                     }}
                   >
                     <InputBase
@@ -601,12 +601,12 @@ export default function CreatePost() {
                         fontSize: "1rem",
                         overflowY: "auto",
                         minHeight: 40,
-                        fontStyle: "italic",
+                        fontStyle: "italic"
                       }}
                       autoComplete="title"
                       autoFocus={true}
                       placeholder={"Type your description here"}
-                      onChange={(e) => setDescription(e.target.value)}
+                      onChange={e => setDescription(e.target.value)}
                     ></InputBase>
                   </div>
                   <ClickAwayListener
@@ -622,14 +622,13 @@ export default function CreatePost() {
                         autoFocus={true}
                         placeholder={"Type your title here"}
                         value={title}
-                        onChange={(e) =>
+                        onChange={e =>
                           setTitle(
                             e.target.value
                               .toLowerCase()
                               .split(" ")
                               .map(
-                                (s) =>
-                                  s.charAt(0).toUpperCase() + s.substring(1)
+                                s => s.charAt(0).toUpperCase() + s.substring(1)
                               )
                               .join(" ")
                           )
@@ -642,7 +641,7 @@ export default function CreatePost() {
             </AnimatedGrid>
             {activeStep === 2 && (
               <AnimatedGrid
-                key = "rental"
+                key="rental"
                 layout
                 item
                 xs="auto"
@@ -672,7 +671,7 @@ export default function CreatePost() {
                         position: "relative",
                         padding: 20,
                         height: 200,
-                        width: 200,
+                        width: 200
                       }}
                     >
                       <Image src={preview} objectFit="contain" layout="fill" />
@@ -712,7 +711,7 @@ export default function CreatePost() {
       {activeStep === 0 && (
         <motion.div animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <Popper
-            key = {1}
+            key={1}
             open={anchorRef_title.current !== null}
             anchorEl={anchorRef_title.current}
             placement="left"
@@ -722,7 +721,7 @@ export default function CreatePost() {
             </div>
           </Popper>
           <Popper
-            key = {2}
+            key={2}
             open={title !== "" && anchorRef_title.current !== null}
             anchorEl={anchorRef_description.current}
             placement="left"

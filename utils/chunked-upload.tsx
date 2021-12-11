@@ -1,5 +1,5 @@
-const { default: axios } = require("axios");
 import bytes from "bytes";
+import axios from "axios";
 
 class ChunkedFile {
   static chunkSize = bytes("5MB");
@@ -22,16 +22,16 @@ class ChunkedFile {
         headers: {
           "X-Upload-Id": this.uploadId + ":" + this.fileInterface.name,
           "X-Total-Chunks": this.numEvenChunks + this.hasRemainder
-        },
+        }
       }
-    ); 
+    );
   }
   async uploadFile() {
     /* remainderChunk fileSize & chunkSize */
 
     //The first thing we do is create the chunked upload
 
-    await this.createUpload(); 
+    await this.createUpload();
 
     let uploads = [];
     for (let ithChunk = 0; ithChunk < this.numEvenChunks; ++ithChunk) {
@@ -81,8 +81,8 @@ class ChunkedFile {
         "X-Upload-Id": this.uploadId + ":" + this.fileInterface.name,
         "X-Current-Chunk-Number":
           Math.floor(chunkStart / ChunkedFile.chunkSize) + 1,
-        "X-Total-Chunks": this.numEvenChunks + this.hasRemainder,
-      },
+        "X-Total-Chunks": this.numEvenChunks + this.hasRemainder
+      }
     });
   }
 }
