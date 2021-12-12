@@ -116,3 +116,61 @@ export const OverlayContainer = styled(motion.div)`
           </Popper>
         </motion.div>
 */
+
+/*
+const useChunkedUpload = () => {
+  const [isError, setIsError] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  const [numCompletedChunks, setNumCompletedChunks] = useState(0);
+  const [chunkedFileObject, setChunkedFileObject] = useState(null);
+
+  const progress =
+    chunkedFileObject === null
+      ? 0
+      : numCompletedChunks / chunkedFileObject.numChunks;
+  const isLoading = chunkedFileObject !== null;
+
+  const upload = async (url, file) => {
+    if (isComplete || isLoading) return;
+    const chunkedFile = new ChunkedFile(uuidv4(), file);
+    setChunkedFileObject(chunkedFile);
+  };
+
+  useEffect(async () => {
+    if (chunkedFileObject === null) return;
+    try {
+      const promises = await chunkedFileObject.uploadFile();
+      promises.forEach(promise => {
+        promise
+          .then(response => {
+            if (response.status === 200) {
+              setIsComplete(true);
+              setNumCompletedChunks(chunkedFileObject.numChunks);
+            } else {
+              setNumCompletedChunks(
+                numCompletedChunks => numCompletedChunks + 1
+              );
+            }
+          })
+          .catch(error => {
+            setIsError(true);
+          });
+      });
+    } catch (error) {
+      setIsError(true);
+    }
+  }, [chunkedFileObject]);
+
+  useEffect(() => {
+    if (
+      chunkedFileObject &&
+      numCompletedChunks === chunkedFileObject.numChunks &&
+      isComplete === false
+    ) {
+      setIsError(true);
+    }
+  }, [numCompletedChunks]);
+
+  return [upload, isComplete, isLoading, isError, progress];
+};
+*/

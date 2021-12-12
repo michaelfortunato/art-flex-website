@@ -1,8 +1,8 @@
 import React from "react";
-import styles from "@styles/StoreTile.module.css";
-import styled, { useTheme } from "styled-components";
-import { Paper, Grid, Button, Typography, Divider } from "@material-ui/core";
+import styled from "styled-components";
+import { Paper, Button, Typography, Divider } from "@material-ui/core";
 import Image from "next/image";
+
 const StyledTile = styled(Paper)`
   position: relative;
   padding: 40px;
@@ -14,19 +14,18 @@ const StyledTile = styled(Paper)`
 const Tag = styled.span`
   display: inline-block;
   margin: 4px;
-  margin-left: ${(props) => (props.index === 0 ? 0 : 4)}px;
+  margin-left: ${props => (props.index === 0 ? 0 : 4)}px;
   padding: 5px;
   padding-left: 10px;
   padding-right: 10px;
   border-radius: 20px;
   opacity: 0.8;
-  background-color: ${(props) =>
-    props.theme.tag[props.variant].backgroundColor};
-  color: ${(props) => props.theme.tag[props.variant].textColor};
+  background-color: ${props => props.theme.tag[props.variant].backgroundColor};
+  color: ${props => props.theme.tag[props.variant].textColor};
 `;
 const imageBaseURL = "https://www.artic.edu/iiif/2";
 
-export {StyledTile}
+export { StyledTile };
 
 export default function StoreTile(props) {
   const src =
@@ -41,6 +40,7 @@ export default function StoreTile(props) {
             width={props.image_size.width}
             height={props.image_size.height}
             src={src}
+            alt="Image here"
           />
         </div>
 
@@ -56,24 +56,22 @@ export default function StoreTile(props) {
         <div
           style={{ maxWidth: props.image_size.width + 75, marginTop: "10px" }}
         >
-          {props.tags.map((tag, index) => {
-            return (
-              <Tag
-                key={index}
-                index={index}
-                variant={
-                  {
-                    0: "period",
-                    1: "social",
-                    2: "prominence",
-                    3: "prominence",
-                  }[index] || "period"
-                }
-              >
-                {tag}
-              </Tag>
-            );
-          })}
+          {props.tags.map((tag, index) => (
+            <Tag
+              key={index}
+              index={index}
+              variant={
+                {
+                  0: "period",
+                  1: "social",
+                  2: "prominence",
+                  3: "prominence"
+                }[index] || "period"
+              }
+            >
+              {tag}
+            </Tag>
+          ))}
         </div>
         <div
           style={{ maxWidth: props.image_size.width + 75, marginTop: "10px" }}
@@ -85,18 +83,16 @@ export default function StoreTile(props) {
         <div
           style={{ maxWidth: props.image_size.width + 75, marginTop: "10px" }}
         >
-          {props.rental_pricing.map(({ price, period }, index) => {
-            return (
-              <Button
-                key={index}
-                style={{ marginRight: 10, marginBottom: 10 }}
-                variant="contained"
-                color="secondary"
-              >
-                {`Rent for $${price} per ${period}`}
-              </Button>
-            );
-          })}
+          {props.rental_pricing.map(({ price, period }, index) => (
+            <Button
+              key={index}
+              style={{ marginRight: 10, marginBottom: 10 }}
+              variant="contained"
+              color="secondary"
+            >
+              {`Rent for $${price} per ${period}`}
+            </Button>
+          ))}
           <Button
             style={{ marginRight: 10, marginBottom: 10 }}
             variant="contained"

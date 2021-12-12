@@ -282,7 +282,6 @@ export default function Dropzone(props: {
   const [menuOpen, setMenuOpen] = useState(false);
   const [delayOverlay, setDelayOverlay] = useState(false);
   const [selectedImage, setSelectedImage] = useState<number>(0);
-  const [showOverlay, setShowOverlay] = useState(false);
 
   const {
     getRootProps,

@@ -63,6 +63,35 @@ interface PostInterface {
   images: PostImage[];
 }
 
+function InputDescription(props: { setDescription: any }) {
+  return (
+    <div
+      style={{
+        maxHeight: 200,
+        overflowY: "auto",
+        marginTop: 20,
+        borderBottomStyle: "solid",
+        borderBottomColor: "#000000"
+      }}
+    >
+      <InputBase
+        fullWidth
+        style={{
+          fontSize: "1rem",
+          minHeight: 40,
+          fontStyle: "italic"
+        }}
+        multiline
+        spellCheck
+        autoComplete="title"
+        autoFocus={true}
+        placeholder={"Type your description here"}
+        onChange={e => props.setDescription(e.target.value)}
+      ></InputBase>
+    </div>
+  );
+}
+
 function PostImages(props: {
   uploadStep: number;
   images: PostImage[];
@@ -133,46 +162,46 @@ function Post(props: {
         </div>
         <div
           style={{
-            maxHeight: 100,
+            maxHeight: 200,
             overflowY: "auto",
             marginTop: 20,
-            borderStyle: "solid"
+            borderBottomStyle: "solid",
+            borderBottomColor: "#000000"
           }}
         >
           <InputBase
             fullWidth
             style={{
               fontSize: "1rem",
-              overflowY: "auto",
               minHeight: 40,
               fontStyle: "italic"
             }}
+            multiline
+            spellCheck
             autoComplete="title"
             autoFocus={true}
             placeholder={"Type your description here"}
             onChange={e => setDescription(e.target.value)}
           ></InputBase>
         </div>
-        <ClickAwayListener>
-          <div style={{ marginTop: 20, borderStyle: "solid" }}>
-            <InputBase
-              style={{ minHeight: 40, fontStyle: "italic" }}
-              autoComplete="title"
-              autoFocus={true}
-              placeholder={"Type your title here"}
-              onChange={e =>
-                // Maybe we need value in sign up form
-                setTitle(
-                  e.target.value
-                    .toLowerCase()
-                    .split(" ")
-                    .map(s => s.charAt(0).toUpperCase() + s.substring(1))
-                    .join(" ")
-                )
-              }
-            ></InputBase>
-          </div>
-        </ClickAwayListener>
+        <div style={{ marginTop: 20, borderBottomStyle: "solid" }}>
+          <InputBase
+            style={{ minHeight: 40, fontStyle: "italic" }}
+            autoComplete="title"
+            autoFocus={true}
+            placeholder={"Type your title here"}
+            onChange={e =>
+              // Maybe we need value in sign up form
+              setTitle(
+                e.target.value
+                  .toLowerCase()
+                  .split(" ")
+                  .map(s => s.charAt(0).toUpperCase() + s.substring(1))
+                  .join(" ")
+              )
+            }
+          ></InputBase>
+        </div>
       </div>
     </Paper>
   );
