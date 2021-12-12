@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import Appbar from "@components/Appbar";
+import Appbar from "@components/Appbar/Appbar";
 import {
   Button,
   Grid,
@@ -10,7 +10,6 @@ import {
   Typography,
   Divider,
   InputBase,
-  capitalize,
   Popper,
   ClickAwayListener
 } from "@material-ui/core";
@@ -20,24 +19,24 @@ import {
   useRef,
   useEffect,
   useLayoutEffect,
-  forwardRef
+  forwardRef,
+  ReactElement,
+  ChangeEvent
 } from "react";
-import { createPortal } from "react-dom";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import CheckIcon from "@material-ui/icons/Check";
 import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
 import postPlaceHolderImg from "@public/create_post_placeholder.jpg";
 import SystemUpdateAltOutlinedIcon from "@material-ui/icons/SystemUpdateAltOutlined";
-import { SocialBanner } from "@components/SignIn/SignUp";
 import { useDropzone } from "react-dropzone";
 import AppsIcon from "@material-ui/icons/Apps";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { v4 as uuidv4 } from "uuid";
-import ChunkedFile from "@utils/chunked-upload";
-import axios from "axios";
+import uploadFile from "@utils/chunked-upload";
 
+/*
 const TextArea = () => {
   const ref = useRef();
   const [value, setValue] = useState(
@@ -82,6 +81,28 @@ const TextArea = () => {
     />
   );
 };
+*/
+
+const MAX_IMAGES = 5;
+const steps = [
+  {
+    stepTitle: "Name and description",
+    stepContent: "Please enter the title of your piece and give a description"
+  },
+  {
+    stepTitle: "Upload photos",
+    stepContent: `Please upload 2-${MAX_IMAGES} photos of your piece`
+  },
+  {
+    stepTitle: "Set your price",
+    stepContent:
+      "Set the price for your piece. You can choose to have customers rent it, buy it or both."
+  },
+  {
+    stepTitle: "Summary",
+    stepContent: "Summary"
+  }
+];
 
 const DragAndDropMenuContainer = styled.div`
   color: #ffffff;
@@ -125,6 +146,7 @@ const reorder = (sourceIndex, destinationIndex, items) => {
   return reorderedItems;
 };
 
+// eslint-disable-next-line react/display-name
 const DragAndDropMenu = forwardRef((props, containerRef) => {
   const onDragEnd = result => {
     if (!result.destination) {
@@ -279,15 +301,6 @@ const Overlay = props => {
   );
 };
 
-const DropzoneContainer = styled(motion.div)`
-  border-style: dashed;
-  border-width: 2px;
-  border-color: ${props => getBorderColorOnDrop(props)};
-  outline: none;
-  height: 100%;
-  position: relative;
-`;
-
 const getBorderColorOnDrop = props => {
   if (props.isDragAccept) {
     return "#00e676";
@@ -301,8 +314,21 @@ const getBorderColorOnDrop = props => {
   return "#eeeeee";
 };
 
-const StyledDropzone = props => {
+const DropzoneContainer = styled(motion.div)`
+  border-style: dashed;
+  border-width: 2px;
+  border-color: ${props => getBorderColorOnDrop(props)};
+  outline: none;
+  height: 100%;
+  position: relative;
+`;
+
+function Dropzone(props: { images: any[]; setImages: any }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [delayOverlay, setDelayOverlay] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [showOverlay, setShowOverlay] = useState(false);
+
   const {
     getRootProps,
     getInputProps,
@@ -317,16 +343,14 @@ const StyledDropzone = props => {
         Object.assign(file, {
           preview: URL.createObjectURL(file)
         })
-      );
+      ) as File[];
       setDelayOverlay(true);
-      props.setImages(images =>
+      props.setImages((images: File[]) =>
         additionalImages.concat(images).slice(0, MAX_IMAGES)
       );
     }
   });
-  const [delayOverlay, setDelayOverlay] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [showOverlay, setShowOverlay] = useState(false);
+
   useEffect(() => {
     setTimeout(() => setDelayOverlay(false), 500);
   }, [delayOverlay]);
@@ -358,9 +382,7 @@ const StyledDropzone = props => {
                   Drag and drop your files here
                 </Typography>
               </div>
-              <div style={{ paddingTop: 20, paddingBottom: 20 }}>
-                <SocialBanner />
-              </div>
+              <div style={{ paddingTop: 20, paddingBottom: 20 }}></div>
               <div
                 style={{
                   textAlign: "center",
@@ -377,6 +399,7 @@ const StyledDropzone = props => {
         <div style={{ position: "relative", padding: 20, height: "100%" }}>
           <Image
             src={props.images[selectedImage].preview}
+            alt=""
             objectFit="contain"
             layout="fill"
           />
@@ -394,34 +417,15 @@ const StyledDropzone = props => {
       />
     </DropzoneContainer>
   );
-};
+}
 
 const Container = styled.div`
   margin-left: auto;
   margin-right: auto;
   max-width: 1870px;
 `;
-const MAX_IMAGES = 5;
-const steps = [
-  {
-    step_title: "Name and description",
-    step_content: "Please enter the title of your piece and give a description"
-  },
-  {
-    step_title: "Upload photos",
-    step_content: `Please upload 2-${MAX_IMAGES} photos of your piece`
-  },
-  {
-    step_title: "Set your price",
-    step_content:
-      "Set the price for your piece. You can choose to have customers rent it, buy it or both."
-  },
-  {
-    step_title: "Summary",
-    step_content: "Summary"
-  }
-];
 
+/*
 const useChunkedUpload = () => {
   const [isError, setIsError] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -477,63 +481,134 @@ const useChunkedUpload = () => {
 
   return [upload, isComplete, isLoading, isError, progress];
 };
+*/
+function UploadStatus() {}
 
-async function upload_post({ title, description, images }) {
-  const chunkedFiles = images.map(imageFile => {
-    console.log(imageFile);
-    return new ChunkedFile(uuidv4(), imageFile);
-  });
-  try {
-    const res = await chunkedFiles[0].uploadFile();
-    console.log(res);
-  } catch (error) {
-    console.log(error);
-  }
+interface PostImage extends File {
+  preview: string;
 }
 
-const AnimatedGrid = motion(Grid);
-export default function CreatePost() {
-  const [activeStep, setActiveStep] = useState(0);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [images, setImages] = useState([]);
+interface PostInterface {
+  title: string | undefined;
+  description: string | undefined;
+  images: PostImage[];
+}
 
-  const anchorRef_canvas = useRef(null);
-  const anchorRef_title = useRef(null);
-  const anchorRef_description = useRef(null);
-  const [isTitleFocused, setIsTitleFocused] = useState(false);
-
-  const [upload, isComplete, isLoading, isError, progress] = useChunkedUpload();
-  console.log(isComplete, isLoading, isError, progress);
-  const disabled = [title === "" || description === "", false, false];
-  const handleNext = () => {
-    if (activeStep < steps.length - 1) {
-      setActiveStep(activeStep + 1);
-    } else {
-      upload("/account", images[0]);
-      //upload_post({ title, description, images });
-    }
-  };
-  const handlePrevious = () => {
-    setActiveStep(activeStep - 1);
-  };
+function PostImages(props: {
+  uploadStep: number;
+  images: PostImage[];
+  setImages: any;
+}) {
   return (
-    <>
-      <Grid style={{ height: "100%" }} container direction="column" spacing={8}>
-        <AnimateSharedLayout>
-          <Grid item xs="auto">
-            <Stepper activeStep={activeStep} alternativeLabel>
-              {steps.map(({ step_title, step_content }) => {
-                return (
-                  <Step key={step_title}>
-                    <StepLabel>
-                      <Typography>{step_content}</Typography>
-                    </StepLabel>
-                  </Step>
-                );
-              })}
-            </Stepper>
-          </Grid>
+    <div
+      style={{
+        display: "inline-block",
+        height: 440,
+        width: 400,
+        marginBottom: 20
+      }}
+    >
+      <AnimatePresence exitBeforeEnter>
+        {props.uploadStep === 0 ? (
+          <motion.div
+            key={0}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              borderStyle: "solid",
+              borderColor: "#OOOOOO",
+              filter: "blur(.5rem)"
+            }}
+          >
+            <Image src={postPlaceHolderImg} alt="" placeholder="blur" />
+          </motion.div>
+        ) : (
+          <Dropzone images={props.images} setImages={props.setImages} />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function Post(props: {
+  accountName: string;
+  uploadStep: number;
+  post: PostInterface;
+  setPost: {
+    setTitle: any;
+    setDescription: any;
+    setImages: any;
+  };
+}) {
+  const { images } = props.post;
+  const { setTitle, setDescription, setImages } = props.setPost;
+  return (
+    <Paper
+      elevation={3}
+      style={{
+        padding: 60,
+        borderRadius: 10,
+        display: "inline-block"
+      }}
+    >
+      <div>
+        <PostImages
+          uploadStep={props.uploadStep}
+          images={images}
+          setImages={setImages}
+        />
+        <Divider style={{ height: 1, marginBottom: 20, marginTop: 10 }} />
+        <div>
+          <Typography variant="h5">{props.accountName}</Typography>
+        </div>
+        <div
+          style={{
+            maxHeight: 100,
+            overflowY: "auto",
+            marginTop: 20,
+            borderStyle: "solid"
+          }}
+        >
+          <InputBase
+            fullWidth
+            style={{
+              fontSize: "1rem",
+              overflowY: "auto",
+              minHeight: 40,
+              fontStyle: "italic"
+            }}
+            autoComplete="title"
+            autoFocus={true}
+            placeholder={"Type your description here"}
+            onChange={e => setDescription(e.target.value)}
+          ></InputBase>
+        </div>
+        <ClickAwayListener onClickAway={() => setIsTitleFocused(false)}>
+          <div style={{ marginTop: 20, borderStyle: "solid" }}>
+            <InputBase
+              style={{ minHeight: 40, fontStyle: "italic" }}
+              autoComplete="title"
+              autoFocus={true}
+              placeholder={"Type your title here"}
+              onChange={e =>
+                // Maybe we need value in sign up form
+                setTitle(
+                  e.target.value
+                    .toLowerCase()
+                    .split(" ")
+                    .map(s => s.charAt(0).toUpperCase() + s.substring(1))
+                    .join(" ")
+                )
+              }
+            ></InputBase>
+          </div>
+        </ClickAwayListener>
+      </div>
+    </Paper>
+  );
+}
+/*
           <Grid
             container
             item
@@ -542,104 +617,9 @@ export default function CreatePost() {
             alignItems="center"
           >
             <AnimatedGrid key="front" item xs="auto" layout>
-              <Paper
-                ref={anchorRef_canvas}
-                elevation={3}
-                style={{
-                  padding: 60,
-                  borderRadius: 10,
-                  display: "inline-block"
-                }}
-              >
-                <div>
-                  <div
-                    style={{
-                      display: "inline-block",
-                      height: 440,
-                      width: 400,
-                      marginBottom: 20
-                    }}
-                  >
-                    <AnimatePresence exitBeforeEnter>
-                      {activeStep === 0 ? (
-                        <motion.div
-                          key={0}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          style={{
-                            borderStyle: "solid",
-                            borderColor: "#OOOOOO",
-                            filter: "blur(.5rem)"
-                          }}
-                        >
-                          <Image src={postPlaceHolderImg} placeholder="blur" />
-                        </motion.div>
-                      ) : (
-                        <StyledDropzone images={images} setImages={setImages} />
-                      )}
-                    </AnimatePresence>
-                  </div>
-                  <Divider
-                    style={{ height: 1, marginBottom: 20, marginTop: 10 }}
-                  />
-                  <div>
-                    <Typography variant="h5">Michael Fortunato</Typography>
-                  </div>
-                  <div
-                    ref={anchorRef_description}
-                    style={{
-                      maxHeight: 100,
-                      overflowY: "auto",
-                      marginTop: 20,
-                      borderStyle: "solid"
-                    }}
-                  >
-                    <InputBase
-                      fullWidth
-                      style={{
-                        fontSize: "1rem",
-                        overflowY: "auto",
-                        minHeight: 40,
-                        fontStyle: "italic"
-                      }}
-                      autoComplete="title"
-                      autoFocus={true}
-                      placeholder={"Type your description here"}
-                      onChange={e => setDescription(e.target.value)}
-                    ></InputBase>
-                  </div>
-                  <ClickAwayListener
-                    onClickAway={() => setIsTitleFocused(false)}
-                  >
-                    <div
-                      ref={anchorRef_title}
-                      style={{ marginTop: 20, borderStyle: "solid" }}
-                    >
-                      <InputBase
-                        style={{ minHeight: 40, fontStyle: "italic" }}
-                        autoComplete="title"
-                        autoFocus={true}
-                        placeholder={"Type your title here"}
-                        value={title}
-                        onChange={e =>
-                          setTitle(
-                            e.target.value
-                              .toLowerCase()
-                              .split(" ")
-                              .map(
-                                s => s.charAt(0).toUpperCase() + s.substring(1)
-                              )
-                              .join(" ")
-                          )
-                        }
-                      ></InputBase>
-                    </div>
-                  </ClickAwayListener>
-                </div>
-              </Paper>
+              <Post accountName={"Michael Fortunato"} uploadStep={uploadStep} />
             </AnimatedGrid>
-            {activeStep === 2 && (
+            {uploadStep === 2 && (
               <AnimatedGrid
                 key="rental"
                 layout
@@ -653,7 +633,7 @@ export default function CreatePost() {
                 </Paper>
               </AnimatedGrid>
             )}
-            {activeStep === 3 && (
+            {uploadStep === 3 && (
               <AnimatedGrid
                 key="back"
                 layout
@@ -681,7 +661,97 @@ export default function CreatePost() {
               </AnimatedGrid>
             )}
           </Grid>
-          <AnimatedGrid
+
+                {uploadStep === 0 && (
+        <motion.div animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <Popper
+            key={1}
+            open={anchorRef_title.current !== null}
+            anchorEl={anchorRef_title.current}
+            placement="left"
+          >
+            <div style={{ paddingRight: 10 }}>
+              {post.title !== "" ? <CheckIcon /> : <ArrowForwardIcon />}
+            </div>
+          </Popper>
+          <Popper
+            key={2}
+            open={post.title !== "" && anchorRef_title.current !== null}
+            anchorEl={anchorRef_description.current}
+            placement="left"
+          >
+            <div style={{ paddingRight: 10 }}>
+              {post.description !== "" ? <CheckIcon /> : <ArrowForwardIcon />}
+            </div>
+          </Popper>
+        </motion.div>
+*/
+
+export default function CreatePost() {
+  const [uploadStep, setUploadStep] = useState(0);
+
+  // Define the attributes for the post
+  const [title, setTitle] = useState<undefined | string>(undefined);
+  const [description, setDescription] = useState<undefined | string>(undefined);
+  const [images, setImages] = useState<File[]>([]);
+
+  const isButtonDisabled = (): boolean => {
+    switch (uploadStep) {
+      case 0:
+        return title === undefined || description === undefined;
+      default:
+        return false;
+    }
+  };
+  const handleNext = () => {
+    if (uploadStep < steps.length - 1) {
+      setUploadStep(uploadStep + 1);
+    } else {
+      uploadFile();
+      // upload("/account/upload-image", images[0]);
+      // upload_post({ title, description, images });
+    }
+  };
+  const handlePrevious = () => {
+    setUploadStep(uploadStep - 1);
+  };
+  return (
+    <Grid container direction="column" spacing={8}>
+      <AnimateSharedLayout>
+        <Grid item xs="auto">
+          <Stepper activeStep={uploadStep} alternativeLabel>
+            {steps.map(({ stepTitle, stepContent }) => (
+              <Step key={stepTitle}>
+                <StepLabel>
+                  <Typography>{stepContent}</Typography>
+                </StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+        </Grid>
+        <Grid container item direction="column" spacing={8}>
+          <Grid
+            container
+            item
+            xs
+            justifyContent="space-around"
+            alignItems="center"
+          >
+            <Grid component={motion.div} key="front" item xs="auto" layout>
+              <Post
+                accountName={"Michael Fortunato"}
+                uploadStep={uploadStep}
+                post={{ title, description, images }}
+                setPost={{
+                  setTitle,
+                  setDescription,
+                  setImages
+                }}
+              />
+            </Grid>
+          </Grid>
+          <Grid
+            component={motion.div}
             layout
             container
             item
@@ -691,52 +761,28 @@ export default function CreatePost() {
             spacing={5}
           >
             <Grid item xs="auto">
-              <Button disabled={activeStep === 0} onClick={handlePrevious}>
+              <Button disabled={uploadStep === 0} onClick={handlePrevious}>
                 Back
               </Button>
             </Grid>
             <Grid item xs="auto">
               <Button
-                disabled={disabled[activeStep]}
+                disabled={isButtonDisabled()}
                 variant="contained"
                 color="primary"
                 onClick={handleNext}
               >
-                {activeStep < steps.length - 1 ? "Next" : "Submit"}
+                {uploadStep < steps.length - 1 ? "Next" : "Submit"}
               </Button>
             </Grid>
-          </AnimatedGrid>
-        </AnimateSharedLayout>
-      </Grid>
-      {activeStep === 0 && (
-        <motion.div animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <Popper
-            key={1}
-            open={anchorRef_title.current !== null}
-            anchorEl={anchorRef_title.current}
-            placement="left"
-          >
-            <div style={{ paddingRight: 10 }}>
-              {title !== "" ? <CheckIcon /> : <ArrowForwardIcon />}
-            </div>
-          </Popper>
-          <Popper
-            key={2}
-            open={title !== "" && anchorRef_title.current !== null}
-            anchorEl={anchorRef_description.current}
-            placement="left"
-          >
-            <div style={{ paddingRight: 10 }}>
-              {description !== "" ? <CheckIcon /> : <ArrowForwardIcon />}
-            </div>
-          </Popper>
-        </motion.div>
-      )}
-    </>
+          </Grid>
+        </Grid>
+      </AnimateSharedLayout>
+    </Grid>
   );
 }
 
-CreatePost.getLayout = function getLayout(page) {
+CreatePost.getLayout = function getLayout(page: ReactElement) {
   return (
     <Container key={1}>
       <Appbar key={1} />

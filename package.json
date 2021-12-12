@@ -12,6 +12,7 @@
     "@material-ui/icons": "^4.11.2",
     "@ramonak/react-progress-bar": "^4.2.0",
     "@reduxjs/toolkit": "^1.6.2",
+    "@types/uuid": "^8.3.3",
     "axios": "^0.24.0",
     "babel-preset-next": "^1.4.0",
     "bytes": "^3.1.1",
@@ -41,6 +42,7 @@
     "@types/bytes": "^3.1.1",
     "@types/node": "16.11.11",
     "@types/react": "17.0.37",
+    "@types/react-beautiful-dnd": "^13.1.2",
     "@types/styled-components": "^5.1.16",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/parser": "^5.5.0",
@@ -51,6 +53,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "^2.5.1",
+    "ts-node": "^10.4.0",
     "typescript": "4.5.2"
   }
 }

@@ -3,161 +3,136 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
 type UploadUrlsType = Record<number, string>;
+type ProgressCb = () => void;
 const CHUNK_SIZE = bytes("5MB");
-class ChunkedFile {
-  static chunkSize = bytes("5MB");
 
-  imageKey: string;
+// TODO: More thought needs to be put into the progressCb. Is this safe to do?
+// I think so because you cannot trust the client, so the only security we
+// have to do is in on our servers. For example, even if I removed the Cb
+// a malicious user to edit my front end code and execute it however it wants
+// to. The key is that my routes are on accessible via a valid AT
+// If a malicious actor gets that then we are fucked for 15 minutes until it
+// expires. If a malicious actor get a RT, we would remove the RT in the DB,
+// which would reduce the ammt of time for an attack but would still leave 15
+// minutes in (or whatever I end up deciding what the AT's expiriation is).
 
-  uploadId: string;
-
-  fileInterface: File;
-
-  numParts: number;
-
-  #uploadUrls: UploadUrlsType | undefined;
-
-  #numEvenChunks: number;
-
-  #hasChunkRemainder: boolean;
-
-  /**
-   * Initialize an object for chunked file uploading
-   * @param fileInterface - A NodeJS file object
-   * @param accountEmail - The account email associated with the upload
-   */
-  constructor(fileInterface: File, accountEmail: string) {
-    this.imageKey = ChunkedFile.generateFileKey(
-      fileInterface.name,
-      accountEmail
-    );
-    this.uploadId = "";
-    this.fileInterface = fileInterface;
-    this.#numEvenChunks = Math.floor(
-      fileInterface.size / ChunkedFile.chunkSize
-    );
-    this.#hasChunkRemainder = fileInterface.size % ChunkedFile.chunkSize !== 0;
-    this.numParts = this.#hasChunkRemainder
-      ? this.#numEvenChunks + 1
-      : this.#numEvenChunks;
-  }
-
-  /**
-   * This method returns
-   * @param filename
-   * @param accountEmail
-   */
-  static generateFileKey(filename: string, accountEmail: string): string {
-    return `${accountEmail}/${filename}-${uuidv4()}`;
-  }
-
-  /**
-   * Method starts the upload process with AWS by calling the backend server.
-   *
-   * @returns
-   */
-  async #createUpload(isDraft: boolean) {
-    const { data } = await axios.post("/account/upload-image/create-upload", {
-      imageKey: this.imageKey,
-      isDraft
-    });
-    return data.uploadId;
-  }
-
-  async #generateUploadUrls(isDraft: boolean): Promise<UploadUrlsType> {
-    const { data } = await axios.post(
-      "/account/upload-image/generate-upload-part-urls",
-      {
-        uploadId: this.uploadId,
-        imageKey: this.imageKey,
-        numParts: this.numParts,
-        isDraft
-      }
-    );
-    return data.uploadPartUrls;
-  }
-
-  async uploadFile(
-    file: File,
-    accountEmail: string,
-    isDraft: boolean,
-    maxRetries = 5
-  ) {
-    const imageKey = ChunkedFile.generateFileKey(file.name, accountEmail);
-    const numEvenChunks = Math.floor(file.size / CHUNK_SIZE);
-    const hasChunkRemainder: boolean = file.size % CHUNK_SIZE !== 0;
-    const numParts = hasChunkRemainder
-      ? this.#numEvenChunks + 1
-      : this.#numEvenChunks;
-
-    const uploadId = createUpload;
-    /* remainderChunk fileSize & chunkSize */
-
-    // The first thing we do is create the chunked upload
-
-    this.uploadId = await this.#createUpload(isDraft);
-
-    this.#uploadUrls = await this.#generateUploadUrls(isDraft);
-
-    // uploadUrlKeyIndexMap[index] = "key"
-    const ETags = Object.keys(this.#uploadUrls).map(ithChunk =>
-      this.uploadChunk(
-        this.#uploadUrls?.[parseInt(ithChunk, 10)],
-        parseInt(ithChunk, 10),
-        maxRetries
-      )
-    );
-    const uploadResults = await Promise.all(ETags);
-  }
-
-  async uploadChunk(
-    url: string | undefined,
-    ithChunk: number,
-    maxRetries: number
-  ) {
-    if (url === undefined) {
-      throw new Error(`Upload url does not exist for chunk number ${ithChunk}`);
-    }
-    const chunkStart = ithChunk * ChunkedFile.chunkSize;
-    const chunkEnd =
-      this.#hasChunkRemainder && ithChunk === this.numParts - 1
-        ? this.fileInterface.size
-        : (ithChunk + 1) * ChunkedFile.chunkSize;
-    const blobSlice = this.fileInterface.slice(chunkStart, chunkEnd);
-
-    // Here we do the uploads, with retry logic if maxRetries > 0
-    try {
-      const result = await axios.put(url, blobSlice, {
-        headers: {
-          "Content-Type": "application/octet-stream",
-          "Content-Range": `bytes ${chunkStart}-${chunkStart + chunkEnd}/${
-            this.fileInterface.size
-          }`
-        }
-      });
-      return result;
-    } catch (error: any) {
-      for (let ithRetry = 0; ithRetry < maxRetries; ithRetry += 1) {
-        try {
-          // eslint-disable-next-line no-await-in-loop
-          const result = await axios.put(url, blobSlice, {
-            headers: {
-              "Content-Type": "application/octet-stream",
-              "Content-Range": `bytes ${chunkStart}-${chunkStart + chunkEnd}/${
-                this.fileInterface.size
-              }`
-            }
-          });
-          return result;
-        } catch (retryError: any) {
-          if (ithRetry === maxRetries - 1) {
-            return retryError;
-          }
-        }
-      }
-      return error;
-    }
-  }
+/**
+ * This method returns
+ * @param filename
+ * @param accountEmail
+ */
+function generateFileKey(filename: string, accountEmail: string): string {
+  return `${accountEmail}/${filename}-${uuidv4()}`;
 }
 
-export default ChunkedFile;
+/**
+ * Method starts the upload process with AWS by calling the backend server.
+ *
+ * @returns
+ */
+async function createUpload(
+  imageKey: string,
+  isDraft: boolean
+): Promise<string> {
+  const { data } = await axios.post("/account/upload-image/create-upload", {
+    imageKey,
+    isDraft
+  });
+  return data.uploadId;
+}
+
+async function generateUploadUrls(
+  uploadId: string,
+  imageKey: string,
+  numParts: number,
+  isDraft: boolean
+): Promise<UploadUrlsType> {
+  const { data } = await axios.post(
+    "/account/upload-image/generate-upload-part-urls",
+    {
+      uploadId,
+      imageKey,
+      numParts,
+      isDraft
+    }
+  );
+  return data.uploadPartUrls;
+}
+async function uploadChunk(
+  url: string,
+  blobSlice: Blob,
+  maxRetries: number,
+  progressCb?: ProgressCb
+) {
+  // Here we do the uploads, with retry logic if maxRetries > 0
+  try {
+    const result = await axios.put(url, blobSlice, {
+      headers: { "Content-Type": "application/octet-stream" }
+    });
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    progressCb && progressCb();
+    return result;
+  } catch (error: any) {
+    for (let ithRetry = 0; ithRetry < maxRetries; ithRetry += 1) {
+      try {
+        // Rule doc gives us clearance to use in this case
+        // eslint-disable-next-line no-await-in-loop
+        const result = await axios.put(url, blobSlice, {
+          headers: { "Content-Type": "application/octet-stream" }
+        });
+
+        // Yes this is a side effect
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        progressCb && progressCb();
+        return result;
+      } catch (retryError: any) {
+        if (ithRetry === maxRetries - 1) {
+          return retryError;
+        }
+      }
+    }
+    return error;
+  }
+}
+async function uploadFile(
+  file: File,
+  accountEmail: string,
+  isDraft: boolean,
+  maxRetries = 5,
+  progressCb?: ProgressCb
+) {
+  const imageKey = generateFileKey(file.name, accountEmail);
+  const numEvenChunks = Math.floor(file.size / CHUNK_SIZE);
+  const hasChunkRemainder: boolean = file.size % CHUNK_SIZE !== 0;
+  const numParts = hasChunkRemainder ? numEvenChunks + 1 : numEvenChunks;
+
+  const uploadId = await createUpload(imageKey, isDraft);
+  const uploadUrls = await generateUploadUrls(
+    uploadId,
+    imageKey,
+    numParts,
+    isDraft
+  );
+
+  // uploadUrlKeyIndexMap[index] = "key"
+  const uploadUrlKeys = Object.keys(uploadUrls);
+  const ETags = uploadUrlKeys.map(uploadUrlKey => {
+    const ithChunk = parseInt(uploadUrlKey, 10);
+    const url = uploadUrls[ithChunk];
+    const chunkStart = ithChunk * CHUNK_SIZE;
+    const chunkEnd =
+      ithChunk === uploadUrlKeys.length - 1
+        ? file.size
+        : (ithChunk + 1) * CHUNK_SIZE;
+    // Blob 🍕
+    const blobSlice = file.slice(
+      chunkStart,
+      chunkEnd,
+      "application/octet-stream"
+    );
+    return uploadChunk(url, blobSlice, maxRetries, progressCb);
+  });
+  await Promise.all(ETags);
+}
+
+export default uploadFile;
