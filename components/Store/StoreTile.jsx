@@ -11,7 +11,7 @@ const StyledTile = styled(Paper)`
   height: auto;
   margin: 20;
 `;
-const Tag = styled.span`
+export const Tag = styled.span`
   display: inline-block;
   margin: 4px;
   margin-left: ${props => (props.index === 0 ? 0 : 4)}px;

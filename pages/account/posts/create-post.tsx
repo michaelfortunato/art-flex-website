@@ -10,7 +10,12 @@ import {
   Typography,
   Divider,
   InputBase,
-  ClickAwayListener
+  ClickAwayListener,
+  List,
+  ListItem,
+  ListItemText,
+  Menu,
+  MenuItem
 } from "@material-ui/core";
 import Image from "next/image";
 import {
@@ -20,15 +25,17 @@ import {
   useLayoutEffect,
   forwardRef,
   ReactElement,
-  ChangeEvent
+  ChangeEvent,
+  MouseEventHandler
 } from "react";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import CheckIcon from "@material-ui/icons/Check";
 import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
 import postPlaceHolderImg from "@public/create_post_placeholder.jpg";
-import { v4 as uuidv4 } from "uuid";
 import uploadFile from "@utils/chunked-upload";
 import Dropzone from "@components/CreatePost/Dropzone";
+
+import * as S from "@components/CreatePost/Post.styled";
 
 const MAX_IMAGES = 5;
 const steps = [
@@ -53,6 +60,19 @@ const steps = [
 
 function UploadStatus() {}
 
+interface RentalPricing {
+  period: "Month" | "Year";
+  duration: number;
+  price: number;
+}
+interface BuyPricing {
+  price: number;
+}
+interface Pricing {
+  rentalPricing: RentalPricing[] | undefined;
+  buyPrice: BuyPricing | undefined;
+}
+
 interface PostImage extends File {
   preview: string;
 }
@@ -61,34 +81,39 @@ interface PostInterface {
   title: string | undefined;
   description: string | undefined;
   images: PostImage[];
+  pricing: Pricing;
 }
 
+function InputTitle(props: { setTitle: any }) {
+  return (
+    <S.InputForm
+      autoComplete="title"
+      autoFocus={true}
+      placeholder={"Type your title here"}
+      onChange={e =>
+        // Maybe we need value autoComplete in sign up form
+        props.setTitle(
+          e.target.value
+            .toLowerCase()
+            .split(" ")
+            .map(s => s.charAt(0).toUpperCase() + s.substring(1))
+            .join(" ")
+        )
+      }
+    ></S.InputForm>
+  );
+}
 function InputDescription(props: { setDescription: any }) {
   return (
-    <div
-      style={{
-        maxHeight: 200,
-        overflowY: "auto",
-        marginTop: 20,
-        borderBottomStyle: "solid",
-        borderBottomColor: "#000000"
-      }}
-    >
-      <InputBase
-        fullWidth
-        style={{
-          fontSize: "1rem",
-          minHeight: 40,
-          fontStyle: "italic"
-        }}
-        multiline
-        spellCheck
-        autoComplete="title"
-        autoFocus={true}
-        placeholder={"Type your description here"}
-        onChange={e => props.setDescription(e.target.value)}
-      ></InputBase>
-    </div>
+    <S.InputForm
+      fullWidth
+      multiline
+      spellCheck
+      autoComplete="title"
+      autoFocus={true}
+      placeholder={"Type your description here"}
+      onChange={e => props.setDescription(e.target.value)}
+    ></S.InputForm>
   );
 }
 
@@ -129,6 +154,223 @@ function PostImages(props: {
   );
 }
 
+const TagValues = {
+  // Periods
+  Modernism: {
+    variant: "period"
+  },
+  Surrealism: {
+    variant: "period"
+  },
+  Impressionism: {
+    variant: "period"
+  },
+  // Locations
+  "New York": {
+    variant: "social"
+  },
+  "Los Angeles": {
+    variant: "social"
+  },
+  Paris: {
+    variant: "social"
+  },
+  // Mediums
+  Pastel: {
+    variant: "prominence"
+  },
+  Drawing: {
+    variant: "prominence"
+  }
+};
+
+const emptyTagsConfig = [
+  ["Modernism", "period"],
+  ["New York", "social"],
+  ["Pastel", "prominence"]
+];
+
+function EmptyTags() {
+  return (
+    <S.RevealInputStep showBlur container spacing={3}>
+      {emptyTagsConfig.map(tagKey => (
+        <Grid key={tagKey[0]} item xs="auto">
+          <S.Tag variant={tagKey[1] as S.TagVariants}>{tagKey[0]}</S.Tag>
+        </Grid>
+      ))}
+    </S.RevealInputStep>
+  );
+}
+
+type PurchaseButtonProps = {
+  pricing: RentalPricing | BuyPricing;
+  onClick?: (e: MouseEventHandler<HTMLButtonElement>) => void;
+};
+
+function isRentalPricing(
+  pricing: RentalPricing | BuyPricing
+): pricing is RentalPricing {
+  return (
+    (pricing as RentalPricing).duration !== undefined &&
+    (pricing as RentalPricing).period !== undefined
+  );
+}
+
+function isBuyPricing(
+  pricing: RentalPricing | BuyPricing
+): pricing is BuyPricing {
+  return (
+    (pricing as BuyPricing).price !== undefined && !isRentalPricing(pricing)
+  );
+}
+
+function PurchaseButton(props: PurchaseButtonProps) {
+  let color: "primary" | "secondary" | undefined;
+  let text: string;
+  if (isRentalPricing(props.pricing)) {
+    const period = `${props.pricing.period}${
+      props.pricing.duration > 1 && "s"
+    }`;
+    text = `Rent for $${props.pricing.price}} per ${props.pricing.duration} ${period}`;
+    color = "secondary";
+  } else if (isBuyPricing(props.pricing)) {
+    text = `Buy for $${props.pricing.price}`;
+    color = "primary";
+  } else {
+    throw new Error("Invalid prop type for props.pricing.");
+  }
+  return (
+    <Button variant="contained" color={color}>
+      {text}
+    </Button>
+  );
+}
+
+const PricingOptions = ["Rental", "Purchase"];
+
+function SimpleListMenu(props: { menuItems: string[] }) {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | undefined>(
+    undefined
+  );
+  const open = Boolean(anchorEl);
+  const handleClickListItem = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuItemClick = (
+    event: React.MouseEvent<HTMLElement>,
+    index: number
+  ) => {
+    setSelectedIndex(index);
+    setAnchorEl(null);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <div>
+      <List component="nav" aria-label="Device settings">
+        <ListItem
+          button
+          id="lock-button"
+          aria-haspopup="listbox"
+          aria-controls="lock-menu"
+          aria-label="when device is locked"
+          aria-expanded={open ? "true" : undefined}
+          onClick={handleClickListItem}
+        >
+          <ListItemText
+            primary={
+              selectedIndex !== undefined
+                ? props.menuItems[selectedIndex]
+                : "Pick a pricing option"
+            }
+          />
+        </ListItem>
+      </List>
+      <Menu
+        id="lock-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          "aria-labelledby": "lock-button",
+          role: "listbox"
+        }}
+      >
+        {props.menuItems.map((option, index) => (
+          <MenuItem
+            key={option}
+            selected={index === selectedIndex}
+            onClick={event => handleMenuItemClick(event, index)}
+          >
+            {option}
+          </MenuItem>
+        ))}
+      </Menu>
+    </div>
+  );
+}
+
+type EnterPricingProps = {
+  pricing: Pricing;
+  setPricing: any;
+};
+function EnterPricing(props: EnterPricingProps) {
+  const buyPriceSet: boolean = props.pricing.buyPrice !== undefined;
+  const numberOfRentalPrices: number = props.pricing.rentalPricing?.length || 0;
+  const rentalPricesSet: boolean = numberOfRentalPrices > 1;
+
+  const initial = !buyPriceSet && !rentalPricesSet;
+  console.log(props.pricing.buyPrice);
+  console.log("hooplay");
+  const optional = !initial && (!buyPriceSet || !rentalPricesSet);
+
+  console.log(optional);
+  return (
+    <Grid container component={motion.div}>
+      <AnimateSharedLayout>
+        <Grid component={motion.div} layout item xs={12}>
+          <AnimatePresence exitBeforeEnter>
+            {initial && (
+              <Typography key="initial" component={motion.span} variant="h5">
+                Add Pricing
+              </Typography>
+            )}
+            {optional && (
+              <Typography key="optional" component={motion.span} variant="h5">
+                Add Additional Pricing Options
+              </Typography>
+            )}
+          </AnimatePresence>
+        </Grid>
+        <Grid conainer item xs={12}></Grid>
+      </AnimateSharedLayout>
+    </Grid>
+  );
+}
+
+type PostPricingProps = {
+  pricing: Pricing;
+  setPricing: any;
+};
+function PostPricing(props: PostPricingProps) {
+  const { pricing, setPricing } = props;
+  return (
+    <S.RevealInputStep container spacing={2}>
+      <Grid item xs="auto">
+        <Button>Add Purchase Option</Button>
+      </Grid>
+      <Grid item xs="auto">
+        <EnterPricing pricing={pricing} setPricing={setPricing} />
+      </Grid>
+    </S.RevealInputStep>
+  );
+}
+
 function Post(props: {
   accountName: string;
   uploadStep: number;
@@ -137,10 +379,11 @@ function Post(props: {
     setTitle: any;
     setDescription: any;
     setImages: any;
+    setPricing: any;
   };
 }) {
-  const { images } = props.post;
-  const { setTitle, setDescription, setImages } = props.setPost;
+  const { images, pricing } = props.post;
+  const { setTitle, setDescription, setImages, setPricing } = props.setPost;
   return (
     <Paper
       elevation={3}
@@ -160,48 +403,18 @@ function Post(props: {
         <div>
           <Typography variant="h5">{props.accountName}</Typography>
         </div>
-        <div
-          style={{
-            maxHeight: 200,
-            overflowY: "auto",
-            marginTop: 20,
-            borderBottomStyle: "solid",
-            borderBottomColor: "#000000"
-          }}
-        >
-          <InputBase
-            fullWidth
-            style={{
-              fontSize: "1rem",
-              minHeight: 40,
-              fontStyle: "italic"
-            }}
-            multiline
-            spellCheck
-            autoComplete="title"
-            autoFocus={true}
-            placeholder={"Type your description here"}
-            onChange={e => setDescription(e.target.value)}
-          ></InputBase>
-        </div>
-        <div style={{ marginTop: 20, borderBottomStyle: "solid" }}>
-          <InputBase
-            style={{ minHeight: 40, fontStyle: "italic" }}
-            autoComplete="title"
-            autoFocus={true}
-            placeholder={"Type your title here"}
-            onChange={e =>
-              // Maybe we need value in sign up form
-              setTitle(
-                e.target.value
-                  .toLowerCase()
-                  .split(" ")
-                  .map(s => s.charAt(0).toUpperCase() + s.substring(1))
-                  .join(" ")
-              )
-            }
-          ></InputBase>
-        </div>
+        <S.InputContainer>
+          <InputTitle setTitle={setTitle} />
+        </S.InputContainer>
+        <S.InputContainer style={{ borderBottomStyle: "none" }}>
+          <EmptyTags />
+        </S.InputContainer>
+        <S.InputContainer style={{ maxHeight: 200, overflowY: "auto" }}>
+          <InputDescription setDescription={setDescription} />
+        </S.InputContainer>
+        <S.InputContainer style={{ borderBottomStyle: "none" }}>
+          <PostPricing pricing={pricing} setPricing={setPricing} />
+        </S.InputContainer>
       </div>
     </Paper>
   );
@@ -214,6 +427,10 @@ export default function CreatePost() {
   const [title, setTitle] = useState<undefined | string>(undefined);
   const [description, setDescription] = useState<undefined | string>(undefined);
   const [images, setImageBase] = useState<PostImage[]>([]);
+  const [pricing, setPricing] = useState<Pricing>({
+    rentalPricing: undefined,
+    buyPrice: undefined
+  });
   const setImages = (newImages: PostImage[]) =>
     setImageBase(oldImages => newImages.concat(oldImages).slice(0, MAX_IMAGES));
 
@@ -251,26 +468,19 @@ export default function CreatePost() {
             ))}
           </Stepper>
         </Grid>
-        <Grid container item direction="column" spacing={8}>
-          <Grid
-            container
-            item
-            xs
-            justifyContent="space-around"
-            alignItems="center"
-          >
-            <Grid component={motion.div} key="front" item xs="auto" layout>
-              <Post
-                accountName={"Michael Fortunato"}
-                uploadStep={uploadStep}
-                post={{ title, description, images }}
-                setPost={{
-                  setTitle,
-                  setDescription,
-                  setImages
-                }}
-              />
-            </Grid>
+        <Grid container item direction="column" alignItems="center" spacing={8}>
+          <Grid item xs="auto" component={motion.div} layout>
+            <Post
+              accountName={"Michael Fortunato"}
+              uploadStep={uploadStep}
+              post={{ title, description, images, pricing }}
+              setPost={{
+                setTitle,
+                setDescription,
+                setImages,
+                setPricing
+              }}
+            />
           </Grid>
           <Grid
             component={motion.div}
