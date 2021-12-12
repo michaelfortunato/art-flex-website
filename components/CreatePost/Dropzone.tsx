@@ -315,15 +315,6 @@ export default function Dropzone(props: {
         <PopulatedDropzone previewUrl={props.images[selectedImage].preview} />
       )}
       <input {...getInputProps()} />
-      <Overlay
-        showOverlay={showOverlay && !delayOverlay && props.images.length > 0}
-        images={props.images}
-        setImages={props.setImages}
-        selectedImage={selectedImage}
-        setSelectedImage={setSelectedImage}
-        menuOpen={menuOpen}
-        setMenuOpen={setMenuOpen}
-      />
     </S.DropzoneContainer>
   );
 }
