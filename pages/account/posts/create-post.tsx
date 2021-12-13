@@ -15,8 +15,11 @@ import {
   ListItem,
   ListItemText,
   Menu,
-  MenuItem
+  MenuItem,
+  TextField,
+  IconButton
 } from "@material-ui/core";
+import { Autocomplete } from "@material-ui/lab";
 import Image from "next/image";
 import {
   useState,
@@ -30,12 +33,20 @@ import {
 } from "react";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import CheckIcon from "@material-ui/icons/Check";
-import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
+import {
+  AnimatePresence,
+  AnimateSharedLayout,
+  motion,
+  LayoutGroup
+} from "framer-motion";
 import postPlaceHolderImg from "@public/create_post_placeholder.jpg";
 import uploadFile from "@utils/chunked-upload";
 import Dropzone from "@components/CreatePost/Dropzone";
 
 import * as S from "@components/CreatePost/Post.styled";
+import SimpleListMenu from "@components/SimpleListMenu";
+import { Add } from "@material-ui/icons";
+import AFBaseFormField from "@components/Library/FormField/BaseFormField";
 
 const MAX_IMAGES = 5;
 const steps = [
@@ -246,74 +257,139 @@ function PurchaseButton(props: PurchaseButtonProps) {
   );
 }
 
-const PricingOptions = ["Rental", "Purchase"];
+interface ConfigureRentlPriceProps {
+  setRentalPricing: (rentalPrice: RentalPricing) => void;
+}
 
-function SimpleListMenu(props: { menuItems: string[] }) {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedIndex, setSelectedIndex] = useState<number | undefined>(
-    undefined
-  );
-  const open = Boolean(anchorEl);
-  const handleClickListItem = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+/*
 
-  const handleMenuItemClick = (
-    event: React.MouseEvent<HTMLElement>,
-    index: number
-  ) => {
-    setSelectedIndex(index);
-    setAnchorEl(null);
-  };
+{
+  1 Month
+  3 Months
+  6 Months
+  9 Months
+  1 Year
+}
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+*/
 
+type ConfigureRentalPeriod =
+  | "1 Month"
+  | "3 Months"
+  | "6 Months"
+  | "9 Months"
+  | "1 Year";
+
+const RentalPeriodOptions: ConfigureRentalPeriod[] = [
+  "1 Month",
+  "3 Months",
+  "6 Months",
+  "9 Months",
+  "1 Year"
+];
+
+function ConfigureRentalPrice(props: ConfigureRentlPriceProps) {
+  const [rentalPeriod, setRentalPeriod] =
+    useState<ConfigureRentalPeriod | null>(null);
+  const [rentalPeriodInput, setRentalPeriodInput] = useState<
+    string | undefined
+  >("");
+  const [price, setPrice] = useState<number | undefined>(undefined);
+  function addRentalPriceConfig() {
+    // We need to split the rentalPeriod "<period> <duration>" to
+    // get it to conform to the Pricing Spec
+    if (!rentalPeriod || !price) {
+      return;
+    }
+    const [duration, period] = rentalPeriod.split(" ") as [
+      string,
+      "Month" | "Year"
+    ];
+    props.setRentalPricing({
+      period,
+      duration: parseInt(duration, 10),
+      price
+    });
+  }
   return (
-    <div>
-      <List component="nav" aria-label="Device settings">
-        <ListItem
-          button
-          id="lock-button"
-          aria-haspopup="listbox"
-          aria-controls="lock-menu"
-          aria-label="when device is locked"
-          aria-expanded={open ? "true" : undefined}
-          onClick={handleClickListItem}
-        >
-          <ListItemText
-            primary={
-              selectedIndex !== undefined
-                ? props.menuItems[selectedIndex]
-                : "Pick a pricing option"
-            }
-          />
-        </ListItem>
-      </List>
-      <Menu
-        id="lock-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        MenuListProps={{
-          "aria-labelledby": "lock-button",
-          role: "listbox"
-        }}
-      >
-        {props.menuItems.map((option, index) => (
-          <MenuItem
-            key={option}
-            selected={index === selectedIndex}
-            onClick={event => handleMenuItemClick(event, index)}
-          >
-            {option}
-          </MenuItem>
-        ))}
-      </Menu>
-    </div>
+    <Grid container justifyContent="space-between" spacing={3}>
+      <Grid item xs="auto">
+        <Autocomplete
+          value={rentalPeriod}
+          onChange={(event: any, newValue: ConfigureRentalPeriod | null) => {
+            setRentalPeriod(newValue);
+          }}
+          inputValue={rentalPeriodInput}
+          onInputChange={(event, newInputValue: string | undefined) => {
+            // We can be sure this is correct as its
+            // the discrete set of such values
+            setRentalPeriodInput(newInputValue);
+          }}
+          id="controllable-states-demo"
+          options={RentalPeriodOptions}
+          style={{ width: 200 }}
+          renderInput={params => (
+            <TextField
+              {...params}
+              label="Set Rental Period"
+              variant="standard"
+            />
+          )}
+        />
+      </Grid>
+      <Grid item xs="auto">
+        <TextField
+          label="Set Rental Price"
+          variant="standard"
+          type="number"
+          onChange={e => setPrice(parseInt(e.target.value, 10))}
+        />
+      </Grid>
+      <Grid item xs="auto">
+        <IconButton onClick={addRentalPriceConfig}>
+          <Add />
+        </IconButton>
+      </Grid>
+    </Grid>
   );
 }
+
+interface ConfigureBuyPriceProps {
+  setBuyPrice: (buyPrice: BuyPricing) => void;
+}
+function ConfigureBuyPrice(props: ConfigureBuyPriceProps) {
+  const [price, setPrice] = useState<number | undefined>(undefined);
+  function addBuyPriceConfig() {
+    if (price && price > 0) {
+      props.setBuyPrice({ price });
+    }
+  }
+  return (
+    <Grid container direction="row" justifyContent="space-evenly">
+      <Grid item xs="auto">
+        <TextField
+          label="Set the Price"
+          variant="standard"
+          type="number"
+          onChange={e => setPrice(parseInt(e.target.value, 10))}
+        />
+      </Grid>
+      <Grid item xs="auto">
+        <IconButton
+          disabled={
+            price === undefined || price <= 0 || typeof price !== "number"
+          }
+          onClick={addBuyPriceConfig}
+        >
+          <Add />
+        </IconButton>
+      </Grid>
+    </Grid>
+  );
+}
+
+type ConfigurePriceType = "Rental" | "Buy";
+const PRICING_OPTIONS: ConfigurePriceType[] = ["Rental", "Buy"];
 
 type EnterPricingProps = {
   pricing: Pricing;
@@ -323,32 +399,62 @@ function EnterPricing(props: EnterPricingProps) {
   const buyPriceSet: boolean = props.pricing.buyPrice !== undefined;
   const numberOfRentalPrices: number = props.pricing.rentalPricing?.length || 0;
   const rentalPricesSet: boolean = numberOfRentalPrices > 1;
-
   const initial = !buyPriceSet && !rentalPricesSet;
-  console.log(props.pricing.buyPrice);
-  console.log("hooplay");
   const optional = !initial && (!buyPriceSet || !rentalPricesSet);
 
-  console.log(optional);
+  const [priceOptionNumber, setPriceOptionNumber] = useState<0 | 1 | undefined>(
+    undefined
+  );
+  const priceOption =
+    typeof priceOptionNumber === "number" && PRICING_OPTIONS[priceOptionNumber];
+
+  function setRentalPricing(rentalPrice: RentalPricing) {
+    props.setPricing((oldPricing: Pricing): Pricing => {
+      if (oldPricing.rentalPricing?.length) {
+        const popOldestElement = oldPricing.rentalPricing.length > 1;
+        const startingIndex = popOldestElement ? 1 : 0;
+        const newRentalPricing = [
+          ...oldPricing.rentalPricing.slice(startingIndex),
+          rentalPrice
+        ];
+        return { ...oldPricing, rentalPricing: newRentalPricing };
+      }
+      const newRentalPricing = [rentalPrice];
+      return { ...oldPricing, rentalPricing: newRentalPricing };
+    });
+  }
+  function setBuyPrice(buyPrice: BuyPricing) {
+    props.setPricing(
+      (pricing: Pricing): Pricing => ({
+        ...pricing,
+        buyPrice
+      })
+    );
+  }
   return (
-    <Grid container component={motion.div}>
-      <AnimateSharedLayout>
-        <Grid component={motion.div} layout item xs={12}>
-          <AnimatePresence exitBeforeEnter>
-            {initial && (
-              <Typography key="initial" component={motion.span} variant="h5">
-                Add Pricing
-              </Typography>
-            )}
-            {optional && (
-              <Typography key="optional" component={motion.span} variant="h5">
-                Add Additional Pricing Options
-              </Typography>
-            )}
-          </AnimatePresence>
-        </Grid>
-        <Grid conainer item xs={12}></Grid>
-      </AnimateSharedLayout>
+    <Grid
+      container
+      component={motion.div}
+      direction="row"
+      alignItems="center"
+      spacing={1}
+    >
+      <Grid item xs="auto">
+        <SimpleListMenu
+          defaultLabel="PICK A PRICING OPTION"
+          menuItems={PRICING_OPTIONS}
+          selectedItemIndex={priceOptionNumber}
+          setSelectedItemIndex={setPriceOptionNumber}
+        />
+      </Grid>
+      <Grid item xs>
+        {priceOption === "Rental" && (
+          <ConfigureRentalPrice setRentalPricing={setRentalPricing} />
+        )}
+        {priceOption === "Buy" && (
+          <ConfigureBuyPrice setBuyPrice={setBuyPrice} />
+        )}
+      </Grid>
     </Grid>
   );
 }
@@ -413,7 +519,7 @@ function Post(props: {
           <InputDescription setDescription={setDescription} />
         </S.InputContainer>
         <S.InputContainer style={{ borderBottomStyle: "none" }}>
-          <PostPricing pricing={pricing} setPricing={setPricing} />
+          <EnterPricing pricing={pricing} setPricing={setPricing} />
         </S.InputContainer>
       </div>
     </Paper>
