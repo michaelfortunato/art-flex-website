@@ -134,34 +134,38 @@ function PostImages(props: {
   setImages: any;
 }) {
   return (
-    <div
-      style={{
-        display: "inline-block",
-        height: 440,
-        width: 400,
-        marginBottom: 20
-      }}
-    >
-      <AnimatePresence exitBeforeEnter>
-        {props.uploadStep === 0 ? (
-          <motion.div
-            key={0}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={{
-              borderStyle: "solid",
-              borderColor: "#OOOOOO",
-              filter: "blur(.5rem)"
-            }}
-          >
-            <Image src={postPlaceHolderImg} alt="" placeholder="blur" />
-          </motion.div>
-        ) : (
-          <Dropzone images={props.images} setImages={props.setImages} />
-        )}
-      </AnimatePresence>
-    </div>
+    <Grid container justifyContent="center">
+      <Grid xs="auto">
+        <div
+          style={{
+            display: "inline-block",
+            height: 440,
+            width: 400,
+            marginBottom: 20
+          }}
+        >
+          <AnimatePresence exitBeforeEnter>
+            {props.uploadStep === 0 ? (
+              <motion.div
+                key={0}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                style={{
+                  borderStyle: "solid",
+                  borderColor: "#OOOOOO",
+                  filter: "blur(.5rem)"
+                }}
+              >
+                <Image src={postPlaceHolderImg} alt="" placeholder="blur" />
+              </motion.div>
+            ) : (
+              <Dropzone images={props.images} setImages={props.setImages} />
+            )}
+          </AnimatePresence>
+        </div>
+      </Grid>
+    </Grid>
   );
 }
 
@@ -312,7 +316,7 @@ function ConfigureRentalPrice(props: ConfigureRentlPriceProps) {
     });
   }
   return (
-    <Grid container justifyContent="space-between" spacing={3}>
+    <>
       <Grid item xs="auto">
         <Autocomplete
           value={rentalPeriod}
@@ -350,7 +354,7 @@ function ConfigureRentalPrice(props: ConfigureRentlPriceProps) {
           <Add />
         </IconButton>
       </Grid>
-    </Grid>
+    </>
   );
 }
 
@@ -365,7 +369,7 @@ function ConfigureBuyPrice(props: ConfigureBuyPriceProps) {
     }
   }
   return (
-    <Grid container direction="row" justifyContent="space-evenly">
+    <>
       <Grid item xs="auto">
         <TextField
           label="Set the Price"
@@ -384,7 +388,7 @@ function ConfigureBuyPrice(props: ConfigureBuyPriceProps) {
           <Add />
         </IconButton>
       </Grid>
-    </Grid>
+    </>
   );
 }
 
@@ -437,7 +441,8 @@ function EnterPricing(props: EnterPricingProps) {
       component={motion.div}
       direction="row"
       alignItems="center"
-      spacing={1}
+      justifyContent="space-between"
+      spacing={3}
     >
       <Grid item xs="auto">
         <SimpleListMenu
@@ -447,14 +452,10 @@ function EnterPricing(props: EnterPricingProps) {
           setSelectedItemIndex={setPriceOptionNumber}
         />
       </Grid>
-      <Grid item xs>
-        {priceOption === "Rental" && (
-          <ConfigureRentalPrice setRentalPricing={setRentalPricing} />
-        )}
-        {priceOption === "Buy" && (
-          <ConfigureBuyPrice setBuyPrice={setBuyPrice} />
-        )}
-      </Grid>
+      {priceOption === "Rental" && (
+        <ConfigureRentalPrice setRentalPricing={setRentalPricing} />
+      )}
+      {priceOption === "Buy" && <ConfigureBuyPrice setBuyPrice={setBuyPrice} />}
     </Grid>
   );
 }
