@@ -437,6 +437,7 @@ function EnterPricing(props: EnterPricingProps) {
   }
   return (
     <Grid
+      layout
       container
       component={motion.div}
       direction="row"
@@ -444,7 +445,7 @@ function EnterPricing(props: EnterPricingProps) {
       justifyContent="space-between"
       spacing={3}
     >
-      <Grid item xs="auto">
+      <Grid item xs="auto" layout component={motion.div}>
         <SimpleListMenu
           defaultLabel="PICK A PRICING OPTION"
           menuItems={PRICING_OPTIONS}
@@ -538,6 +539,8 @@ export default function CreatePost() {
     rentalPricing: undefined,
     buyPrice: undefined
   });
+  const inputContainerRef = useRef<any>(null);
+
   const setImages = (newImages: PostImage[]) =>
     setImageBase(oldImages => newImages.concat(oldImages).slice(0, MAX_IMAGES));
 
@@ -575,20 +578,49 @@ export default function CreatePost() {
             ))}
           </Stepper>
         </Grid>
-        <Grid container item direction="column" alignItems="center" spacing={8}>
-          <Grid item xs="auto" component={motion.div} layout>
-            <Post
-              accountName={"Michael Fortunato"}
-              uploadStep={uploadStep}
-              post={{ title, description, images, pricing }}
-              setPost={{
-                setTitle,
-                setDescription,
-                setImages,
-                setPricing
-              }}
-            />
+        <Grid
+          layout
+          component={motion.div}
+          container
+          item
+          direction="column"
+          alignItems="center"
+          spacing={8}
+        >
+          <Grid
+            component={motion.div}
+            container
+            direction="row"
+            justifyContent="space-around"
+            layout
+          >
+            <AnimateSharedLayout>
+              <Grid item xs="auto" component={motion.div} key="front" layout>
+                <Post
+                  accountName={"Michael Fortunato"}
+                  uploadStep={uploadStep}
+                  post={{ title, description, images, pricing }}
+                  setPost={{
+                    setTitle,
+                    setDescription,
+                    setImages,
+                    setPricing
+                  }}
+                />
+              </Grid>
+              <Grid
+                layout
+                component={motion.div}
+                ref={inputContainerRef}
+                item
+                xs="auto"
+                key="input"
+              >
+                <EnterPricing pricing={pricing} setPricing={setPricing} />
+              </Grid>
+            </AnimateSharedLayout>
           </Grid>
+
           <Grid
             component={motion.div}
             layout
