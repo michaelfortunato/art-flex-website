@@ -10,9 +10,10 @@ import {
 } from "@material-ui/core";
 
 interface SimpleListMenuProps {
-  buttonLabel: string;
-  menuItems: Record<string, boolean>;
-  handleMenuItemClick: Dispatch<SetStateAction<any>>;
+  defaultLabel: string;
+  menuItems: string[];
+  selectedItemIndex: number | undefined;
+  setSelectedItemIndex: Dispatch<SetStateAction<any>>;
 }
 export default function SimpleListMenu(props: SimpleListMenuProps) {
   const anchorRef = useRef<HTMLButtonElement>(null);
@@ -22,20 +23,21 @@ export default function SimpleListMenu(props: SimpleListMenuProps) {
     setOpen(oldOpen => !oldOpen);
   };
 
-  const handleClose = (event: React.MouseEvent<EventTarget>) => {
+  const handleClose = (
+    event: React.MouseEvent<EventTarget>,
+    index: number | undefined
+  ) => {
     if (
       anchorRef.current &&
       anchorRef.current.contains(event.target as HTMLElement)
     ) {
       return;
     }
+    if (index !== undefined && index !== props.selectedItemIndex)
+      props.setSelectedItemIndex(index);
     setOpen(false);
   };
 
-  function handleClick(event: React.MouseEvent<EventTarget>, menuItem: string) {
-    handleClose(event);
-    props.handleMenuItemClick(menuItem);
-  }
   function handleListKeyDown(event: React.KeyboardEvent) {
     if (event.key === "Tab") {
       event.preventDefault();
@@ -58,10 +60,10 @@ export default function SimpleListMenu(props: SimpleListMenuProps) {
         aria-controls={open ? "menu-list-grow" : undefined}
         aria-haspopup="true"
         onClick={handleToggle}
-        variant="contained"
-        color={"primary"}
       >
-        {props.buttonLabel}
+        {props.selectedItemIndex !== undefined
+          ? props.menuItems[props.selectedItemIndex]
+          : props.defaultLabel}
       </Button>
 
       <Popper
@@ -69,7 +71,7 @@ export default function SimpleListMenu(props: SimpleListMenuProps) {
         anchorEl={anchorRef.current}
         role={undefined}
         transition
-        disablePortal={false}
+        disablePortal
       >
         {({ TransitionProps, placement }) => (
           <Grow
@@ -80,18 +82,21 @@ export default function SimpleListMenu(props: SimpleListMenuProps) {
             }}
           >
             <Paper>
-              <ClickAwayListener onClickAway={handleClose}>
+              <ClickAwayListener
+                onClickAway={(e: React.MouseEvent<EventTarget>) =>
+                  handleClose(e, props.selectedItemIndex)
+                }
+              >
                 <MenuList
                   autoFocusItem={open}
                   id="menu-list-grow"
                   onKeyDown={handleListKeyDown}
                 >
-                  {Object.keys(props.menuItems).map(menuItem => (
+                  {props.menuItems.map((menuItem, index) => (
                     <MenuItem
                       key={menuItem}
-                      disabled={props.menuItems[menuItem]}
                       onClick={(e: React.MouseEvent<EventTarget>) =>
-                        handleClick(e, menuItem)
+                        handleClose(e, index)
                       }
                     >
                       {menuItem}

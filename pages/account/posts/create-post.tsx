@@ -17,9 +17,15 @@ import {
   Menu,
   MenuItem,
   TextField,
-  IconButton
+  IconButton,
+  Table,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableBody,
+  TableCell
 } from "@material-ui/core";
-import { Autocomplete } from "@material-ui/lab";
+import { Autocomplete, useAutocomplete } from "@material-ui/lab";
 import Image from "next/image";
 import {
   useState,
@@ -514,14 +520,123 @@ function PostPricing(props: PostPricingProps) {
 
 function ConfigurablePriceButton() {
   const theme: any = useTheme();
+  const {
+    getRootProps,
+    getInputLabelProps,
+    getInputProps,
+    getTagProps,
+    getListboxProps,
+    getOptionProps,
+    groupedOptions,
+    value,
+    focused,
+    setAnchorEl
+  } = useAutocomplete({
+    id: "customized-hook-demo",
+    defaultValue: "Value",
+    multiple: true,
+    options: ["Buy", "Rent"],
+    getOptionLabel: option => option.title
+  });
   return (
     <div
+      {...getRootProps()}
       style={{
         backgroundColor: theme.palette.primary.main
       }}
-    >
-      Said I made it
-    </div>
+    ></div>
+  );
+}
+
+function BuyRow(props: { setBuyPriceConfig: (price: number) => void }) {
+  const [price, setPrice] = useState<number | null>(null);
+  const [priceTypeIndex, setPriceTypeIndex] = useState<0 | 1>(0);
+  const [rentalPeriod, setRentalPeriod] =
+    useState<ConfigureRentalPeriod | null>(null);
+  const [rentalPeriodInput, setRentalPeriodInput] = useState<
+    string | undefined
+  >("");
+  const priceTypes = ["Rent", "Buy"];
+  const priceType = priceTypes[priceTypeIndex];
+
+  return (
+    <TableRow component={motion.tr} layout>
+      <TableCell align="left" component="th" scope="row">
+        <SimpleListMenu
+          menuItems={priceTypes}
+          defaultLabel="Buy or Rent"
+          selectedItemIndex={priceTypeIndex}
+          setSelectedItemIndex={setPriceTypeIndex}
+        />
+      </TableCell>
+      <TableCell align="left" component="th" scope="row">
+        {priceType === "Rent" && (
+          <Autocomplete
+            value={rentalPeriod}
+            onChange={(event: any, newValue: ConfigureRentalPeriod | null) => {
+              setRentalPeriod(newValue);
+            }}
+            inputValue={rentalPeriodInput}
+            onInputChange={(event, newInputValue: string | undefined) => {
+              // We can be sure this is correct as its
+              // the discrete set of such values
+              setRentalPeriodInput(newInputValue);
+            }}
+            id="controllable-states-demo"
+            options={RentalPeriodOptions}
+            style={{ width: 200 }}
+            renderInput={params => (
+              <TextField
+                {...params}
+                label="Set Rental Period"
+                variant="standard"
+              />
+            )}
+          />
+        )}
+      </TableCell>
+      <TableCell align="left" component="th" scope="row">
+        <TextField
+          fullWidth={false}
+          style={{ maxWidth: 100 }}
+          label="Set the Price"
+          variant="standard"
+          type="number"
+          onChange={e => setPrice(parseInt(e.target.value, 10))}
+        />
+      </TableCell>
+      <TableCell align="center" component="th" scope="row">
+        <IconButton
+          color="primary"
+          disabled={typeof price !== "number" || price <= 0}
+          onClick={() =>
+            typeof price === "number" && props.setBuyPriceConfig(price)
+          }
+        >
+          <Add />
+        </IconButton>
+      </TableCell>
+    </TableRow>
+  );
+}
+
+function ConfigurablePriceTable() {
+  return (
+    <TableContainer component={motion.div} layout>
+      <Table aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell align="left">Buy or Rent</TableCell>
+            <TableCell align="left">Period</TableCell>
+            <TableCell align="left">Price</TableCell>
+            <TableCell align="left">Confirm</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <BuyRow />
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }
 
@@ -567,7 +682,7 @@ function Post(props: {
           <InputDescription setDescription={setDescription} />
         </S.InputContainer>
         <S.InputContainer style={{ borderBottomStyle: "none" }}>
-          <ConfigurablePriceButton />
+          <ConfigurablePriceTable />
         </S.InputContainer>
       </div>
     </Paper>
