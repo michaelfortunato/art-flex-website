@@ -47,6 +47,7 @@ import * as S from "@components/CreatePost/Post.styled";
 import SimpleListMenu from "@components/SimpleListMenu";
 import { Add } from "@material-ui/icons";
 import AFBaseFormField from "@components/Library/FormField/BaseFormField";
+import { useTheme } from "@material-ui/styles";
 
 const MAX_IMAGES = 5;
 const steps = [
@@ -135,7 +136,7 @@ function PostImages(props: {
 }) {
   return (
     <Grid container justifyContent="center">
-      <Grid xs="auto">
+      <Grid item xs="auto">
         <div
           style={{
             display: "inline-block",
@@ -316,7 +317,7 @@ function ConfigureRentalPrice(props: ConfigureRentlPriceProps) {
     });
   }
   return (
-    <>
+    <Grid container spacing={3}>
       <Grid item xs="auto">
         <Autocomplete
           value={rentalPeriod}
@@ -354,7 +355,7 @@ function ConfigureRentalPrice(props: ConfigureRentlPriceProps) {
           <Add />
         </IconButton>
       </Grid>
-    </>
+    </Grid>
   );
 }
 
@@ -369,7 +370,7 @@ function ConfigureBuyPrice(props: ConfigureBuyPriceProps) {
     }
   }
   return (
-    <>
+    <Grid container>
       <Grid item xs="auto">
         <TextField
           label="Set the Price"
@@ -380,6 +381,7 @@ function ConfigureBuyPrice(props: ConfigureBuyPriceProps) {
       </Grid>
       <Grid item xs="auto">
         <IconButton
+          color="primary"
           disabled={
             price === undefined || price <= 0 || typeof price !== "number"
           }
@@ -388,7 +390,7 @@ function ConfigureBuyPrice(props: ConfigureBuyPriceProps) {
           <Add />
         </IconButton>
       </Grid>
-    </>
+    </Grid>
   );
 }
 
@@ -409,9 +411,8 @@ function EnterPricing(props: EnterPricingProps) {
   const [priceOptionNumber, setPriceOptionNumber] = useState<0 | 1 | undefined>(
     undefined
   );
-  const priceOption =
-    typeof priceOptionNumber === "number" && PRICING_OPTIONS[priceOptionNumber];
-
+  const [rentalRows, setRentalRows] = useState<number[]>([]);
+  const [buyRow, setBuyRow] = useState<boolean>(false);
   function setRentalPricing(rentalPrice: RentalPricing) {
     props.setPricing((oldPricing: Pricing): Pricing => {
       if (oldPricing.rentalPricing?.length) {
@@ -435,28 +436,60 @@ function EnterPricing(props: EnterPricingProps) {
       })
     );
   }
+
+  function addPriceOptionRow(priceOption: string) {
+    if (priceOption === "Rental") {
+      setRentalRows((prevRentalRows: number[]) => {
+        const maxKey = prevRentalRows.reduce(
+          (prevMax, candidate) => (candidate > prevMax ? candidate : prevMax),
+          0
+        );
+        return [...rentalRows, maxKey + 1];
+      });
+    }
+    if (priceOption === "Buy") {
+      setBuyRow(prevBuyRow => {
+        if (!prevBuyRow) return true;
+        return prevBuyRow;
+      });
+    }
+  }
+
   return (
-    <Grid
-      layout
-      container
-      component={motion.div}
-      direction="row"
-      alignItems="center"
-      justifyContent="space-between"
-      spacing={3}
-    >
-      <Grid item xs="auto" layout component={motion.div}>
+    <Grid container direction="column" spacing={3}>
+      <Grid item xs="auto">
         <SimpleListMenu
-          defaultLabel="PICK A PRICING OPTION"
-          menuItems={PRICING_OPTIONS}
-          selectedItemIndex={priceOptionNumber}
-          setSelectedItemIndex={setPriceOptionNumber}
+          buttonLabel="Add Price"
+          menuItems={{
+            Rental: rentalRows.length < 2,
+            Buy: buyRow
+          }}
+          handleMenuItemClick={addPriceOptionRow}
         />
       </Grid>
-      {priceOption === "Rental" && (
-        <ConfigureRentalPrice setRentalPricing={setRentalPricing} />
-      )}
-      {priceOption === "Buy" && <ConfigureBuyPrice setBuyPrice={setBuyPrice} />}
+      <Grid
+        layout
+        container
+        direction="column"
+        component={motion.div}
+        item
+        spacing={3}
+        xs="auto"
+      >
+        {rentalRows.map((index: number) => (
+          <Grid key={index} item xs="auto">
+            <ConfigureRentalPrice
+              key={index}
+              setRentalPricing={setRentalPricing}
+            />
+          </Grid>
+        ))}
+        {buyRow && (
+          <Grid key="BuyRow" item xs="auto">
+            <ConfigureBuyPrice setBuyPrice={setBuyPrice} />
+          </Grid>
+        )}
+      </Grid>
     </Grid>
   );
 }
@@ -476,6 +509,19 @@ function PostPricing(props: PostPricingProps) {
         <EnterPricing pricing={pricing} setPricing={setPricing} />
       </Grid>
     </S.RevealInputStep>
+  );
+}
+
+function ConfigurablePriceButton() {
+  const theme: any = useTheme();
+  return (
+    <div
+      style={{
+        backgroundColor: theme.palette.primary.main
+      }}
+    >
+      Said I made it
+    </div>
   );
 }
 
@@ -521,7 +567,7 @@ function Post(props: {
           <InputDescription setDescription={setDescription} />
         </S.InputContainer>
         <S.InputContainer style={{ borderBottomStyle: "none" }}>
-          <EnterPricing pricing={pricing} setPricing={setPricing} />
+          <ConfigurablePriceButton />
         </S.InputContainer>
       </div>
     </Paper>
@@ -588,10 +634,12 @@ export default function CreatePost() {
           spacing={8}
         >
           <Grid
+            item
+            xs="auto"
             component={motion.div}
             container
             direction="row"
-            justifyContent="space-around"
+            justifyContent="space-evenly"
             layout
           >
             <AnimateSharedLayout>
