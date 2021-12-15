@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Grid,
   Button,
   Table,
   TableContainer,
@@ -14,8 +15,8 @@ import { Add } from "@material-ui/icons";
 import { useAutocomplete, Autocomplete } from "@material-ui/lab";
 import styled from "styled-components";
 import { motion } from "framer-motion";
+import { DropdownSelection } from "@components/Dropdowns";
 import { RentalPricing, BuyPricing, Pricing } from "./Post";
-import DropdownSelection from "@components/DropdownSelection";
 
 type InputRentalPeriod =
   | "1 Month"
@@ -343,5 +344,57 @@ export function ConfigurablePriceTable() {
         </TableBody>
       </Table>
     </TableContainer>
+  );
+}
+
+export function InputPricing() {
+  return (
+    <div>
+      <span style={{ marginRight: 10 }}>
+        <DropdownSelection
+          defaultLabel="Add Pricing"
+          buttonProps={{
+            color: "primary",
+            variant: "contained"
+          }}
+          menuItems={["Eyee", "Whoadie"]}
+          rootStyles={{
+            display: "inline"
+          }}
+        />
+      </span>
+      <span style={{ marginLeft: 10 }}>
+        <Button variant="contained" color="secondary">
+          Add Rental Pricing
+        </Button>
+      </span>
+      <div></div>
+    </div>
+  );
+}
+
+export function InputPricing2() {
+  return (
+    <div>
+      <span style={{ marginRight: 10 }}>
+        <DropdownSelection
+          defaultLabel="Add Pricing"
+          buttonProps={{
+            color: "primary",
+            variant: "contained"
+          }}
+          menuItems={["Eyee", "Whoadie"]}
+          rootStyles={{
+            display: "inline"
+          }}
+        />
+      </span>
+      <span style={{ marginLeft: 10 }}>
+        <Button variant="contained" color="secondary">
+          Add Rental Pricing
+        </Button>
+      </span>
+      <div></div>
+    </div>
   );
 }

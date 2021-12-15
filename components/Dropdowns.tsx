@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, SetStateAction, Dispatch } from "react";
+import { useState, useRef, useEffect, CSSProperties } from "react";
 import {
   Paper,
   MenuList,
@@ -6,35 +6,47 @@ import {
   Button,
   ClickAwayListener,
   Popper,
-  Grow
+  Grow,
+  ButtonProps
 } from "@material-ui/core";
 
-interface SimpleListMenuProps {
+interface DropdownSelectionComponent {
   defaultLabel: string;
   menuItems: string[];
-  selectedItemIndex: number | undefined;
-  setSelectedItemIndex: Dispatch<SetStateAction<any>>;
+  onClick: (selectedItemIndex: number) => void;
+  buttonProps?: ButtonProps;
+  rootStyles?: CSSProperties;
 }
-export default function SimpleListMenu(props: SimpleListMenuProps) {
+interface DropdownTemplateParams extends DropdownSelectionComponent {
+  isButton: boolean;
+}
+
+function DropdownTemplate(props: DropdownTemplateParams) {
   const anchorRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
   const prevOpen = useRef(open);
+  const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(
+    null
+  );
+
+  const dropDownlabel =
+    selectedItemIndex !== null && !props.isButton
+      ? props.menuItems[selectedItemIndex]
+      : props.defaultLabel;
+
   const handleToggle = () => {
     setOpen(oldOpen => !oldOpen);
   };
 
-  const handleClose = (
-    event: React.MouseEvent<EventTarget>,
-    index: number | undefined
-  ) => {
+  const handleClose = (event: React.MouseEvent<EventTarget>) => {
     if (
       anchorRef.current &&
       anchorRef.current.contains(event.target as HTMLElement)
     ) {
       return;
     }
-    if (index !== undefined && index !== props.selectedItemIndex)
-      props.setSelectedItemIndex(index);
+    props.onClick(selectedItemIndex as number);
+    setSelectedItemIndex(selectedItemIndex);
     setOpen(false);
   };
 
@@ -54,16 +66,15 @@ export default function SimpleListMenu(props: SimpleListMenuProps) {
   }, [open]);
 
   return (
-    <div>
+    <div style={{ ...props.rootStyles }}>
       <Button
         ref={anchorRef}
         aria-controls={open ? "menu-list-grow" : undefined}
         aria-haspopup="true"
         onClick={handleToggle}
+        {...props.buttonProps}
       >
-        {props.selectedItemIndex !== undefined
-          ? props.menuItems[props.selectedItemIndex]
-          : props.defaultLabel}
+        {dropDownlabel}
       </Button>
 
       <Popper
@@ -71,7 +82,7 @@ export default function SimpleListMenu(props: SimpleListMenuProps) {
         anchorEl={anchorRef.current}
         role={undefined}
         transition
-        disablePortal
+        disablePortal={false}
       >
         {({ TransitionProps, placement }) => (
           <Grow
@@ -82,23 +93,14 @@ export default function SimpleListMenu(props: SimpleListMenuProps) {
             }}
           >
             <Paper>
-              <ClickAwayListener
-                onClickAway={(e: React.MouseEvent<EventTarget>) =>
-                  handleClose(e, props.selectedItemIndex)
-                }
-              >
+              <ClickAwayListener onClickAway={handleClose}>
                 <MenuList
                   autoFocusItem={open}
                   id="menu-list-grow"
                   onKeyDown={handleListKeyDown}
                 >
                   {props.menuItems.map((menuItem, index) => (
-                    <MenuItem
-                      key={menuItem}
-                      onClick={(e: React.MouseEvent<EventTarget>) =>
-                        handleClose(e, index)
-                      }
-                    >
+                    <MenuItem key={index} onClick={handleClose}>
                       {menuItem}
                     </MenuItem>
                   ))}
@@ -109,5 +111,33 @@ export default function SimpleListMenu(props: SimpleListMenuProps) {
         )}
       </Popper>
     </div>
+  );
+}
+
+type DropdownSelectionProps = DropdownSelectionComponent;
+export function DropdownSelection(props: DropdownSelectionProps) {
+  return (
+    <DropdownTemplate
+      defaultLabel={props.defaultLabel}
+      isButton={true}
+      onClick={props.onClick}
+      menuItems={props.menuItems}
+      buttonProps={props.buttonProps}
+      rootStyles={props.rootStyles}
+    />
+  );
+}
+
+type DropdownButtonProps = DropdownSelectionComponent;
+export default function DropdownButton(props: DropdownButtonProps) {
+  return (
+    <DropdownTemplate
+      defaultLabel={props.defaultLabel}
+      isButton={true}
+      onClick={props.onClick}
+      menuItems={props.menuItems}
+      buttonProps={props.buttonProps}
+      rootStyles={props.rootStyles}
+    />
   );
 }
