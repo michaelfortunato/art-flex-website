@@ -9,13 +9,16 @@ import {
   TableRow,
   TableCell,
   TextField,
-  IconButton
+  IconButton,
+  Typography
 } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import { useAutocomplete, Autocomplete } from "@material-ui/lab";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { DropdownSelection } from "@components/Dropdowns";
+import * as BaseForm from "@components/Library/FormField/BaseFormField.styled";
+import CustomAutocomplete from "@components/CustomAutocomplete";
 import { RentalPricing, BuyPricing, Pricing } from "./Post";
 
 type InputRentalPeriod =
@@ -238,7 +241,7 @@ export function FilloutPriceButton() {
   );
 }
 
-export function FilloutPriceButton2() {
+export function FilloutPriceButtonDeprecated() {
   <Button
     disableRipple
     disableFocusRipple
@@ -254,60 +257,41 @@ export function FilloutPriceButton2() {
   </Button>;
 }
 
-function ConfigPriceRow(props: { setBuyPriceConfig: (price: number) => void }) {
+function ConfigPriceRow(props: {
+  priceType: "Rent" | "Buy";
+  setBuyPriceConfig: (price: number) => void;
+}) {
   const [price, setPrice] = useState<number | null>(null);
-  const [priceTypeIndex, setPriceTypeIndex] = useState<0 | 1>(0);
   const [rentalPeriod, setRentalPeriod] = useState<InputRentalPeriod | null>(
     null
   );
-  const [rentalPeriodInput, setRentalPeriodInput] = useState<
-    string | undefined
-  >("");
-  const priceTypes = ["Rent", "Buy"];
-  const priceType = priceTypes[priceTypeIndex];
-
+  console.log(rentalPeriod);
   return (
     <TableRow component={motion.tr} layout>
       <TableCell align="left" component="th" scope="row">
-        <DropdownSelection
-          menuItems={priceTypes}
-          defaultLabel="Buy or Rent"
-          selectedItemIndex={priceTypeIndex}
-          setSelectedItemIndex={setPriceTypeIndex}
-        />
+        <Typography variant="body1">{props.priceType}</Typography>
       </TableCell>
       <TableCell align="left" component="th" scope="row">
-        {priceType === "Rent" && (
-          <Autocomplete
-            value={rentalPeriod}
-            onChange={(event: any, newValue: InputRentalPeriod | null) => {
-              setRentalPeriod(newValue);
+        {props.priceType === "Rent" && (
+          <CustomAutocomplete
+            InputProps={{
+              placeholder: "Select Period"
             }}
-            inputValue={rentalPeriodInput}
-            onInputChange={(event, newInputValue: string | undefined) => {
-              // We can be sure this is correct as its
-              // the discrete set of such values
-              setRentalPeriodInput(newInputValue);
-            }}
-            id="controllable-states-demo"
-            options={inputRentalPeriodOptions}
-            style={{ width: 200 }}
-            renderInput={params => (
-              <TextField
-                {...params}
-                label="Set Rental Period"
-                variant="standard"
-              />
-            )}
-          />
+            options={["1 Month"]}
+            width={200}
+            onChange={newValue =>
+              setRentalPeriod(newValue as InputRentalPeriod)
+            }
+          >
+            <BaseForm.AFBaseFormField />
+          </CustomAutocomplete>
         )}
       </TableCell>
       <TableCell align="left" component="th" scope="row">
-        <TextField
-          fullWidth={false}
-          style={{ maxWidth: 100 }}
-          label="Set the Price"
-          variant="standard"
+        <BaseForm.AFBaseFormField
+          fullWidth={true}
+          style={{ maxWidth: 150 }}
+          placeholder="Set the Price"
           type="number"
           onChange={e => setPrice(parseInt(e.target.value, 10))}
         />
@@ -340,19 +324,19 @@ export function ConfigurablePriceTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          <ConfigPriceRow />
+          <ConfigPriceRow priceType="Rent" />
         </TableBody>
       </Table>
     </TableContainer>
   );
 }
 
-export function InputPricing() {
+export function InputPricing2() {
   return (
     <div>
       <span style={{ marginRight: 10 }}>
         <DropdownSelection
-          defaultLabel="Add Pricing"
+          defaultLabel="Add Buy Pricing"
           buttonProps={{
             color: "primary",
             variant: "contained"
@@ -373,28 +357,22 @@ export function InputPricing() {
   );
 }
 
-export function InputPricing2() {
+export function InputPricing() {
   return (
     <div>
-      <span style={{ marginRight: 10 }}>
-        <DropdownSelection
-          defaultLabel="Add Pricing"
-          buttonProps={{
-            color: "primary",
-            variant: "contained"
-          }}
-          menuItems={["Eyee", "Whoadie"]}
-          rootStyles={{
-            display: "inline"
-          }}
-        />
-      </span>
-      <span style={{ marginLeft: 10 }}>
-        <Button variant="contained" color="secondary">
-          Add Rental Pricing
-        </Button>
-      </span>
-      <div></div>
+      <div>
+        <FilloutPriceButton />
+      </div>
+    </div>
+  );
+}
+
+export function InputPricing3() {
+  return (
+    <div>
+      <div>
+        <ConfigurablePriceTable />
+      </div>
     </div>
   );
 }

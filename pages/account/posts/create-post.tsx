@@ -310,8 +310,6 @@ function Post(props: {
         </S.InputContainer>
         <S.InputContainer
           style={{
-            maxHeight: 200,
-            overflowY: "auto",
             borderBottomStyle: "none"
           }}
         >
