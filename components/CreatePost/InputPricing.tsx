@@ -1,4 +1,11 @@
-import { useState, useEffect, useRef, KeyboardEvent } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  KeyboardEvent,
+  ChangeEvent
+} from "react";
 import {
   Grid,
   Button,
@@ -34,6 +41,7 @@ const inputRentalPeriodOptions = [
 
 type InputRentalPeriod = typeof inputRentalPeriodOptions[number];
 
+// I should annotate setPricing rigth I need to get the state type. See 57 also.
 function setRentalPricing(
   rentalPrice: RentalPricing,
   setPricing: (price: any) => void
@@ -65,7 +73,7 @@ function setBuyPrice(buyPrice: BuyPricing, setPricing: (price: any) => void) {
 const StyledFilloutPriceButton = styled.div<{
   variant: "primary" | "secondary";
 }>`
-  display: inline-block;
+  display: inline-flex;
   align-items: center;
   appearance: none;
   background-color: ${props =>
@@ -108,7 +116,7 @@ const StyledFilloutPriceButton = styled.div<{
   font-variant-numeric: normal;
   font-weight: 500;
   min-height: 36px;
-  justify-content: center;
+  justify-content: flex-start;
   letter-spacing: 0.39998px;
   line-height: 24.5px;
   margin-bottom: 0px;
@@ -187,7 +195,7 @@ function validPrice(price: any): boolean {
 interface FilloutPriceButtonProps {
   type: "Rent" | "Buy";
   addRentalPrice: (rentalPrice: RentalPricing) => void;
-  setBuyPrice: (buyPrice: BuyPricing) => void;
+  addBuyPrice: (buyPrice: BuyPricing) => void;
   autoFocusOnMount?: boolean;
 }
 
@@ -203,19 +211,28 @@ const BlackTooltip = styled(({ className, ...props }: TooltipProps) => (
   }
 `;
 
+function validPriceConfiguration(
+  type: "Rent" | "Buy",
+  rentalPeriod: InputRentalPeriod | null,
+  price: number | null
+): boolean {
+  const validRentalPeriod = isInputRentalPeriod(rentalPeriod);
+  return validPrice(price) && (validRentalPeriod || type !== "Rent");
+}
+
 export function FilloutPriceButton(props: FilloutPriceButtonProps) {
   const [rentalPeriod, setRentalPeriod] = useState<InputRentalPeriod | null>(
     null
   );
   const [price, setPrice] = useState<number | null>(null);
 
+  const [showPeriodTooltip, setShowPeriodToolTip] = useState(false);
+
   const [priceEntered, setPriceEntered] = useState<boolean>(false);
-  const [periodEntered, setPeriodEntered] = useState<boolean>(false);
   const priceRef = useRef<HTMLInputElement>(null);
   const prevPriceEntered = useRef<boolean>(false);
-  const prevPeriodEntered = useRef<boolean>(false);
 
-  const theme = useTheme();
+  const theme = useTheme() as any;
   console.log(theme);
 
   useEffect(() => {
@@ -225,12 +242,15 @@ export function FilloutPriceButton(props: FilloutPriceButtonProps) {
     if (prevPriceEntered.current) priceRef.current?.focus();
     prevPriceEntered.current = priceEntered;
   }, [priceEntered]);
-  useEffect(() => {
-    prevPeriodEntered.current = periodEntered;
-  }, [periodEntered]);
 
-  function onConfirm() {
-    if (props.type === "Rent") {
+  function handleConditionalEnter(fieldName: "Price" | "Period") {
+    if (fieldName === "Price" && validPrice(price)) {
+      setPriceEntered(true);
+    }
+  }
+  const { type, addBuyPrice, addRentalPrice } = props;
+  const addPriceConfiguration = useCallback(() => {
+    if (type === "Rent") {
       const [duration, period] = (rentalPeriod as InputRentalPeriod).split(
         " "
       ) as [number, "Month" | "Year"];
@@ -239,25 +259,24 @@ export function FilloutPriceButton(props: FilloutPriceButtonProps) {
         duration,
         period
       } as RentalPricing;
-      props.addRentalPrice(rentalPrice);
+      addRentalPrice(rentalPrice);
     }
-    if (props.type === "Buy") {
+    if (type === "Buy") {
       const buyPrice = { price } as BuyPricing;
-      props.setBuyPrice(buyPrice);
+      addBuyPrice(buyPrice);
     }
-  }
-  function validPriceConfiguration() {
-    const validRentalPeriod = isInputRentalPeriod(rentalPeriod);
-    return validPrice(price) && (validRentalPeriod || props.type !== "Rent");
-  }
-  function handleConditionalEnter(fieldName: "Price" | "Period") {
-    if (fieldName === "Price" && validPrice(price)) {
-      setPriceEntered(true);
+  }, [type, price, rentalPeriod]);
+
+  useEffect(() => {
+    if (
+      priceEntered &&
+      validPriceConfiguration(props.type, rentalPeriod, price)
+    ) {
+      console.log("true");
+      addPriceConfiguration();
     }
-    if (fieldName === "Period" && isInputRentalPeriod(rentalPeriod)) {
-      setPeriodEntered(true);
-    }
-  }
+  }, [props.type, priceEntered, price, rentalPeriod, addPriceConfiguration]);
+
   function handleKeyDown(
     event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
     fieldName: "Price" | "Period"
@@ -266,13 +285,26 @@ export function FilloutPriceButton(props: FilloutPriceButtonProps) {
       handleConditionalEnter(fieldName);
     }
   }
+
+  function handlePeriodTooltipOpen(e: ChangeEvent<any>) {
+    // Detect where we hovered over button lable,
+    // if not, cancel the event.
+    if (!e.target.classList.contains("MuiButton-label")) {
+      setShowPeriodToolTip(false);
+    } else {
+      setShowPeriodToolTip(true);
+    }
+  }
+
+  function handlePeriodTooltipClose() {
+    setShowPeriodToolTip(false);
+  }
   return (
     <Grid container justifyContent="space-between">
-      <Grid item xs="auto">
+      <Grid component={motion.div} item xs={12}>
         <ClickAwayListener
           onClickAway={() => {
             handleConditionalEnter("Price");
-            handleConditionalEnter("Period");
           }}
         >
           <StyledFilloutPriceButton
@@ -287,26 +319,30 @@ export function FilloutPriceButton(props: FilloutPriceButtonProps) {
                     <b>Rent for $</b>
                   </Typography>
                   {!priceEntered ? (
-                    <input
-                      ref={priceRef}
+                    <BaseForm.AFBaseFormField
+                      inputRef={priceRef}
                       style={{
-                        width: 100,
+                        width: 114,
                         fontSize: 18,
-                        borderStyle: "none",
-                        outlineStyle: "none"
+                        padding: 4,
+                        paddingLeft: 8,
+                        paddingRight: 8,
+                        height: "inherit"
                       }}
-                      min={0}
-                      value={price === null ? undefined : price}
-                      max={15000}
-                      onKeyDown={event => handleKeyDown(event, "Price")}
+                      inputProps={{
+                        min: 0,
+                        value: price === null ? undefined : price,
+                        max: 15000,
+                        onKeyDown: event => handleKeyDown(event, "Price"),
+                        type: "number",
+                        placeholder: "Set Price"
+                      }}
                       onChange={event =>
                         setPrice(parseInt(event.target.value as string, 10))
                       }
-                      type="number"
-                      placeholder="Set Price"
                     />
                   ) : (
-                    <BlackTooltip title="Click to change price">
+                    <BlackTooltip title="Click to change price" placement="top">
                       <Typography
                         onClick={() => {
                           setPriceEntered(false);
@@ -326,40 +362,70 @@ export function FilloutPriceButton(props: FilloutPriceButtonProps) {
                   >
                     <b>&nbsp;Per&nbsp;</b>
                   </Typography>
-                  {!periodEntered ? (
-                    <CustomAutocomplete
-                      // here we are copying the array to make it mutable I
-                      // hope the performance is ok
-                      autoFocusOnMount={prevPeriodEntered && !periodEntered}
-                      options={[...inputRentalPeriodOptions]}
-                      width={100}
-                      onChange={newValue =>
-                        setRentalPeriod(newValue as InputRentalPeriod)
-                      }
-                      InputProps={{
-                        onKeyDown: event => handleKeyDown(event, "Period"),
-                        placeholder: "Set Period",
-                        style: {
-                          width: 100,
-                          fontSize: 18
-                        }
+                  <BlackTooltip
+                    title="Click to change rental period"
+                    placement="top"
+                    open={showPeriodTooltip}
+                    onClose={handlePeriodTooltipClose}
+                    onOpen={handlePeriodTooltipOpen}
+                  >
+                    <motion.div
+                      style={{
+                        backgroundColor: "white",
+                        boxShadow: "0 1px 4px 0 rgb(34 34 34 / 10%) inset",
+                        borderColor: "rgba(34, 34, 34, 0.15)",
+                        borderStyle: "solid",
+                        borderWidth: "1px",
+                        borderRadius: "6px",
+                        color: "darkGrey"
                       }}
+                      animate={
+                        rentalPeriod &&
+                        ({
+                          backgroundColor: (theme as any).palette.secondary
+                            .main,
+                          padding: 0,
+                          borderStyle: "none",
+                          borderRadius: "0px",
+                          borderWidth: "0px",
+                          boxShadow: "none"
+                        } as any)
+                      }
                     >
-                      <input />
-                    </CustomAutocomplete>
-                  ) : (
-                    <BlackTooltip title="Click to change rental period">
-                      <Typography
-                        onClick={() => {
-                          setPeriodEntered(false);
+                      <DropdownSelection
+                        defaultLabel="Set Period"
+                        menuItems={[...inputRentalPeriodOptions]}
+                        onClick={itemNumber => {
+                          const newRentalPeriod =
+                            itemNumber !== null
+                              ? inputRentalPeriodOptions[itemNumber]
+                              : null;
+                          setRentalPeriod(newRentalPeriod);
+                          // setPeriodEntered(true);
                         }}
-                        variant="body1"
-                        style={{ cursor: "pointer" }}
-                      >
-                        <b>{rentalPeriod}</b>
-                      </Typography>
-                    </BlackTooltip>
-                  )}
+                        buttonProps={{
+                          style: rentalPeriod
+                            ? {
+                                fontSize: theme.typography.body1.fontSize,
+                                fontWeight: 1000,
+                                padding: 0,
+                                color: "#000000",
+                                alignItems: "none",
+                                justifyContent: "start"
+                              }
+                            : {
+                                fontSize: theme.typography.body1.fontSize,
+                                fontWeight: 400,
+                                padding: 4,
+                                paddingLeft: 8,
+                                paddingRight: 8,
+                                color: "darkGrey",
+                                justifyContent: "start"
+                              }
+                        }}
+                      />
+                    </motion.div>
+                  </BlackTooltip>
                 </>
               ) : (
                 <>
@@ -368,21 +434,27 @@ export function FilloutPriceButton(props: FilloutPriceButtonProps) {
                   </Typography>
                   {!priceEntered ? (
                     <>
-                      <input
-                        ref={priceRef}
+                      <BaseForm.AFBaseFormField
+                        inputRef={priceRef}
                         style={{
-                          width: 100,
+                          width: 114,
                           fontSize: 18,
-                          marginRight: 10,
                           padding: 4,
-                          borderStyle: "none"
+                          paddingLeft: 8,
+                          paddingRight: 8,
+                          height: "inherit"
+                        }}
+                        inputProps={{
+                          min: 0,
+                          value: price === null ? undefined : price,
+                          max: 15000,
+                          onKeyDown: event => handleKeyDown(event, "Price"),
+                          type: "number",
+                          placeholder: "Set Price"
                         }}
                         onChange={event =>
                           setPrice(parseInt(event.target.value as string, 10))
                         }
-                        type="number"
-                        placeholder="Set Price"
-                        onKeyDown={event => handleKeyDown(event, "Price")}
                       />
                     </>
                   ) : (
@@ -545,20 +617,38 @@ export function InputPricing2() {
   );
 }
 
-export function InputPricing() {
+type InputPricingProps = {
+  setPricing: (price: Pricing) => void;
+};
+export function InputPricing(props: InputPricingProps) {
+  function addRentalPrice(rentalPrice: RentalPricing) {
+    setRentalPricing(rentalPrice, props.setPricing);
+  }
+  function addBuyPrice(buyPrice: BuyPricing) {
+    setBuyPrice(buyPrice, props.setPricing);
+  }
   return (
     <Grid container direction="column" spacing={2}>
       <Grid item>
-        <FilloutPriceButton autoFocusOnMount={true} type="Rent" />
+        <FilloutPriceButton
+          addBuyPrice={addBuyPrice}
+          addRentalPrice={addRentalPrice}
+          autoFocusOnMount={true}
+          type="Rent"
+        />
       </Grid>
       <Grid item>
-        <FilloutPriceButton type="Buy" />
+        <FilloutPriceButton
+          addBuyPrice={addBuyPrice}
+          addRentalPrice={addRentalPrice}
+          type="Buy"
+        />
       </Grid>
     </Grid>
   );
 }
 
-export function InputPricing3() {
+export function InputPricing1() {
   return (
     <div>
       <div>

@@ -13,7 +13,7 @@ import {
 interface DropdownSelectionComponent {
   defaultLabel: string;
   menuItems: string[];
-  onClick: (selectedItemIndex: number) => void;
+  onClick: (selectedItemIndex: number | null) => void;
   buttonProps?: ButtonProps;
   rootStyles?: CSSProperties;
 }
@@ -38,15 +38,18 @@ function DropdownTemplate(props: DropdownTemplateParams) {
     setOpen(oldOpen => !oldOpen);
   };
 
-  const handleClose = (event: React.MouseEvent<EventTarget>) => {
+  const handleClose = (
+    event: React.MouseEvent<EventTarget>,
+    itemIndex: number | null
+  ) => {
     if (
       anchorRef.current &&
       anchorRef.current.contains(event.target as HTMLElement)
     ) {
       return;
     }
-    props.onClick(selectedItemIndex as number);
-    setSelectedItemIndex(selectedItemIndex);
+    props.onClick(itemIndex);
+    setSelectedItemIndex(itemIndex);
     setOpen(false);
   };
 
@@ -93,14 +96,16 @@ function DropdownTemplate(props: DropdownTemplateParams) {
             }}
           >
             <Paper>
-              <ClickAwayListener onClickAway={handleClose}>
+              <ClickAwayListener
+                onClickAway={e => handleClose(e, selectedItemIndex)}
+              >
                 <MenuList
                   autoFocusItem={open}
                   id="menu-list-grow"
                   onKeyDown={handleListKeyDown}
                 >
                   {props.menuItems.map((menuItem, index) => (
-                    <MenuItem key={index} onClick={handleClose}>
+                    <MenuItem key={index} onClick={e => handleClose(e, index)}>
                       {menuItem}
                     </MenuItem>
                   ))}
@@ -119,7 +124,7 @@ export function DropdownSelection(props: DropdownSelectionProps) {
   return (
     <DropdownTemplate
       defaultLabel={props.defaultLabel}
-      isButton={true}
+      isButton={false}
       onClick={props.onClick}
       menuItems={props.menuItems}
       buttonProps={props.buttonProps}

@@ -313,7 +313,7 @@ function Post(props: {
             borderBottomStyle: "none"
           }}
         >
-          <InputPricing />
+          <InputPricing setPricing={setPricing} />
         </S.InputContainer>
       </div>
     </Paper>
