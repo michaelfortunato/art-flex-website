@@ -292,7 +292,8 @@ export function FilloutPriceButton(props: FilloutPriceButtonProps) {
                       style={{
                         width: 100,
                         fontSize: 18,
-                        borderStyle: "none"
+                        borderStyle: "none",
+                        outlineStyle: "none"
                       }}
                       min={0}
                       value={price === null ? undefined : price}
