@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useAutocomplete } from "@material-ui/lab";
 import { InputBaseProps } from "@material-ui/core";
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 const StyledListBox = styled.ul<{ width: number | string }>`
   width: ${props =>
@@ -34,6 +34,7 @@ type CustomAutocompleteProps = {
   width: number | string;
   onChange: (newValue: string | null) => void;
   InputProps?: InputBaseProps;
+  autoFocusOnMount?: boolean;
 };
 export default function CustomAutocomplete(props: CustomAutocompleteProps) {
   const {
@@ -49,8 +50,15 @@ export default function CustomAutocomplete(props: CustomAutocompleteProps) {
     getOptionLabel: (option: string) => option
   });
   const { onChange } = props;
+  const { ref: inputRef } = getInputProps() as any;
   useEffect(() => {
-    onChange(value);
+    if (props.autoFocusOnMount) {
+      inputRef.current?.focus();
+    }
+  }, [props.autoFocusOnMount]);
+
+  useEffect(() => {
+    onChange(value as string | null);
   }, [value, onChange]);
   return (
     <div {...getRootProps()}>

@@ -229,7 +229,7 @@ type PurchaseButtonProps = {
   onClick?: (e: MouseEventHandler<HTMLButtonElement>) => void;
 };
 
-function PurchaseButton(props: PurchaseButtonProps) {
+export function PurchaseButton(props: PurchaseButtonProps) {
   let color: "primary" | "secondary" | undefined;
   let text: string;
   if (isRentalPricing(props.pricing)) {

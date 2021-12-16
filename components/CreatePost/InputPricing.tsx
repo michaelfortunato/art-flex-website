@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, KeyboardEvent } from "react";
 import {
   Grid,
   Button,
@@ -8,33 +8,31 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  TextField,
   IconButton,
-  Typography
+  Typography,
+  ClickAwayListener,
+  Tooltip,
+  TooltipProps
 } from "@material-ui/core";
-import { Add } from "@material-ui/icons";
-import { useAutocomplete, Autocomplete } from "@material-ui/lab";
+import { Add, BorderStyle } from "@material-ui/icons";
+import { useTheme } from "@material-ui/styles";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { DropdownSelection } from "@components/Dropdowns";
 import * as BaseForm from "@components/Library/FormField/BaseFormField.styled";
 import CustomAutocomplete from "@components/CustomAutocomplete";
 import { RentalPricing, BuyPricing, Pricing } from "./Post";
+import { PurchaseButton } from "pages/account/posts/create-post";
 
-type InputRentalPeriod =
-  | "1 Month"
-  | "3 Months"
-  | "6 Months"
-  | "9 Months"
-  | "1 Year";
-
-const inputRentalPeriodOptions: InputRentalPeriod[] = [
+const inputRentalPeriodOptions = [
   "1 Month",
   "3 Months",
   "6 Months",
   "9 Months",
   "1 Year"
-];
+] as const;
+
+type InputRentalPeriod = typeof inputRentalPeriodOptions[number];
 
 function setRentalPricing(
   rentalPrice: RentalPricing,
@@ -64,40 +62,16 @@ function setBuyPrice(buyPrice: BuyPricing, setPricing: (price: any) => void) {
   );
 }
 
-const StyledInput = styled.input`
-  max-width: 50;
-  margin-left: 10;
-  margin-right: 10;
-`;
-const StyledListBox = styled.ul`
-  width: 100px;
-  margin: 0px;
-  margin-right: 10px;
-  padding: 0px;
-  z-index: 2;
-  position: absolute;
-  list-style: none;
-  background-color: white;
-  color: black;
-  overflow: auto;
-  max-height: 200px;
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  & li[data-focus="true"] {
-    background-color: #4a8df6;
-    color: white;
-    cursor: pointer;
-  }
-  & li:active: {
-    background-color: #2977f5;
-    color: white;
-  }
-`;
-
-const StyledFilloutPriceButton = styled.div`
+const StyledFilloutPriceButton = styled.div<{
+  variant: "primary" | "secondary";
+}>`
   display: inline-block;
   align-items: center;
   appearance: none;
-  background-color: rgb(103, 58, 183);
+  background-color: ${props =>
+    props.variant === "primary"
+      ? props.theme.palette.primary.main
+      : props.theme.palette.secondary.main};
   border-bottom-color: rgb(255, 255, 255);
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
@@ -123,7 +97,6 @@ const StyledFilloutPriceButton = styled.div`
     rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
   box-sizing: border-box;
   color: rgb(255, 255, 255);
-  cursor: pointer;
   display: inline-flex;
   font-family: Roboto, Helvetica, Arial, sans-serif;
   font-size: 14px;
@@ -134,7 +107,7 @@ const StyledFilloutPriceButton = styled.div`
   font-variant-ligatures: normal;
   font-variant-numeric: normal;
   font-weight: 500;
-  height: 36px;
+  min-height: 36px;
   justify-content: center;
   letter-spacing: 0.39998px;
   line-height: 24.5px;
@@ -169,10 +142,12 @@ const StyledFilloutPriceButton = styled.div`
   -webkit-border-image: none;
 `;
 
-const StyledFilloutPriceButtonLabel = styled.span`
+const StyledFilloutPriceButtonLabel = styled.span<{
+  variant: "primary" | "secondary";
+}>`
+  padding: 4px;
   align-items: center;
-  color: rgb(255, 255, 255);
-  cursor: pointer;
+  color: ${props => (props.variant === "primary" ? "#FFFFFF" : "#000000")};
   display: flex;
   font-family: Roboto, Helvetica, Arial, sans-serif;
   font-size: 14px;
@@ -183,7 +158,7 @@ const StyledFilloutPriceButtonLabel = styled.span`
   font-variant-ligatures: normal;
   font-variant-numeric: normal;
   font-weight: 500;
-  height: 24px;
+  min-height: 24px;
   justify-content: center;
   letter-spacing: 0.39998px;
   line-height: 24.5px;
@@ -200,47 +175,259 @@ const StyledFilloutPriceButtonLabel = styled.span`
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 `;
 
-export function FilloutPriceButton() {
-  const {
-    getRootProps,
-    getInputProps,
-    getListboxProps,
-    getOptionProps,
-    groupedOptions
-  } = useAutocomplete({
-    id: "use-autocomplete-demo",
-    options: inputRentalPeriodOptions,
-    getOptionLabel: option => option
-  });
+function isInputRentalPeriod(period: any): period is InputRentalPeriod {
+  const notRentalPeriod = inputRentalPeriodOptions.every(
+    option => period !== option
+  );
+  return !notRentalPeriod;
+}
+function validPrice(price: any): boolean {
+  return typeof price === "number" && price > 0 && price < 15000;
+}
+interface FilloutPriceButtonProps {
+  type: "Rent" | "Buy";
+  addRentalPrice: (rentalPrice: RentalPricing) => void;
+  setBuyPrice: (buyPrice: BuyPricing) => void;
+  autoFocusOnMount?: boolean;
+}
+
+const BlackTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))`
+  & .MuiTooltip-tooltip {
+    background-color: #000000;
+    font-size: ${props => props.theme.typography.body1.fontSize};
+  }
+  & .MuiTooltip-arrow {
+    background-color: #000000;
+  }
+`;
+
+export function FilloutPriceButton(props: FilloutPriceButtonProps) {
+  const [rentalPeriod, setRentalPeriod] = useState<InputRentalPeriod | null>(
+    null
+  );
+  const [price, setPrice] = useState<number | null>(null);
+
+  const [priceEntered, setPriceEntered] = useState<boolean>(false);
+  const [periodEntered, setPeriodEntered] = useState<boolean>(false);
+  const priceRef = useRef<HTMLInputElement>(null);
+  const prevPriceEntered = useRef<boolean>(false);
+  const prevPeriodEntered = useRef<boolean>(false);
+
+  const theme = useTheme();
+  console.log(theme);
+
+  useEffect(() => {
+    if (props.autoFocusOnMount) priceRef.current?.focus();
+  }, [props.autoFocusOnMount]);
+  useEffect(() => {
+    if (prevPriceEntered.current) priceRef.current?.focus();
+    prevPriceEntered.current = priceEntered;
+  }, [priceEntered]);
+  useEffect(() => {
+    prevPeriodEntered.current = periodEntered;
+  }, [periodEntered]);
+
+  function onConfirm() {
+    if (props.type === "Rent") {
+      const [duration, period] = (rentalPeriod as InputRentalPeriod).split(
+        " "
+      ) as [number, "Month" | "Year"];
+      const rentalPrice = {
+        price,
+        duration,
+        period
+      } as RentalPricing;
+      props.addRentalPrice(rentalPrice);
+    }
+    if (props.type === "Buy") {
+      const buyPrice = { price } as BuyPricing;
+      props.setBuyPrice(buyPrice);
+    }
+  }
+  function validPriceConfiguration() {
+    const validRentalPeriod = isInputRentalPeriod(rentalPeriod);
+    return validPrice(price) && (validRentalPeriod || props.type !== "Rent");
+  }
+  function handleConditionalEnter(fieldName: "Price" | "Period") {
+    if (fieldName === "Price" && validPrice(price)) {
+      setPriceEntered(true);
+    }
+    if (fieldName === "Period" && isInputRentalPeriod(rentalPeriod)) {
+      setPeriodEntered(true);
+    }
+  }
+  function handleKeyDown(
+    event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+    fieldName: "Price" | "Period"
+  ) {
+    if (event.key === "Enter" || event.key === "Tab") {
+      handleConditionalEnter(fieldName);
+    }
+  }
   return (
-    <StyledFilloutPriceButton>
-      <StyledFilloutPriceButtonLabel>
-        Rent for
-        <input
-          style={{ width: 100, marginLeft: 10, marginRight: 10 }}
-          type="number"
-        />
-        Per
-        <div {...getRootProps()}>
-          <StyledInput
-            style={{ maxWidth: 75, marginLeft: 10, marginRight: 10 }}
-            {...getInputProps()}
-          />
-          {groupedOptions.length > 0 ? (
-            <StyledListBox {...getListboxProps()}>
-              {groupedOptions.map((option, index) => (
-                <li key={index} {...getOptionProps({ option, index })}>
-                  {option}
-                </li>
-              ))}
-            </StyledListBox>
-          ) : null}
-        </div>
-      </StyledFilloutPriceButtonLabel>
-    </StyledFilloutPriceButton>
+    <Grid container justifyContent="space-between">
+      <Grid item xs="auto">
+        <ClickAwayListener
+          onClickAway={() => {
+            handleConditionalEnter("Price");
+            handleConditionalEnter("Period");
+          }}
+        >
+          <StyledFilloutPriceButton
+            variant={props.type === "Rent" ? "secondary" : "primary"}
+          >
+            <StyledFilloutPriceButtonLabel
+              variant={props.type === "Rent" ? "secondary" : "primary"}
+            >
+              {props.type === "Rent" ? (
+                <>
+                  <Typography variant="body1">
+                    <b>Rent for $</b>
+                  </Typography>
+                  {!priceEntered ? (
+                    <input
+                      ref={priceRef}
+                      style={{
+                        width: 100,
+                        fontSize: 18,
+                        borderStyle: "none"
+                      }}
+                      min={0}
+                      value={price === null ? undefined : price}
+                      max={15000}
+                      onKeyDown={event => handleKeyDown(event, "Price")}
+                      onChange={event =>
+                        setPrice(parseInt(event.target.value as string, 10))
+                      }
+                      type="number"
+                      placeholder="Set Price"
+                    />
+                  ) : (
+                    <BlackTooltip title="Click to change price">
+                      <Typography
+                        onClick={() => {
+                          setPriceEntered(false);
+                        }}
+                        variant="body1"
+                        style={{ cursor: "pointer" }}
+                      >
+                        <b>{price}</b>
+                      </Typography>
+                    </BlackTooltip>
+                  )}
+                  <Typography
+                    variant="body1"
+                    style={{
+                      fontWeight: 400
+                    }}
+                  >
+                    <b>&nbsp;Per&nbsp;</b>
+                  </Typography>
+                  {!periodEntered ? (
+                    <CustomAutocomplete
+                      // here we are copying the array to make it mutable I
+                      // hope the performance is ok
+                      autoFocusOnMount={prevPeriodEntered && !periodEntered}
+                      options={[...inputRentalPeriodOptions]}
+                      width={100}
+                      onChange={newValue =>
+                        setRentalPeriod(newValue as InputRentalPeriod)
+                      }
+                      InputProps={{
+                        onKeyDown: event => handleKeyDown(event, "Period"),
+                        placeholder: "Set Period",
+                        style: {
+                          width: 100,
+                          fontSize: 18
+                        }
+                      }}
+                    >
+                      <input />
+                    </CustomAutocomplete>
+                  ) : (
+                    <BlackTooltip title="Click to change rental period">
+                      <Typography
+                        onClick={() => {
+                          setPeriodEntered(false);
+                        }}
+                        variant="body1"
+                        style={{ cursor: "pointer" }}
+                      >
+                        <b>{rentalPeriod}</b>
+                      </Typography>
+                    </BlackTooltip>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Typography variant="body1">
+                    <b>Buy for $</b>
+                  </Typography>
+                  {!priceEntered ? (
+                    <>
+                      <input
+                        ref={priceRef}
+                        style={{
+                          width: 100,
+                          fontSize: 18,
+                          marginRight: 10,
+                          padding: 4,
+                          borderStyle: "none"
+                        }}
+                        onChange={event =>
+                          setPrice(parseInt(event.target.value as string, 10))
+                        }
+                        type="number"
+                        placeholder="Set Price"
+                        onKeyDown={event => handleKeyDown(event, "Price")}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <BlackTooltip title="Click to change price">
+                        <Typography
+                          onClick={() => {
+                            setPriceEntered(false);
+                          }}
+                          variant="body1"
+                          style={{ cursor: "pointer" }}
+                        >
+                          <b>{price}</b>
+                        </Typography>
+                      </BlackTooltip>
+                    </>
+                  )}
+                </>
+              )}
+            </StyledFilloutPriceButtonLabel>
+          </StyledFilloutPriceButton>
+        </ClickAwayListener>
+      </Grid>
+    </Grid>
   );
 }
 
+export function FilloutPriceButtonBuy() {
+  const [rentalPeriod, setRentalPeriod] = useState<InputRentalPeriod | null>(
+    null
+  );
+  return (
+    <Grid container justifyContent="space-between">
+      <Grid item xs="auto">
+        <StyledFilloutPriceButton variant="primary">
+          <StyledFilloutPriceButtonLabel variant="primary"></StyledFilloutPriceButtonLabel>
+        </StyledFilloutPriceButton>
+      </Grid>
+      <Grid item>
+        <IconButton color="primary">
+          <Add />
+        </IconButton>
+      </Grid>
+    </Grid>
+  );
+}
 export function FilloutPriceButtonDeprecated() {
   <Button
     disableRipple
@@ -359,11 +546,14 @@ export function InputPricing2() {
 
 export function InputPricing() {
   return (
-    <div>
-      <div>
-        <FilloutPriceButton />
-      </div>
-    </div>
+    <Grid container direction="column" spacing={2}>
+      <Grid item>
+        <FilloutPriceButton autoFocusOnMount={true} type="Rent" />
+      </Grid>
+      <Grid item>
+        <FilloutPriceButton type="Buy" />
+      </Grid>
+    </Grid>
   );
 }
 
