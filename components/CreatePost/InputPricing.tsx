@@ -28,8 +28,13 @@ import { motion } from "framer-motion";
 import { DropdownSelection } from "@components/Dropdowns";
 import * as BaseForm from "@components/Library/FormField/BaseFormField.styled";
 import CustomAutocomplete from "@components/CustomAutocomplete";
-import { RentalPricing, BuyPricing, Pricing } from "./Post";
-import { PurchaseButton } from "pages/account/posts/create-post";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  setBuyPrice,
+  upsertRentalPrice,
+  removeRentalPrice
+} from "./Pricing/pricingSlice";
+import { validBuyPricing, validPrice, validRentalPricing } from "./Post";
 
 const inputRentalPeriodOptions = [
   "1 Month",
@@ -40,35 +45,6 @@ const inputRentalPeriodOptions = [
 ] as const;
 
 type InputRentalPeriod = typeof inputRentalPeriodOptions[number];
-
-// I should annotate setPricing rigth I need to get the state type. See 57 also.
-function setRentalPricing(
-  rentalPrice: RentalPricing,
-  setPricing: (price: any) => void
-) {
-  setPricing((oldPricing: Pricing) => {
-    if (oldPricing.rentalPricing?.length) {
-      const popOldestElement = oldPricing.rentalPricing.length > 1;
-      const startingIndex = popOldestElement ? 1 : 0;
-      const newRentalPricing = [
-        ...oldPricing.rentalPricing.slice(startingIndex),
-        rentalPrice
-      ];
-      return { ...oldPricing, rentalPricing: newRentalPricing };
-    }
-    const newRentalPricing = [rentalPrice];
-    return { ...oldPricing, rentalPricing: newRentalPricing };
-  });
-}
-
-function setBuyPrice(buyPrice: BuyPricing, setPricing: (price: any) => void) {
-  setPricing(
-    (pricing: Pricing): Pricing => ({
-      ...pricing,
-      buyPrice
-    })
-  );
-}
 
 const StyledFilloutPriceButton = styled.div<{
   variant: "primary" | "secondary";
@@ -183,19 +159,8 @@ const StyledFilloutPriceButtonLabel = styled.span<{
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 `;
 
-function isInputRentalPeriod(period: any): period is InputRentalPeriod {
-  const notRentalPeriod = inputRentalPeriodOptions.every(
-    option => period !== option
-  );
-  return !notRentalPeriod;
-}
-function validPrice(price: any): boolean {
-  return typeof price === "number" && price > 0 && price < 15000;
-}
 interface FilloutPriceButtonProps {
   type: "Rent" | "Buy";
-  addRentalPrice: (rentalPrice: RentalPricing) => void;
-  addBuyPrice: (buyPrice: BuyPricing) => void;
   autoFocusOnMount?: boolean;
 }
 
@@ -211,29 +176,18 @@ const BlackTooltip = styled(({ className, ...props }: TooltipProps) => (
   }
 `;
 
-function validPriceConfiguration(
-  type: "Rent" | "Buy",
-  rentalPeriod: InputRentalPeriod | null,
-  price: number | null
-): boolean {
-  const validRentalPeriod = isInputRentalPeriod(rentalPeriod);
-  return validPrice(price) && (validRentalPeriod || type !== "Rent");
-}
-
 export function FilloutPriceButton(props: FilloutPriceButtonProps) {
   const [rentalPeriod, setRentalPeriod] = useState<InputRentalPeriod | null>(
     null
   );
   const [price, setPrice] = useState<number | null>(null);
-
   const [showPeriodTooltip, setShowPeriodToolTip] = useState(false);
-
   const [priceEntered, setPriceEntered] = useState<boolean>(false);
   const priceRef = useRef<HTMLInputElement>(null);
   const prevPriceEntered = useRef<boolean>(false);
 
+  const dispatch = useDispatch();
   const theme = useTheme() as any;
-  console.log(theme);
 
   useEffect(() => {
     if (props.autoFocusOnMount) priceRef.current?.focus();
@@ -248,34 +202,29 @@ export function FilloutPriceButton(props: FilloutPriceButtonProps) {
       setPriceEntered(true);
     }
   }
-  const { type, addBuyPrice, addRentalPrice } = props;
-  const addPriceConfiguration = useCallback(() => {
-    if (type === "Rent") {
-      const [duration, period] = (rentalPeriod as InputRentalPeriod).split(
-        " "
-      ) as [number, "Month" | "Year"];
-      const rentalPrice = {
-        price,
-        duration,
-        period
-      } as RentalPricing;
-      addRentalPrice(rentalPrice);
-    }
-    if (type === "Buy") {
-      const buyPrice = { price } as BuyPricing;
-      addBuyPrice(buyPrice);
-    }
-  }, [type, price, rentalPeriod]);
 
   useEffect(() => {
     if (
+      props.type === "Rent" &&
       priceEntered &&
-      validPriceConfiguration(props.type, rentalPeriod, price)
+      typeof rentalPeriod === "string"
     ) {
-      console.log("true");
-      addPriceConfiguration();
+      const [duration, period] = rentalPeriod.split(" ");
+      const newRentalPrice = {
+        price,
+        duration: duration && parseInt(duration, 10),
+        period
+      };
+      if (validRentalPricing(newRentalPrice)) {
+        console.log(newRentalPrice);
+        dispatch(upsertRentalPrice(newRentalPrice));
+      }
     }
-  }, [props.type, priceEntered, price, rentalPeriod, addPriceConfiguration]);
+    if (props.type === "Buy" && priceEntered) {
+      const newBuyPrice = { price };
+      if (validBuyPricing(newBuyPrice)) dispatch(setBuyPrice(newBuyPrice));
+    }
+  }, [props.type, priceEntered, price, rentalPeriod, dispatch]);
 
   function handleKeyDown(
     event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -414,13 +363,16 @@ export function FilloutPriceButton(props: FilloutPriceButtonProps) {
                                 justifyContent: "start"
                               }
                             : {
-                                fontSize: theme.typography.body1.fontSize,
                                 fontWeight: 400,
+                                color: "darkGrey",
+                                justifyContent: "start",
+                                width: 120,
+                                fontSize: 18,
                                 padding: 4,
                                 paddingLeft: 8,
                                 paddingRight: 8,
-                                color: "darkGrey",
-                                justifyContent: "start"
+                                height: "inherit",
+                                textTransform: "capitalize"
                               }
                         }}
                       />
@@ -617,32 +569,14 @@ export function InputPricing2() {
   );
 }
 
-type InputPricingProps = {
-  setPricing: (price: Pricing) => void;
-};
-export function InputPricing(props: InputPricingProps) {
-  function addRentalPrice(rentalPrice: RentalPricing) {
-    setRentalPricing(rentalPrice, props.setPricing);
-  }
-  function addBuyPrice(buyPrice: BuyPricing) {
-    setBuyPrice(buyPrice, props.setPricing);
-  }
+export function InputPricing() {
   return (
     <Grid container direction="column" spacing={2}>
       <Grid item>
-        <FilloutPriceButton
-          addBuyPrice={addBuyPrice}
-          addRentalPrice={addRentalPrice}
-          autoFocusOnMount={true}
-          type="Rent"
-        />
+        <FilloutPriceButton autoFocusOnMount={true} type="Rent" />
       </Grid>
       <Grid item>
-        <FilloutPriceButton
-          addBuyPrice={addBuyPrice}
-          addRentalPrice={addRentalPrice}
-          type="Buy"
-        />
+        <FilloutPriceButton type="Buy" />
       </Grid>
     </Grid>
   );

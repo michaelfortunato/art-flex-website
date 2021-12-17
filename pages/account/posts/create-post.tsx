@@ -39,6 +39,7 @@ import {
 } from "@components/CreatePost/InputPricing";
 
 const MAX_IMAGES = 5;
+const MAX_RENTAL_PRICES = 2;
 const steps = [
   {
     stepTitle: "Name and description",
@@ -75,12 +76,12 @@ interface Pricing {
 }
 
 function isRentalPricing(
-  pricing: RentalPricing | BuyPricing
+  pricing: RentalPricing | undefined
 ): pricing is RentalPricing {
-  return (
-    (pricing as RentalPricing).duration !== undefined &&
-    (pricing as RentalPricing).period !== undefined
-  );
+  return pricing
+    ? (pricing as RentalPricing).duration !== undefined &&
+        (pricing as RentalPricing).period !== undefined
+    : false;
 }
 
 function isBuyPricing(
@@ -275,11 +276,10 @@ function Post(props: {
     setTitle: any;
     setDescription: any;
     setImages: any;
-    setPricing: any;
   };
 }) {
   const { images, pricing } = props.post;
-  const { setTitle, setDescription, setImages, setPricing } = props.setPost;
+  const { setTitle, setDescription, setImages } = props.setPost;
   return (
     <Paper
       elevation={3}
@@ -313,7 +313,7 @@ function Post(props: {
             borderBottomStyle: "none"
           }}
         >
-          <InputPricing setPricing={setPricing} />
+          <InputPricing />
         </S.InputContainer>
       </div>
     </Paper>
@@ -327,10 +327,6 @@ export default function CreatePost() {
   const [title, setTitle] = useState<undefined | string>(undefined);
   const [description, setDescription] = useState<undefined | string>(undefined);
   const [images, setImageBase] = useState<PostImage[]>([]);
-  const [pricing, setPricing] = useState<Pricing>({
-    rentalPricing: undefined,
-    buyPrice: undefined
-  });
   const inputContainerRef = useRef<any>(null);
 
   const setImages = (newImages: PostImage[]) =>
@@ -393,12 +389,11 @@ export default function CreatePost() {
                 <Post
                   accountName={"Michael Fortunato"}
                   uploadStep={uploadStep}
-                  post={{ title, description, images, pricing }}
+                  post={{ title, description, images }}
                   setPost={{
                     setTitle,
                     setDescription,
-                    setImages,
-                    setPricing
+                    setImages
                   }}
                 />
               </Grid>
