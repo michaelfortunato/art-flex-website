@@ -22,9 +22,7 @@ export interface PostProps {
   pricing: Pricing;
 }
 
-export function isRentalPricing(
-  pricing: RentalPricing | undefined
-): pricing is RentalPricing {
+export function isRentalPricing(pricing: any): pricing is RentalPricing {
   return pricing
     ? (pricing as RentalPricing).duration !== undefined &&
         (pricing as RentalPricing).period !== undefined

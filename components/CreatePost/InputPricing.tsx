@@ -19,7 +19,8 @@ import {
   Typography,
   ClickAwayListener,
   Tooltip,
-  TooltipProps
+  TooltipProps,
+  FormControl
 } from "@material-ui/core";
 import { Add, BorderStyle } from "@material-ui/icons";
 import { useTheme } from "@material-ui/styles";
@@ -29,12 +30,18 @@ import { DropdownSelection } from "@components/Dropdowns";
 import * as BaseForm from "@components/Library/FormField/BaseFormField.styled";
 import CustomAutocomplete from "@components/CustomAutocomplete";
 import { useSelector, useDispatch } from "react-redux";
+import { setBuyPrice, selectBuyPrice } from "./Pricing/buyPricingSlice";
 import {
-  setBuyPrice,
-  upsertRentalPrice,
-  removeRentalPrice
-} from "./Pricing/pricingSlice";
-import { validBuyPricing, validPrice, validRentalPricing } from "./Post";
+  RentalPricing,
+  validBuyPricing,
+  validPrice,
+  validRentalPricing
+} from "./Post";
+import {
+  selectRentalPricingById,
+  upsertRentalPrice
+} from "./Pricing/rentalPricingsSlice";
+import { RootState } from "@redux-store/store";
 
 const inputRentalPeriodOptions = [
   "1 Month",
@@ -177,17 +184,12 @@ const BlackTooltip = styled(({ className, ...props }: TooltipProps) => (
 `;
 
 export function FilloutPriceButton(props: FilloutPriceButtonProps) {
-  const [rentalPeriod, setRentalPeriod] = useState<InputRentalPeriod | null>(
-    null
-  );
-  const [price, setPrice] = useState<number | null>(null);
-  const [showPeriodTooltip, setShowPeriodToolTip] = useState(false);
   const [priceEntered, setPriceEntered] = useState<boolean>(false);
   const priceRef = useRef<HTMLInputElement>(null);
   const prevPriceEntered = useRef<boolean>(false);
 
   const dispatch = useDispatch();
-  const theme = useTheme() as any;
+  const { price, error: priceError } = useSelector(selectBuyPrice);
 
   useEffect(() => {
     if (props.autoFocusOnMount) priceRef.current?.focus();
@@ -197,41 +199,121 @@ export function FilloutPriceButton(props: FilloutPriceButtonProps) {
     prevPriceEntered.current = priceEntered;
   }, [priceEntered]);
 
-  function handleConditionalEnter(fieldName: "Price" | "Period") {
-    if (fieldName === "Price" && validPrice(price)) {
-      setPriceEntered(true);
+  function handleKeyDown(
+    event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) {
+    if (event.key === "Enter" || event.key === "Tab") {
+      if (price && !priceError) setPriceEntered(true);
     }
   }
 
+  return (
+    <Grid container justifyContent="space-between">
+      <Grid component={motion.div} item xs={12}>
+        <ClickAwayListener
+          onClickAway={() => {
+            /// handleConditionalEnter("Price");
+          }}
+        >
+          <StyledFilloutPriceButton variant="primary">
+            <StyledFilloutPriceButtonLabel variant="primary">
+              <Typography variant="body1">
+                <b>Buy for $</b>
+              </Typography>
+              {!priceEntered ? (
+                <>
+                  <BaseForm.AFBaseFormField
+                    inputRef={priceRef}
+                    style={{
+                      width: 114,
+                      fontSize: 18,
+                      padding: 4,
+                      paddingLeft: 8,
+                      paddingRight: 8,
+                      height: "inherit"
+                    }}
+                    inputProps={{
+                      min: 0,
+                      max: 15000,
+                      onKeyDown: handleKeyDown,
+                      type: "number",
+                      placeholder: "Set Price"
+                    }}
+                    value={price}
+                    // disabled={!!priceError}
+                    onChange={event => {
+                      const inputPrice = parseInt(
+                        event.target.value as string,
+                        10
+                      );
+                      console.log(inputPrice);
+                      if (!inputPrice || inputPrice < 15000) {
+                        console.log(price);
+                        dispatch(
+                          setBuyPrice({
+                            price: !Number.isNaN(inputPrice)
+                              ? inputPrice
+                              : undefined
+                          })
+                        );
+                      }
+                    }}
+                  />
+                </>
+              ) : (
+                <>
+                  <BlackTooltip title="Click to change price">
+                    <Typography
+                      onClick={() => {
+                        setPriceEntered(false);
+                      }}
+                      variant="body1"
+                      style={{ cursor: "pointer" }}
+                    >
+                      <b>{price}</b>
+                    </Typography>
+                  </BlackTooltip>
+                </>
+              )}
+            </StyledFilloutPriceButtonLabel>
+          </StyledFilloutPriceButton>
+        </ClickAwayListener>
+      </Grid>
+    </Grid>
+  );
+}
+
+interface FilloutRentalPricingButtonProps {
+  id: string;
+  autoFocusOnMount?: boolean;
+}
+function FilloutRentalPricingButton(props: FilloutRentalPricingButtonProps) {
+  const [showPeriodTooltip, setShowPeriodToolTip] = useState(false);
+  const [priceEntered, setPriceEntered] = useState<boolean>(false);
+  const priceRef = useRef<HTMLInputElement>(null);
+  const prevPriceEntered = useRef<boolean>(false);
+
+  const dispatch = useDispatch();
+  const { price, duration } =
+    useSelector((state: RootState) =>
+      selectRentalPricingById(state, props.id)
+    ) || {};
+  const theme = useTheme() as any;
+
   useEffect(() => {
-    if (
-      props.type === "Rent" &&
-      priceEntered &&
-      typeof rentalPeriod === "string"
-    ) {
-      const [duration, period] = rentalPeriod.split(" ");
-      const newRentalPrice = {
-        price,
-        duration: duration && parseInt(duration, 10),
-        period
-      };
-      if (validRentalPricing(newRentalPrice)) {
-        console.log(newRentalPrice);
-        dispatch(upsertRentalPrice(newRentalPrice));
-      }
-    }
-    if (props.type === "Buy" && priceEntered) {
-      const newBuyPrice = { price };
-      if (validBuyPricing(newBuyPrice)) dispatch(setBuyPrice(newBuyPrice));
-    }
-  }, [props.type, priceEntered, price, rentalPeriod, dispatch]);
+    if (props.autoFocusOnMount) priceRef.current?.focus();
+  }, [props.autoFocusOnMount]);
+
+  useEffect(() => {
+    if (prevPriceEntered.current) priceRef.current?.focus();
+    prevPriceEntered.current = priceEntered;
+  }, [priceEntered]);
 
   function handleKeyDown(
-    event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
-    fieldName: "Price" | "Period"
+    event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
     if (event.key === "Enter" || event.key === "Tab") {
-      handleConditionalEnter(fieldName);
+      if (validPrice(price)) setPriceEntered(true);
     }
   }
 
@@ -253,179 +335,158 @@ export function FilloutPriceButton(props: FilloutPriceButtonProps) {
       <Grid component={motion.div} item xs={12}>
         <ClickAwayListener
           onClickAway={() => {
-            handleConditionalEnter("Price");
+            if (validPrice(price)) setPriceEntered(true);
           }}
         >
-          <StyledFilloutPriceButton
-            variant={props.type === "Rent" ? "secondary" : "primary"}
-          >
-            <StyledFilloutPriceButtonLabel
-              variant={props.type === "Rent" ? "secondary" : "primary"}
-            >
-              {props.type === "Rent" ? (
-                <>
-                  <Typography variant="body1">
-                    <b>Rent for $</b>
-                  </Typography>
-                  {!priceEntered ? (
-                    <BaseForm.AFBaseFormField
-                      inputRef={priceRef}
-                      style={{
-                        width: 114,
-                        fontSize: 18,
-                        padding: 4,
-                        paddingLeft: 8,
-                        paddingRight: 8,
-                        height: "inherit"
-                      }}
-                      inputProps={{
-                        min: 0,
-                        value: price === null ? undefined : price,
-                        max: 15000,
-                        onKeyDown: event => handleKeyDown(event, "Price"),
-                        type: "number",
-                        placeholder: "Set Price"
-                      }}
-                      onChange={event =>
-                        setPrice(parseInt(event.target.value as string, 10))
-                      }
-                    />
-                  ) : (
-                    <BlackTooltip title="Click to change price" placement="top">
-                      <Typography
-                        onClick={() => {
-                          setPriceEntered(false);
-                        }}
-                        variant="body1"
-                        style={{ cursor: "pointer" }}
-                      >
-                        <b>{price}</b>
-                      </Typography>
-                    </BlackTooltip>
-                  )}
-                  <Typography
-                    variant="body1"
-                    style={{
-                      fontWeight: 400
-                    }}
-                  >
-                    <b>&nbsp;Per&nbsp;</b>
-                  </Typography>
-                  <BlackTooltip
-                    title="Click to change rental period"
-                    placement="top"
-                    open={showPeriodTooltip}
-                    onClose={handlePeriodTooltipClose}
-                    onOpen={handlePeriodTooltipOpen}
-                  >
-                    <motion.div
-                      style={{
-                        backgroundColor: "white",
-                        boxShadow: "0 1px 4px 0 rgb(34 34 34 / 10%) inset",
-                        borderColor: "rgba(34, 34, 34, 0.15)",
-                        borderStyle: "solid",
-                        borderWidth: "1px",
-                        borderRadius: "6px",
-                        color: "darkGrey"
-                      }}
-                      animate={
-                        rentalPeriod &&
-                        ({
-                          backgroundColor: (theme as any).palette.secondary
-                            .main,
-                          padding: 0,
-                          borderStyle: "none",
-                          borderRadius: "0px",
-                          borderWidth: "0px",
-                          boxShadow: "none"
-                        } as any)
-                      }
-                    >
-                      <DropdownSelection
-                        defaultLabel="Set Period"
-                        menuItems={[...inputRentalPeriodOptions]}
-                        onClick={itemNumber => {
-                          const newRentalPeriod =
-                            itemNumber !== null
-                              ? inputRentalPeriodOptions[itemNumber]
-                              : null;
-                          setRentalPeriod(newRentalPeriod);
-                          // setPeriodEntered(true);
-                        }}
-                        buttonProps={{
-                          style: rentalPeriod
-                            ? {
-                                fontSize: theme.typography.body1.fontSize,
-                                fontWeight: 1000,
-                                padding: 0,
-                                color: "#000000",
-                                alignItems: "none",
-                                justifyContent: "start"
-                              }
-                            : {
-                                fontWeight: 400,
-                                color: "darkGrey",
-                                justifyContent: "start",
-                                width: 120,
-                                fontSize: 18,
-                                padding: 4,
-                                paddingLeft: 8,
-                                paddingRight: 8,
-                                height: "inherit",
-                                textTransform: "capitalize"
-                              }
-                        }}
-                      />
-                    </motion.div>
-                  </BlackTooltip>
-                </>
+          <StyledFilloutPriceButton variant="secondary">
+            <StyledFilloutPriceButtonLabel variant="secondary">
+              <Typography variant="body1">
+                <b>Rent for $</b>
+              </Typography>
+              {!priceEntered ? (
+                <BaseForm.AFBaseFormField
+                  inputRef={priceRef}
+                  style={{
+                    width: 114,
+                    fontSize: 18,
+                    padding: 4,
+                    paddingLeft: 8,
+                    paddingRight: 8,
+                    height: "inherit"
+                  }}
+                  inputProps={{
+                    min: 0,
+                    // value: price === null ? undefined : price,
+                    max: 15000,
+                    onKeyDown: handleKeyDown,
+                    type: "number",
+                    placeholder: "Set Price"
+                  }}
+                  onChange={event => {
+                    const inputPrice = parseInt(
+                      event.target.value as string,
+                      10
+                    );
+                    if (typeof props.id === "string") {
+                      dispatch(
+                        upsertRentalPrice({
+                          rentalPriceId: props.id,
+                          price: !Number.isNaN(inputPrice)
+                            ? inputPrice
+                            : undefined
+                        })
+                      );
+                    }
+                  }}
+                />
               ) : (
-                <>
-                  <Typography variant="body1">
-                    <b>Buy for $</b>
+                <BlackTooltip title="Click to change price" placement="top">
+                  <Typography
+                    onClick={() => {
+                      dispatch(
+                        upsertRentalPrice({
+                          rentalPriceId: props.id,
+                          price: undefined
+                        })
+                      );
+                      setPriceEntered(false);
+                    }}
+                    variant="body1"
+                    style={{ cursor: "pointer" }}
+                  >
+                    {/* Notice I cast rentalPricing as RentalPricing 
+                        as priceEntered === true implies that rentalPricing 
+                        is type RentalPricing and I want errors to show if 
+                        that is not true. I'll probably remove 
+                        this in production.
+                    */}
+                    <b>{price}</b>
                   </Typography>
-                  {!priceEntered ? (
-                    <>
-                      <BaseForm.AFBaseFormField
-                        inputRef={priceRef}
-                        style={{
-                          width: 114,
-                          fontSize: 18,
-                          padding: 4,
-                          paddingLeft: 8,
-                          paddingRight: 8,
-                          height: "inherit"
-                        }}
-                        inputProps={{
-                          min: 0,
-                          value: price === null ? undefined : price,
-                          max: 15000,
-                          onKeyDown: event => handleKeyDown(event, "Price"),
-                          type: "number",
-                          placeholder: "Set Price"
-                        }}
-                        onChange={event =>
-                          setPrice(parseInt(event.target.value as string, 10))
-                        }
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <BlackTooltip title="Click to change price">
-                        <Typography
-                          onClick={() => {
-                            setPriceEntered(false);
-                          }}
-                          variant="body1"
-                          style={{ cursor: "pointer" }}
-                        >
-                          <b>{price}</b>
-                        </Typography>
-                      </BlackTooltip>
-                    </>
-                  )}
-                </>
+                </BlackTooltip>
               )}
+              <Typography
+                variant="body1"
+                style={{
+                  fontWeight: 400
+                }}
+              >
+                <b>&nbsp;Per&nbsp;</b>
+              </Typography>
+              <BlackTooltip
+                title="Click to change rental period"
+                placement="top"
+                open={showPeriodTooltip}
+                onClose={handlePeriodTooltipClose}
+                onOpen={handlePeriodTooltipOpen}
+                enterDelay={50}
+              >
+                <motion.div
+                  style={{
+                    backgroundColor: "white",
+                    boxShadow: "0 1px 4px 0 rgb(34 34 34 / 10%) inset",
+                    borderColor: "rgba(34, 34, 34, 0.15)",
+                    borderStyle: "solid",
+                    borderWidth: "1px",
+                    borderRadius: "6px"
+                  }}
+                  animate={
+                    duration &&
+                    ({
+                      backgroundColor: (theme as any).palette.secondary.main,
+                      padding: 0,
+                      borderStyle: "none",
+                      borderRadius: "0px",
+                      borderWidth: "0px",
+                      boxShadow: "none"
+                    } as any)
+                  }
+                >
+                  <DropdownSelection
+                    defaultLabel="Set Period"
+                    menuItems={[...inputRentalPeriodOptions]}
+                    onClick={itemNumber => {
+                      const newRentalPeriod =
+                        itemNumber !== null
+                          ? inputRentalPeriodOptions[itemNumber]
+                          : null;
+                      if (typeof props.id === "string") {
+                        dispatch(
+                          upsertRentalPrice({
+                            rentalPriceId: props.id,
+                            period: newRentalPeriod?.split(" ")[1] as any,
+                            duration: newRentalPeriod?.split(" ")[0] as any
+                          })
+                        );
+                      }
+                      // setRentalPeriod(newRentalPeriod);
+                      // setPeriodEntered(true);
+                    }}
+                    buttonProps={{
+                      style: duration
+                        ? {
+                            fontSize: theme.typography.body1.fontSize,
+                            fontWeight: 1000,
+                            padding: 0,
+                            color: "#000000",
+                            alignItems: "none",
+                            justifyContent: "start"
+                          }
+                        : {
+                            fontWeight: 400,
+                            color: "darkGrey",
+                            justifyContent: "center",
+                            width: 120,
+                            fontSize: 18,
+                            padding: 4,
+                            paddingLeft: 8,
+                            paddingRight: 8,
+                            height: "inherit",
+                            textTransform: "capitalize"
+                          }
+                    }}
+                  />
+                </motion.div>
+              </BlackTooltip>
             </StyledFilloutPriceButtonLabel>
           </StyledFilloutPriceButton>
         </ClickAwayListener>
@@ -573,10 +634,21 @@ export function InputPricing() {
   return (
     <Grid container direction="column" spacing={2}>
       <Grid item>
-        <FilloutPriceButton autoFocusOnMount={true} type="Rent" />
+        <FilloutRentalPricingButton
+          key={"1"}
+          id={"1"}
+          autoFocusOnMount={true}
+        />
       </Grid>
       <Grid item>
         <FilloutPriceButton type="Buy" />
+      </Grid>
+      <Grid item>
+        <FilloutRentalPricingButton
+          key={"1"}
+          id={"2"}
+          autoFocusOnMount={true}
+        />
       </Grid>
     </Grid>
   );

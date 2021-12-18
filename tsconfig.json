@@ -19,7 +19,8 @@
       "@components/*": ["components/*"],
       "@styles/*": ["styles/*"],
       "@public/*": ["public/*"],
-      "@utils/*": ["utils/*"]
+      "@utils/*": ["utils/*"],
+      "@redux-store/*": ["redux-store/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.jsx", "**/*.js"],
