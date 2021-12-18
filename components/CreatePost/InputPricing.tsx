@@ -44,8 +44,10 @@ import {
 } from "./Pricing/rentalPricingsSlice";
 
 import * as PriceButtonStyles from "./Pricing/Pricing.styled";
-import { InputRentalPriceButton } from "./Pricing/RentalPriceButtons";
-import { InputBuyPriceButton } from "./Pricing/BuyPriceButtons";
+import {
+  InputRentalPriceButton,
+  InputBuyPriceButton
+} from "./Pricing/PriceButtons";
 
 const inputRentalPeriodOptions = [
   "1 Month",

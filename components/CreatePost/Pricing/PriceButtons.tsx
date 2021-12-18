@@ -16,26 +16,43 @@ import {
   upsertRentalPrice
 } from "./rentalPricingsSlice";
 
-const inputRentalPeriodOptions = [
-  "1 Month",
-  "3 Months",
-  "6 Months",
-  "9 Months",
-  "1 Year"
-] as const;
-
+export function PriceButtonWrapper(props: {
+  variant: "primary" | "secondary";
+  children: React.ReactNode;
+}) {
+  return (
+    <Grid container justifyContent="space-between">
+      <Grid component={motion.div} item xs={12}>
+        <PriceButtonStyles.Button variant={props.variant}>
+          <PriceButtonStyles.ButtonLabel variant={props.variant}>
+            {props.children}
+          </PriceButtonStyles.ButtonLabel>
+        </PriceButtonStyles.Button>
+      </Grid>
+    </Grid>
+  );
+}
 // type InputRentalPeriod = typeof inputRentalPeriodOptions[number];
 
+export function PriceButtonText(props: { text: string }) {
+  return (
+    <Typography variant="body1">
+      <b>{props.text}</b>
+    </Typography>
+  );
+}
+
 function InputPriceField(props: {
-  id: string;
   price: number | undefined;
-  priceEntered: boolean;
-  setPriceEntered: (entered: boolean) => void;
+  onPriceChange: (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
+  onClickToChangePrice: () => void;
   autoFocusOnMount?: boolean;
 }) {
+  const [priceEntered, setPriceEntered] = useState(false);
   const priceInputRef = useRef<HTMLInputElement>(null);
   const prevPriceEntered = useRef<boolean>(false);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (props.autoFocusOnMount) priceInputRef.current?.focus();
@@ -43,73 +60,55 @@ function InputPriceField(props: {
 
   useEffect(() => {
     if (prevPriceEntered.current) priceInputRef.current?.focus();
-    prevPriceEntered.current = props.priceEntered;
-  }, [props.priceEntered]);
+    prevPriceEntered.current = priceEntered;
+  }, [priceEntered]);
 
-  function onPriceChange(
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) {
-    const inputPrice = parseInt(event.target.value as string, 10);
-    if (typeof props.id === "string") {
-      dispatch(
-        upsertRentalPrice({
-          rentalPriceId: props.id,
-          price: !Number.isNaN(inputPrice) ? inputPrice : undefined
-        })
-      );
-    }
-  }
   function handleKeyDown(
     event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
     if (event.key === "Enter" || event.key === "Tab") {
-      if (validPrice(props.price)) props.setPriceEntered(true);
+      if (validPrice(props.price)) setPriceEntered(true);
     }
+  }
+
+  function onClickAway() {
+    if (validPrice(props.price)) setPriceEntered(true);
   }
 
   return (
     <>
-      {!props.priceEntered ? (
-        <BaseForm.AFBaseFormField
-          inputRef={priceInputRef}
-          style={{
-            width: 114,
-            fontSize: 18,
-            padding: 4,
-            paddingLeft: 8,
-            paddingRight: 8,
-            height: "inherit"
-          }}
-          inputProps={{
-            min: 0,
-            max: 15000,
-            onKeyDown: handleKeyDown,
-            type: "number",
-            placeholder: "Set Price"
-          }}
-          onChange={onPriceChange}
-        />
+      {!priceEntered ? (
+        <ClickAwayListener onClickAway={onClickAway}>
+          <BaseForm.AFBaseFormField
+            inputRef={priceInputRef}
+            style={{
+              width: 114,
+              fontSize: 18,
+              padding: 4,
+              paddingLeft: 8,
+              paddingRight: 8,
+              height: "inherit"
+            }}
+            inputProps={{
+              min: 0,
+              max: 15000,
+              onKeyDown: handleKeyDown,
+              type: "number",
+              placeholder: "Set Price"
+            }}
+            onChange={props.onPriceChange}
+          />
+        </ClickAwayListener>
       ) : (
         <BlackTooltip title="Click to change price" placement="top">
           <Typography
             onClick={() => {
-              dispatch(
-                upsertRentalPrice({
-                  rentalPriceId: props.id,
-                  price: undefined
-                })
-              );
-              props.setPriceEntered(false);
+              props.onClickToChangePrice();
+              setPriceEntered(false);
             }}
             variant="body1"
             style={{ cursor: "pointer" }}
           >
-            {/* Notice I cast rentalPricing as RentalPricing 
-                        as priceEntered === true implies that rentalPricing 
-                        is type RentalPricing and I want errors to show if 
-                        that is not true. I'll probably remove 
-                        this in production.
-                    */}
             <b>{props.price}</b>
           </Typography>
         </BlackTooltip>
@@ -117,6 +116,14 @@ function InputPriceField(props: {
     </>
   );
 }
+
+const inputRentalPeriodOptions = [
+  "1 Month",
+  "3 Months",
+  "6 Months",
+  "9 Months",
+  "1 Year"
+] as const;
 
 function InputRentalPeriod(props: {
   id: string;
@@ -217,83 +224,83 @@ function InputRentalPeriod(props: {
   );
 }
 
-interface InputRentalPriceButtonProps {
-  id: string;
+interface InputPriceButtonProps {
   autoFocusOnMount?: boolean;
 }
-
+interface InputRentalPriceButtonProps extends InputPriceButtonProps {
+  id: string;
+}
+type InputBuyPriceButtonProps = InputPriceButtonProps;
 export function InputRentalPriceButton(props: InputRentalPriceButtonProps) {
-  const [priceEntered, setPriceEntered] = useState<boolean>(false);
   const { price, duration } =
     useSelector((state: RootState) =>
       selectRentalPricingById(state, props.id)
     ) || {};
+  const dispatch = useDispatch();
 
+  function onPriceChange(
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) {
+    const inputPrice = parseInt(event.target.value as string, 10);
+    if (typeof props.id === "string") {
+      dispatch(
+        upsertRentalPrice({
+          rentalPriceId: props.id,
+          price: !Number.isNaN(inputPrice) ? inputPrice : undefined
+        })
+      );
+    }
+  }
+
+  function onClickToChangePrice() {
+    dispatch(
+      upsertRentalPrice({
+        rentalPriceId: props.id,
+        price: undefined
+      })
+    );
+  }
   return (
-    <Grid container justifyContent="space-between">
-      <Grid component={motion.div} item xs={12}>
-        <ClickAwayListener
-          onClickAway={() => {
-            if (validPrice(price)) setPriceEntered(true);
-          }}
-        >
-          <PriceButtonStyles.Button variant="secondary">
-            <PriceButtonStyles.ButtonLabel variant="secondary">
-              <Typography variant="body1">
-                <b>Rent for $</b>
-              </Typography>
-              <InputPriceField
-                id={props.id}
-                price={price}
-                priceEntered={priceEntered}
-                setPriceEntered={setPriceEntered}
-                autoFocusOnMount={props.autoFocusOnMount}
-              />
-              <Typography
-                variant="body1"
-                style={{
-                  fontWeight: 400
-                }}
-              >
-                <b>&nbsp;Per&nbsp;</b>
-              </Typography>
-              <InputRentalPeriod id={props.id} duration={duration} />
-            </PriceButtonStyles.ButtonLabel>
-          </PriceButtonStyles.Button>
-        </ClickAwayListener>
-      </Grid>
-    </Grid>
+    <PriceButtonWrapper variant="secondary">
+      <PriceButtonText text="Rent for $" />
+      <InputPriceField
+        price={price}
+        onPriceChange={onPriceChange}
+        onClickToChangePrice={() => {}}
+        autoFocusOnMount={props.autoFocusOnMount}
+      />
+      <PriceButtonText text="&nbsp;Per&nbsp;" />
+      <InputRentalPeriod id={props.id} duration={duration} />
+    </PriceButtonWrapper>
   );
 }
 
-interface InputBuyPriceButtonProps {
-  autoFocusOnMount?: boolean;
-}
 export function InputBuyPriceButton(props: InputBuyPriceButtonProps) {
-  const [priceEntered, setPriceEntered] = useState<boolean>(false);
-  const priceInputRef = useRef<HTMLInputElement>(null);
-  const prevPriceEntered = useRef<boolean>(false);
-
   const dispatch = useDispatch();
   const { price } = useSelector(selectBuyPrice);
 
+  function onPriceChange(
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) {
+    const inputPrice = parseInt(event.target.value as string, 10);
+    dispatch(
+      setBuyPrice({
+        price: !Number.isNaN(inputPrice) ? inputPrice : undefined
+      })
+    );
+  }
+  function onClickToChangePrice() {
+    dispatch(setBuyPrice);
+  }
   return (
-    <Grid container justifyContent="space-between">
-      <Grid component={motion.div} item xs={12}>
-        <ClickAwayListener
-          onClickAway={() => {
-            /// handleConditionalEnter("Price");
-          }}
-        >
-          <PriceButtonStyles.Button variant="primary">
-            <PriceButtonStyles.ButtonLabel variant="primary">
-              <Typography variant="body1">
-                <b>Buy for $</b>
-              </Typography>
-            </PriceButtonStyles.ButtonLabel>
-          </PriceButtonStyles.Button>
-        </ClickAwayListener>
-      </Grid>
-    </Grid>
+    <PriceButtonWrapper variant="primary">
+      <PriceButtonText text="Buy for $" />
+      <InputPriceField
+        price={price}
+        onPriceChange={onPriceChange}
+        onClickToChangePrice={() => {}}
+        autoFocusOnMount={props.autoFocusOnMount}
+      ></InputPriceField>
+    </PriceButtonWrapper>
   );
 }
