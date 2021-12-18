@@ -30,6 +30,7 @@ import { DropdownSelection } from "@components/Dropdowns";
 import * as BaseForm from "@components/Library/FormField/BaseFormField.styled";
 import CustomAutocomplete from "@components/CustomAutocomplete";
 import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@redux-store/store";
 import { setBuyPrice, selectBuyPrice } from "./Pricing/buyPricingSlice";
 import {
   RentalPricing,
@@ -41,7 +42,10 @@ import {
   selectRentalPricingById,
   upsertRentalPrice
 } from "./Pricing/rentalPricingsSlice";
-import { RootState } from "@redux-store/store";
+
+import * as PriceButtonStyles from "./Pricing/Pricing.styled";
+import { InputRentalPriceButton } from "./Pricing/RentalPriceButtons";
+import { InputBuyPriceButton } from "./Pricing/BuyPriceButtons";
 
 const inputRentalPeriodOptions = [
   "1 Month",
@@ -52,119 +56,6 @@ const inputRentalPeriodOptions = [
 ] as const;
 
 type InputRentalPeriod = typeof inputRentalPeriodOptions[number];
-
-const StyledFilloutPriceButton = styled.div<{
-  variant: "primary" | "secondary";
-}>`
-  display: inline-flex;
-  align-items: center;
-  appearance: none;
-  background-color: ${props =>
-    props.variant === "primary"
-      ? props.theme.palette.primary.main
-      : props.theme.palette.secondary.main};
-  border-bottom-color: rgb(255, 255, 255);
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-  border-bottom-style: none;
-  border-bottom-width: 0px;
-  border-image-outset: 0;
-  border-image-repeat: stretch;
-  border-image-slice: 100%;
-  border-image-source: none;
-  border-image-width: 1;
-  border-left-color: rgb(255, 255, 255);
-  border-left-style: none;
-  border-left-width: 0px;
-  border-right-color: rgb(255, 255, 255);
-  border-right-style: none;
-  border-right-width: 0px;
-  border-top-color: rgb(255, 255, 255);
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  border-top-style: none;
-  border-top-width: 0px;
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 1px -2px,
-    rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
-  box-sizing: border-box;
-  color: rgb(255, 255, 255);
-  display: inline-flex;
-  font-family: Roboto, Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  font-stretch: 100%;
-  font-style: normal;
-  font-variant-caps: normal;
-  font-variant-east-asian: normal;
-  font-variant-ligatures: normal;
-  font-variant-numeric: normal;
-  font-weight: 500;
-  min-height: 36px;
-  justify-content: flex-start;
-  letter-spacing: 0.39998px;
-  line-height: 24.5px;
-  margin-bottom: 0px;
-  margin-left: 0px;
-  margin-right: 0px;
-  margin-top: 0px;
-  min-width: 64px;
-  outline-color: rgb(255, 255, 255);
-  outline-style: none;
-  outline-width: 0px;
-  padding-bottom: 6px;
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-top: 6px;
-  position: relative;
-  text-align: center;
-  text-decoration-color: rgb(255, 255, 255);
-  text-decoration-line: none;
-  text-decoration-style: solid;
-  text-decoration-thickness: auto;
-  text-indent: 0px;
-  text-rendering: auto;
-  text-shadow: none;
-  text-transfor: muppercase;
-  user-select: none;
-  vertical-align: middle;
-  word-spacing: 0px;
-  writing-mode: horizontal-tb;
-  -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  -webkit-border-image: none;
-`;
-
-const StyledFilloutPriceButtonLabel = styled.span<{
-  variant: "primary" | "secondary";
-}>`
-  padding: 4px;
-  align-items: center;
-  color: ${props => (props.variant === "primary" ? "#FFFFFF" : "#000000")};
-  display: flex;
-  font-family: Roboto, Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  font-stretch: 100%;
-  font-style: normal;
-  font-variant-caps: normal;
-  font-variant-east-asian: normal;
-  font-variant-ligatures: normal;
-  font-variant-numeric: normal;
-  font-weight: 500;
-  min-height: 24px;
-  justify-content: center;
-  letter-spacing: 0.39998px;
-  line-height: 24.5px;
-  text-align: center;
-  text-decoration-thickness: auto;
-  text-indent: 0px;
-  text-rendering: auto;
-  text-shadow: none;
-  text-transform: uppercase;
-  user-select: none;
-  word-spacing: 0px;
-  writing-mode: horizontal-tb;
-  -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-`;
 
 interface FilloutPriceButtonProps {
   type: "Rent" | "Buy";
@@ -215,8 +106,8 @@ export function FilloutPriceButton(props: FilloutPriceButtonProps) {
             /// handleConditionalEnter("Price");
           }}
         >
-          <StyledFilloutPriceButton variant="primary">
-            <StyledFilloutPriceButtonLabel variant="primary">
+          <PriceButtonStyles.Button variant="primary">
+            <PriceButtonStyles.ButtonLabel variant="primary">
               <Typography variant="body1">
                 <b>Buy for $</b>
               </Typography>
@@ -275,8 +166,8 @@ export function FilloutPriceButton(props: FilloutPriceButtonProps) {
                   </BlackTooltip>
                 </>
               )}
-            </StyledFilloutPriceButtonLabel>
-          </StyledFilloutPriceButton>
+            </PriceButtonStyles.ButtonLabel>
+          </PriceButtonStyles.Button>
         </ClickAwayListener>
       </Grid>
     </Grid>
@@ -338,8 +229,8 @@ function FilloutRentalPricingButton(props: FilloutRentalPricingButtonProps) {
             if (validPrice(price)) setPriceEntered(true);
           }}
         >
-          <StyledFilloutPriceButton variant="secondary">
-            <StyledFilloutPriceButtonLabel variant="secondary">
+          <PriceButtonStyles.Button variant="secondary">
+            <PriceButtonStyles.ButtonLabel variant="secondary">
               <Typography variant="body1">
                 <b>Rent for $</b>
               </Typography>
@@ -487,8 +378,8 @@ function FilloutRentalPricingButton(props: FilloutRentalPricingButtonProps) {
                   />
                 </motion.div>
               </BlackTooltip>
-            </StyledFilloutPriceButtonLabel>
-          </StyledFilloutPriceButton>
+            </PriceButtonStyles.ButtonLabel>
+          </PriceButtonStyles.Button>
         </ClickAwayListener>
       </Grid>
     </Grid>
@@ -641,14 +532,10 @@ export function InputPricing() {
         />
       </Grid>
       <Grid item>
-        <FilloutPriceButton type="Buy" />
+        <InputBuyPriceButton type="Buy" />
       </Grid>
       <Grid item>
-        <FilloutRentalPricingButton
-          key={"1"}
-          id={"2"}
-          autoFocusOnMount={true}
-        />
+        <InputRentalPriceButton key={"1"} id={"2"} autoFocusOnMount={true} />
       </Grid>
     </Grid>
   );

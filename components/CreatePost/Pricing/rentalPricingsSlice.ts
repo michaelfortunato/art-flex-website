@@ -28,13 +28,9 @@ export const rentalPricingSlice = createSlice({
         ...action.payload,
         error: undefined
       };
-      console.log("ehr;eklwjr;lkj");
-      console.log(stagedRentalPricing);
-      console.log("ehr;eklwjr;lkj");
       const error = !validRentalPricing(stagedRentalPricing)
         ? "Invalid/incomplete rental pricing configuration."
         : undefined;
-      console.log(action.payload);
       rentalPricingAdapter.upsertOne(state, {
         ...action.payload,
         error
