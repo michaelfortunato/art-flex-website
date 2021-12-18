@@ -124,7 +124,7 @@ const inputRentalPeriodOptions = [
   "9 Months",
   "1 Year"
 ] as const;
-
+// type InputRentalPeriodOp = typeof inputRentalPeriodOptions[number];
 function InputRentalPeriod(props: {
   id: string;
   duration: number | undefined;
@@ -252,14 +252,14 @@ export function InputRentalPriceButton(props: InputRentalPriceButtonProps) {
     }
   }
 
-  function onClickToChangePrice() {
-    dispatch(
-      upsertRentalPrice({
-        rentalPriceId: props.id,
-        price: undefined
-      })
-    );
-  }
+  // function onClickToChangePrice() {
+  // dispatch(
+  // upsertRentalPrice({
+  // rentalPriceId: props.id,
+  // price: undefined
+  // })
+  // );
+  // }
   return (
     <PriceButtonWrapper variant="secondary">
       <PriceButtonText text="Rent for $" />
@@ -289,9 +289,9 @@ export function InputBuyPriceButton(props: InputBuyPriceButtonProps) {
       })
     );
   }
-  function onClickToChangePrice() {
-    dispatch(setBuyPrice);
-  }
+  // function onClickToChangePrice() {
+  // dispatch(setBuyPrice);
+  // }
   return (
     <PriceButtonWrapper variant="primary">
       <PriceButtonText text="Buy for $" />

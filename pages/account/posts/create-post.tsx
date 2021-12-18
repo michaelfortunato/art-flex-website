@@ -403,7 +403,7 @@ export default function CreatePost() {
                 ref={inputContainerRef}
                 item
                 xs="auto"
-                key="input"
+                key="configure"
               ></Grid>
             </AnimateSharedLayout>
           </Grid>
