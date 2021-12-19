@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { Grid } from "@material-ui/core";
+import { Grid, TextField } from "@material-ui/core";
 import { Cancel } from "@material-ui/icons";
 import { IconButton } from "@material-ui/core";
 import { motion, AnimatePresence } from "framer-motion";
@@ -109,40 +109,12 @@ export function InputTag(props: InputTagProps) {
 
 export function ConfigureTags() {
   return (
-    <Grid container direction="column">
-      <Grid item xs="auto">
-        <Autocomplete
-          multiple
-          options={Object.keys(TagLabels)}
-          renderTags={(value: readonly string[], getTagProps) => {
-            console.log(value);
-            return value.map((option: string, index: number) => {
-              console.log(option);
-              console.log(getTagProps({ index }));
-              return (
-                <InputTag
-                  key={index}
-                  label={option}
-                  variant="period"
-                  {...getTagProps({ index })}
-                />
-              );
-            });
-          }}
-          filterSelectedOptions
-          renderInput={params => {
-            console.log(params);
-            return (
-              <div ref={params.InputProps.ref}>
-                <AFBaseFormField
-                  placeholder="Add tags to your artwork"
-                  {...params.inputProps}
-                />
-              </div>
-            );
-          }}
-        />
-      </Grid>
+    <Grid container direction="row">
+      {Object.keys(TagLabels).map(option => (
+        <Grid item xs={12}>
+          <InputTag key={option} label={option} variant="period" />
+        </Grid>
+      ))}
     </Grid>
   );
 }
