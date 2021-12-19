@@ -1,3 +1,6 @@
+import { Grid, Paper, Typography, Divider } from "@material-ui/core";
+import * as S from "./Post.styled";
+
 export interface RentalPricing {
   period: "Month" | "Months" | "Year" | "Years";
   duration: number;
@@ -79,4 +82,61 @@ export function validDescription(description: string) {
         error: `Description is must be fewer than ${DESCRIPTION_MAX_LEN} character`
       }
     : {};
+}
+
+interface PostWrapperProps {
+  Image: React.ReactNode;
+  artistName: string;
+  Title: React.ReactNode;
+  Tags: React.ReactNode;
+  Description: React.ReactNode;
+  Pricing: React.ReactNode;
+}
+
+function PostWrapper(props: PostWrapperProps) {
+  return (
+    <Paper
+      elevation={3}
+      style={{
+        padding: 60,
+        borderRadius: 10,
+        display: "inline-block"
+      }}
+    >
+      <div>
+        <Grid container justifyContent="center">
+          <Grid item xs="auto">
+            <div
+              style={{
+                display: "inline-block",
+                height: 440,
+                width: 400,
+                marginBottom: 20
+              }}
+            >
+              {props.Image}
+            </div>
+          </Grid>
+        </Grid>
+        <Divider style={{ height: 1, marginBottom: 20, marginTop: 10 }} />
+        <div>
+          <Typography variant="h5">{props.artistName}</Typography>
+        </div>
+        <S.InputContainer>{props.Title}</S.InputContainer>
+        <S.InputContainer style={{ borderBottomStyle: "none" }}>
+          {props.Tags}
+        </S.InputContainer>
+        <S.InputContainer style={{ maxHeight: 200, overflowY: "auto" }}>
+          {props.Description}
+        </S.InputContainer>
+        <S.InputContainer
+          style={{
+            borderBottomStyle: "none"
+          }}
+        >
+          {props.Pricing}
+        </S.InputContainer>
+      </div>
+    </Paper>
+  );
 }

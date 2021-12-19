@@ -2,7 +2,7 @@ import Store from "@components/Store/Store";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { ReactElement, useEffect } from "react";
-import { signIn } from "redux-store/features/account/accountSlice";
+// import { signIn } from "redux-store/features/account/accountSlice";
 import styled from "styled-components";
 import Appbar from "@components/Appbar/Appbar";
 
@@ -13,10 +13,11 @@ const Container = styled.div`
 `;
 
 export default function HomePage() {
+  /*
   const dispatch = useDispatch();
   useEffect(() => {
     axios
-      .post("/refresh_session")
+      .post("/refresh-session")
       .then(({ data }) =>
         dispatch(signIn({ name: data.name, email: data.email }))
       )
@@ -24,7 +25,7 @@ export default function HomePage() {
         console.log(error);
       });
   }, []);
-
+*/
   return <Store />;
 }
 

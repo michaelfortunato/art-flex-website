@@ -37,6 +37,7 @@ import {
   ConfigurablePriceTable,
   InputPricing
 } from "@components/CreatePost/InputPricing";
+import { InputTag } from "@components/CreatePost/Tags/Tags";
 
 const MAX_IMAGES = 5;
 const MAX_RENTAL_PRICES = 2;
@@ -177,7 +178,7 @@ function PostImages(props: {
   );
 }
 
-const TagValues = {
+const TagLabels = {
   // Periods
   Modernism: {
     variant: "period"
@@ -303,7 +304,10 @@ function Post(props: {
           <InputTitle setTitle={setTitle} />
         </S.InputContainer>
         <S.InputContainer style={{ borderBottomStyle: "none" }}>
-          <EmptyTags />
+          <InputTag
+            variant={TagLabels.Modernism.variant as "social"}
+            label="Modernism"
+          />
         </S.InputContainer>
         <S.InputContainer style={{ maxHeight: 200, overflowY: "auto" }}>
           <InputDescription setDescription={setDescription} />
