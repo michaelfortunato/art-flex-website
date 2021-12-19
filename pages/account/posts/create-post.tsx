@@ -37,7 +37,7 @@ import {
   ConfigurablePriceTable,
   InputPricing
 } from "@components/CreatePost/InputPricing";
-import { InputTag } from "@components/CreatePost/Tags/Tags";
+import { ConfigureTags, InputTag } from "@components/CreatePost/Tags/Tags";
 
 const MAX_IMAGES = 5;
 const MAX_RENTAL_PRICES = 2;
@@ -304,10 +304,7 @@ function Post(props: {
           <InputTitle setTitle={setTitle} />
         </S.InputContainer>
         <S.InputContainer style={{ borderBottomStyle: "none" }}>
-          <InputTag
-            variant={TagLabels.Modernism.variant as "social"}
-            label="Modernism"
-          />
+          <ConfigureTags />
         </S.InputContainer>
         <S.InputContainer style={{ maxHeight: 200, overflowY: "auto" }}>
           <InputDescription setDescription={setDescription} />

@@ -1,23 +1,25 @@
 import { useState } from "react";
 import styled from "styled-components";
+import { Grid } from "@material-ui/core";
 import { Cancel } from "@material-ui/icons";
 import { IconButton } from "@material-ui/core";
 import { motion, AnimatePresence } from "framer-motion";
+import CustomAutocomplete from "@components/CustomAutocomplete";
+import { AFBaseFormField } from "@components/Library/FormField/BaseFormField.styled";
+import { Autocomplete } from "@material-ui/lab";
 
 type TagVariant = "period" | "social" | "prominence";
 
-export const Tag = styled.span<{
+export const TagContainer = styled(Grid)<{
   variant?: TagVariant;
   customBackgroundColor?: string;
   customColor?: string;
 }>`
-  display: inline-block;
-  margin: 4px;
-  padding: 5px;
-  padding-left: 10px;
-  padding-right: 10px;
   border-radius: 20px;
   opacity: 0.8;
+  padding: 5px;
+  padding-left: 15px;
+  padding-right: 10px;
   background-color: ${props =>
     props.variant
       ? props.theme.tag[props.variant].backgroundColor
@@ -26,14 +28,6 @@ export const Tag = styled.span<{
     props.variant
       ? props.theme.tag[props.variant].textColor
       : props.customColor};
-`;
-
-const CancelTagIcon = styled(motion.span)`
-  position: absolute;
-  top: 0%;
-  right: 0%;
-  transform-origin: center;
-  transform: translate(50%, -50%);
 `;
 
 const TagLabels = {
@@ -66,6 +60,31 @@ const TagLabels = {
   }
 };
 
+export function Tag(props: {
+  label: string;
+  variant: TagVariant;
+  children: React.ReactNode;
+}) {
+  return (
+    <TagContainer
+      container
+      justifyContent="space-between"
+      alignItems="center"
+      variant={props.variant}
+      spacing={0}
+    >
+      <Grid item xs="auto">
+        {props.label}
+      </Grid>
+      {props.children && (
+        <Grid item xs="auto">
+          {props.children}
+        </Grid>
+      )}
+    </TagContainer>
+  );
+}
+
 // type TagLabel = keyof typeof TagLabels;
 
 type InputTagProps = { label: string; variant: TagVariant };
@@ -78,31 +97,52 @@ export function InputTag(props: InputTagProps) {
     if (showCancelButton) setShowCancelButton(false);
   }
   return (
-    <div
-      style={{ position: "relative", display: "inline-block" }}
-      onMouseOver={handleMouseOver}
-      onMouseOut={handleMouseOut}
-    >
-      <Tag variant={props.variant}>{props.label}</Tag>
-      <AnimatePresence>
-        {showCancelButton && (
-          <CancelTagIcon
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <IconButton size="medium">
-              <Cancel fontSize="small" />
-            </IconButton>
-          </CancelTagIcon>
-        )}
-      </AnimatePresence>
+    <div style={{ display: "inline-block" }}>
+      <Tag variant={props.variant} label={props.label}>
+        <IconButton size="small">
+          <Cancel fontSize="small" />
+        </IconButton>
+      </Tag>
     </div>
   );
 }
 
 export function ConfigureTags() {
-  <Grid container direction="column">
-    <Grid item></Grid>
-  </Grid>;
+  return (
+    <Grid container direction="column">
+      <Grid item xs="auto">
+        <Autocomplete
+          multiple
+          options={Object.keys(TagLabels)}
+          renderTags={(value: readonly string[], getTagProps) => {
+            console.log(value);
+            return value.map((option: string, index: number) => {
+              console.log(option);
+              console.log(getTagProps({ index }));
+              return (
+                <InputTag
+                  key={index}
+                  label={option}
+                  variant="period"
+                  {...getTagProps({ index })}
+                />
+              );
+            });
+          }}
+          filterSelectedOptions
+          renderInput={params => {
+            console.log(params);
+            return (
+              <div ref={params.InputProps.ref}>
+                <AFBaseFormField
+                  placeholder="Add tags to your artwork"
+                  {...params.inputProps}
+                />
+              </div>
+            );
+          }}
+        />
+      </Grid>
+    </Grid>
+  );
 }
