@@ -91,8 +91,7 @@ function DropdownTemplate(props: DropdownTemplateParams) {
           <Grow
             {...TransitionProps}
             style={{
-              transformOrigin:
-                placement === "bottom" ? "center top" : "center bottom"
+              transformOrigin: "center bottom"
             }}
           >
             <Paper>

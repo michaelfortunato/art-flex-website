@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import styled from "styled-components";
-import { Grid, TextField } from "@material-ui/core";
+import { Grid, TextField, IconButton, Chip } from "@material-ui/core";
 import { Cancel } from "@material-ui/icons";
-import { IconButton } from "@material-ui/core";
 import { motion, AnimatePresence } from "framer-motion";
 import CustomAutocomplete from "@components/CustomAutocomplete";
 import { AFBaseFormField } from "@components/Library/FormField/BaseFormField.styled";
 import { Autocomplete } from "@material-ui/lab";
+import { setTags } from "./tagsSlice";
+import { useDispatch } from "react-redux";
 
 type TagVariant = "period" | "social" | "prominence";
 
@@ -108,13 +109,39 @@ export function InputTag(props: InputTagProps) {
 }
 
 export function ConfigureTags() {
+  const dispatch = useDispatch();
   return (
-    <Grid container direction="row">
-      {Object.keys(TagLabels).map(option => (
-        <Grid item xs={12}>
-          <InputTag key={option} label={option} variant="period" />
-        </Grid>
-      ))}
-    </Grid>
+    <div>
+      <Autocomplete
+        multiple
+        options={Object.keys(TagLabels)}
+        onChange={(event: ChangeEvent<{}>, value: string[]) =>
+          dispatch(setTags({ tags: value }))
+        }
+        renderInput={params => (
+          <TextField
+            {...params}
+            style={{ maxWidth: 400 }}
+            placeholder="Tag your artwork"
+            variant="standard"
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: null
+            }}
+          />
+        )}
+        renderTags={(value, getTagProps) =>
+          value.map((label, index) => (
+            <Chip
+              key={index}
+              style={{ fontSize: 14, fontWeight: 500 }}
+              color="primary"
+              label={label}
+              {...getTagProps({ index })}
+            />
+          ))
+        }
+      />
+    </div>
   );
 }

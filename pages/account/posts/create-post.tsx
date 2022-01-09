@@ -31,7 +31,8 @@ import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
 import postPlaceHolderImg from "@public/create_post_placeholder.jpg";
 import uploadFile from "@utils/chunked-upload";
 import Dropzone from "@components/CreatePost/Dropzone";
-
+import InputTitle from "@components/CreatePost/Title/Title";
+import InputDescription from "@components/CreatePost/Description/Description";
 import * as S from "@components/CreatePost/Post.styled";
 import {
   ConfigurablePriceTable,
@@ -104,7 +105,7 @@ interface PostInterface {
   pricing: Pricing;
 }
 
-function InputTitle(props: { setTitle: any }) {
+function InputTitle2(props: { setTitle: any }) {
   return (
     <S.InputForm
       autoComplete="title"
@@ -123,7 +124,7 @@ function InputTitle(props: { setTitle: any }) {
     ></S.InputForm>
   );
 }
-function InputDescription(props: { setDescription: any }) {
+function InputDescription2(props: { setDescription: any }) {
   return (
     <S.InputForm
       fullWidth
@@ -301,13 +302,13 @@ function Post(props: {
           <Typography variant="h5">{props.accountName}</Typography>
         </div>
         <S.InputContainer>
-          <InputTitle setTitle={setTitle} />
+          <InputTitle />
         </S.InputContainer>
         <S.InputContainer style={{ borderBottomStyle: "none" }}>
           <ConfigureTags />
         </S.InputContainer>
         <S.InputContainer style={{ maxHeight: 200, overflowY: "auto" }}>
-          <InputDescription setDescription={setDescription} />
+          <InputDescription />
         </S.InputContainer>
         <S.InputContainer
           style={{
