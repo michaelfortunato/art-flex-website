@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { useSelector } from "react-redux";
 import Appbar from "@components/Appbar/Appbar";
 import {
   Button,
@@ -39,6 +40,14 @@ import {
   InputPricing
 } from "@components/CreatePost/InputPricing";
 import { ConfigureTags, InputTag } from "@components/CreatePost/Tags/Tags";
+import { selectTitle } from "@components/CreatePost/Title/titleSlice";
+import { selectDescripton } from "@components/CreatePost/Description/descriptionSlice";
+import { selectImages } from "@components/CreatePost/Images/imagesSlice";
+import { selectBuyPrice } from "@components/CreatePost/Pricing/buyPricingSlice";
+import {
+  selectAllRentalPricingIds,
+  selectAllRentalPricings
+} from "@components/CreatePost/Pricing/rentalPricingsSlice";
 
 const MAX_IMAGES = 5;
 const MAX_RENTAL_PRICES = 2;
@@ -280,8 +289,6 @@ function Post(props: {
     setImages: any;
   };
 }) {
-  const { images, pricing } = props.post;
-  const { setTitle, setDescription, setImages } = props.setPost;
   return (
     <Paper
       elevation={3}
@@ -292,11 +299,7 @@ function Post(props: {
       }}
     >
       <div>
-        <PostImages
-          uploadStep={props.uploadStep}
-          images={images}
-          setImages={setImages}
-        />
+        <PostImages uploadStep={props.uploadStep} />
         <Divider style={{ height: 1, marginBottom: 20, marginTop: 10 }} />
         <div>
           <Typography variant="h5">{props.accountName}</Typography>
@@ -326,20 +329,37 @@ export default function CreatePost() {
   const [uploadStep, setUploadStep] = useState(0);
 
   // Define the attributes for the post
-  const [title, setTitle] = useState<undefined | string>(undefined);
-  const [description, setDescription] = useState<undefined | string>(undefined);
-  const [images, setImageBase] = useState<PostImage[]>([]);
   const inputContainerRef = useRef<any>(null);
 
-  const setImages = (newImages: PostImage[]) =>
-    setImageBase(oldImages => newImages.concat(oldImages).slice(0, MAX_IMAGES));
+  const { title } = useSelector(selectTitle);
+  const { description, error: descriptionError } =
+    useSelector(selectDescripton);
+
+  const { images } = useSelector(selectImages);
+  const { price: buyPrice, error: buyPriceError } = useSelector(selectBuyPrice);
+  const rentalPricings = useSelector(selectAllRentalPricings);
 
   const isButtonDisabled = (): boolean => {
     switch (uploadStep) {
       case 0:
-        return title === undefined || description === undefined;
+        return (
+          title === undefined ||
+          title === "" ||
+          description === undefined ||
+          description === "" ||
+          typeof descriptionError === "string"
+        );
+      case 1:
+        return images.length < 2;
+      case 2:
+        return (
+          (typeof buyPrice === "number" && buyPriceError === undefined) ||
+          rentalPricings.every(
+            rentalPricing => typeof rentalPricing.error === "string"
+          )
+        );
       default:
-        return false;
+        return true;
     }
   };
   const handleNext = () => {
@@ -391,12 +411,6 @@ export default function CreatePost() {
                 <Post
                   accountName={"Michael Fortunato"}
                   uploadStep={uploadStep}
-                  post={{ title, description, images }}
-                  setPost={{
-                    setTitle,
-                    setDescription,
-                    setImages
-                  }}
                 />
               </Grid>
               <Grid

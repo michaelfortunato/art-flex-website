@@ -1,8 +1,8 @@
 import { combineReducers } from "@reduxjs/toolkit";
 // eslint-disable-next-line import/no-cycle
 import buyPricingReducer, { selectBuyPrice } from "./buyPricingSlice";
-import rentalPricingsReducer from "./rentalPricingsSlice";
 // eslint-disable-next-line import/no-cycle
+import rentalPricingsReducer from "./rentalPricingsSlice";
 
 export { selectBuyPrice };
 export default combineReducers({

@@ -1,12 +1,14 @@
+/* eslint-disable import/no-cycle */
+import { RootState } from "@redux-store/store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { MAX_IMAGES, PostImage } from "../Post";
 
-type ImagesSlice = { images: PostImage[] | undefined };
+type ImagesSlice = { images: PostImage[] };
 
 export const imagesSlice = createSlice({
   name: "postImages",
   initialState: {
-    images: undefined
+    images: []
   } as ImagesSlice,
 
   reducers: {
@@ -73,5 +75,5 @@ export const { addImage, reorderImages } = imagesSlice.actions;
 // Export selectors
 export const selectImage = (state: ImagesSlice, index: number) =>
   state.images?.[index];
-
+export const selectImages = (state: RootState) => state.createPost.images;
 export default imagesSlice.reducer;

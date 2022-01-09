@@ -1,3 +1,5 @@
+/* eslint-disable import/no-cycle */
+import { RootState } from "@redux-store/store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { validDescription } from "../Post";
 
@@ -30,8 +32,8 @@ export const descriptionSlice = createSlice({
 export const { addDescription } = descriptionSlice.actions;
 
 // Export selectors
-export const selectDescripton = (state: DescriptionState) => state.description;
-export const selectDescriptonError = (state: DescriptionState) => state.error;
+export const selectDescripton = (state: RootState) =>
+  state.createPost.description;
 
 // Export the reducer
 export default descriptionSlice.reducer;

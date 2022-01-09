@@ -87,7 +87,7 @@ function DropdownTemplate(props: DropdownTemplateParams) {
         transition
         disablePortal={false}
       >
-        {({ TransitionProps, placement }) => (
+        {({ TransitionProps }) => (
           <Grow
             {...TransitionProps}
             style={{

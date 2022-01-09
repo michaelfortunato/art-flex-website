@@ -1,13 +1,10 @@
 import { useState, ChangeEvent } from "react";
 import styled from "styled-components";
+import { useDispatch } from "react-redux";
 import { Grid, TextField, IconButton, Chip } from "@material-ui/core";
 import { Cancel } from "@material-ui/icons";
-import { motion, AnimatePresence } from "framer-motion";
-import CustomAutocomplete from "@components/CustomAutocomplete";
-import { AFBaseFormField } from "@components/Library/FormField/BaseFormField.styled";
 import { Autocomplete } from "@material-ui/lab";
 import { setTags } from "./tagsSlice";
-import { useDispatch } from "react-redux";
 
 type TagVariant = "period" | "social" | "prominence";
 
