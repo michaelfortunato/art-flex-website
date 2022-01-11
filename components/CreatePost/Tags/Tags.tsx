@@ -5,6 +5,7 @@ import { Grid, TextField, IconButton, Chip } from "@material-ui/core";
 import { Cancel } from "@material-ui/icons";
 import { Autocomplete } from "@material-ui/lab";
 import { setTags } from "./tagsSlice";
+import { makeStyles } from "@material-ui/styles";
 
 type TagVariant = "period" | "social" | "prominence";
 
@@ -104,9 +105,27 @@ export function InputTag(props: InputTagProps) {
     </div>
   );
 }
-
+const useStyles = makeStyles({
+  underline: {
+    "&::before": {
+      transition: "none",
+      borderBottom: "1px solid rgba(0, 0, 0, 0.42)"
+    },
+    "&::after": {
+      transition: "none",
+      borderBottom: "1px solid rgba(0, 0, 0, 0.42)"
+    },
+    "&:hover:not(.Mui-disabled):before": {
+      borderBottom: "1px solid rgba(0, 0, 0, 0.42)"
+    },
+    "&:hover:not(.Mui-disabled):after": {
+      borderBottom: "1px solid rgba(0, 0, 0, 0.42)"
+    }
+  }
+});
 export function ConfigureTags() {
   const dispatch = useDispatch();
+  const classes = useStyles();
   return (
     <div>
       <Autocomplete
@@ -123,7 +142,8 @@ export function ConfigureTags() {
             variant="standard"
             InputProps={{
               ...params.InputProps,
-              endAdornment: null
+              endAdornment: null,
+              classes
             }}
           />
         )}

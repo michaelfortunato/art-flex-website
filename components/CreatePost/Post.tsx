@@ -93,7 +93,7 @@ interface PostWrapperProps {
   Pricing: React.ReactNode;
 }
 
-function PostWrapper(props: PostWrapperProps) {
+export function PostWrapper(props: PostWrapperProps) {
   return (
     <Paper
       elevation={3}

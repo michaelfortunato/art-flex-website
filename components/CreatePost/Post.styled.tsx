@@ -11,6 +11,7 @@ export const InputContainer = styled.div`
   margin-top: 20px;
   border-bottom-style: solid;
   border-bottom-color: #000000;
+  border-width: 1px;
 `;
 
 export type TagVariants = "period" | "social" | "prominence";

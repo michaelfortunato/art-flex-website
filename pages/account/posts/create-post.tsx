@@ -31,23 +31,24 @@ import { useState, useRef, ReactElement, MouseEventHandler } from "react";
 import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
 import postPlaceHolderImg from "@public/create_post_placeholder.jpg";
 import uploadFile from "@utils/chunked-upload";
-import Dropzone from "@components/CreatePost/Dropzone";
 import InputTitle from "@components/CreatePost/Title/Title";
 import InputDescription from "@components/CreatePost/Description/Description";
 import * as S from "@components/CreatePost/Post.styled";
-import {
-  ConfigurablePriceTable,
-  InputPricing
-} from "@components/CreatePost/InputPricing";
+
 import { ConfigureTags, InputTag } from "@components/CreatePost/Tags/Tags";
 import { selectTitle } from "@components/CreatePost/Title/titleSlice";
 import { selectDescripton } from "@components/CreatePost/Description/descriptionSlice";
 import { selectImages } from "@components/CreatePost/Images/imagesSlice";
 import { selectBuyPrice } from "@components/CreatePost/Pricing/buyPricingSlice";
 import {
+  ConfigureImages,
+  Images as PostImages
+} from "@components/CreatePost/Images/Images";
+import {
   selectAllRentalPricingIds,
   selectAllRentalPricings
 } from "@components/CreatePost/Pricing/rentalPricingsSlice";
+import { PostWrapper } from "@components/CreatePost/Post";
 
 const MAX_IMAGES = 5;
 const MAX_RENTAL_PRICES = 2;
@@ -147,47 +148,6 @@ function InputDescription2(props: { setDescription: any }) {
   );
 }
 
-function PostImages(props: {
-  uploadStep: number;
-  images: PostImage[];
-  setImages: any;
-}) {
-  return (
-    <Grid container justifyContent="center">
-      <Grid item xs="auto">
-        <div
-          style={{
-            display: "inline-block",
-            height: 440,
-            width: 400,
-            marginBottom: 20
-          }}
-        >
-          <AnimatePresence exitBeforeEnter>
-            {props.uploadStep === 0 ? (
-              <motion.div
-                key={0}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                style={{
-                  borderStyle: "solid",
-                  borderColor: "#OOOOOO",
-                  filter: "blur(.5rem)"
-                }}
-              >
-                <Image src={postPlaceHolderImg} alt="" placeholder="blur" />
-              </motion.div>
-            ) : (
-              <Dropzone images={props.images} setImages={props.setImages} />
-            )}
-          </AnimatePresence>
-        </div>
-      </Grid>
-    </Grid>
-  );
-}
-
 const TagLabels = {
   // Periods
   Modernism: {
@@ -279,50 +239,39 @@ function PostPricing(props: PostPricingProps) {
   );
 }
 
-function Post(props: {
-  accountName: string;
-  uploadStep: number;
-  post: PostInterface;
-  setPost: {
-    setTitle: any;
-    setDescription: any;
-    setImages: any;
-  };
-}) {
+function PostDraft(props: { accountName: string; uploadStep: number }) {
   return (
-    <Paper
-      elevation={3}
-      style={{
-        padding: 60,
-        borderRadius: 10,
-        display: "inline-block"
-      }}
-    >
-      <div>
-        <PostImages uploadStep={props.uploadStep} />
-        <Divider style={{ height: 1, marginBottom: 20, marginTop: 10 }} />
-        <div>
-          <Typography variant="h5">{props.accountName}</Typography>
-        </div>
-        <S.InputContainer>
-          <InputTitle />
-        </S.InputContainer>
-        <S.InputContainer style={{ borderBottomStyle: "none" }}>
-          <ConfigureTags />
-        </S.InputContainer>
-        <S.InputContainer style={{ maxHeight: 200, overflowY: "auto" }}>
-          <InputDescription />
-        </S.InputContainer>
-        <S.InputContainer
-          style={{
-            borderBottomStyle: "none"
-          }}
-        >
-          <InputPricing />
-        </S.InputContainer>
-      </div>
-    </Paper>
+    <PostWrapper
+      Image={<PostImages uploadStep={props.uploadStep} />}
+      artistName={"Michael Fortunato"}
+      Title={<InputTitle />}
+      Tags={<ConfigureTags />}
+      Description={<InputDescription />}
+      Pricing={<div />}
+    />
   );
+}
+
+function ConfigureTitleAndDescription() {
+  return <div></div>;
+}
+
+function ConfigurePrices() {
+  return <div />;
+}
+function ConfigurePost(props: { uploadStep: number }) {
+  switch (props.uploadStep) {
+    case 0:
+      return <ConfigureTitleAndDescription />;
+    case 1:
+      return <ConfigureImages />;
+    case 2:
+      return <ConfigurePrices />;
+    case 3:
+      return <ConfigureTags />;
+    default:
+      return null;
+  }
 }
 
 export default function CreatePost() {
@@ -408,7 +357,7 @@ export default function CreatePost() {
           >
             <AnimateSharedLayout>
               <Grid item xs="auto" component={motion.div} key="front" layout>
-                <Post
+                <PostDraft
                   accountName={"Michael Fortunato"}
                   uploadStep={uploadStep}
                 />
@@ -420,10 +369,11 @@ export default function CreatePost() {
                 item
                 xs="auto"
                 key="configure"
-              ></Grid>
+              >
+                <ConfigurePost uploadStep={uploadStep} />
+              </Grid>
             </AnimateSharedLayout>
           </Grid>
-
           <Grid
             component={motion.div}
             layout
