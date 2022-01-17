@@ -21,7 +21,7 @@ export const descriptionSlice = createSlice({
       const { description } = action.payload;
       const { error } = validDescription(description);
       return {
-        description: !error ? description : state.description,
+        description,
         error
       };
     }

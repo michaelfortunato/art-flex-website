@@ -7,11 +7,13 @@ export const InputForm = styled(InputBase)`
   font-style: italic;
 `;
 
-export const InputContainer = styled.div`
+export const PostItem = styled.div`
   margin-top: 20px;
-  border-bottom-style: solid;
-  border-bottom-color: #000000;
-  border-width: 1px;
+  max-width: 400px;
+  // overflow-y: auto;
+  //border-bottom-style: solid;
+  //border-bottom-color: #000000;
+  //border-width: 1px;
 `;
 
 export type TagVariants = "period" | "social" | "prominence";
@@ -30,8 +32,10 @@ export const Tag = styled.span<{
   color: ${props => props.theme.tag[props.variant].textColor};
 `;
 
-export const RevealInputStep = styled(Grid)<{
+export const RevealInputStep = styled.div<{
   showBlur?: boolean;
+  disableInteraction?: boolean;
 }>`
+  pointer-events: ${props => (props.disableInteraction ? "none" : "auto")};
   filter: ${props => (props.showBlur ? "blur(.2rem)" : "none")};
 `;

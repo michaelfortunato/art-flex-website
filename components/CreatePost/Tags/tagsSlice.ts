@@ -1,3 +1,4 @@
+import { RootState } from "@redux-store/store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type TagsState = {
@@ -41,8 +42,7 @@ export const tagsSlice = createSlice({
 export const { upsertTag, removeTag, setTags } = tagsSlice.actions;
 
 // Export selectors
-export const selectTags = (state: TagsState) => state.tags;
-export const selectTagsError = (state: TagsState) => state.error;
+export const selectTags = (state: RootState) => state.createPost.tags;
 
 // Export the reducer
 export default tagsSlice.reducer;

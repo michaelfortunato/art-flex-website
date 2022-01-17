@@ -1,43 +1,34 @@
 import styled from "styled-components";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Appbar from "@components/Appbar/Appbar";
 import {
   Button,
   Grid,
-  Paper,
   Step,
   StepLabel,
   Stepper,
   Typography,
-  Divider,
   InputBase,
-  ClickAwayListener,
-  List,
-  ListItem,
-  ListItemText,
-  Menu,
-  MenuItem,
-  TextField,
-  IconButton,
-  Table,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableBody,
-  TableCell
+  useTheme
 } from "@material-ui/core";
 import Image from "next/image";
 import { useState, useRef, ReactElement, MouseEventHandler } from "react";
 import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
-import postPlaceHolderImg from "@public/create_post_placeholder.jpg";
 import uploadFile from "@utils/chunked-upload";
 import InputTitle from "@components/CreatePost/Title/Title";
 import InputDescription from "@components/CreatePost/Description/Description";
 import * as S from "@components/CreatePost/Post.styled";
 
-import { ConfigureTags, InputTag } from "@components/CreatePost/Tags/Tags";
-import { selectTitle } from "@components/CreatePost/Title/titleSlice";
-import { selectDescripton } from "@components/CreatePost/Description/descriptionSlice";
+import {
+  ConfigureTags,
+  DraftTags,
+  InputTag
+} from "@components/CreatePost/Tags/Tags";
+import { addTitle, selectTitle } from "@components/CreatePost/Title/titleSlice";
+import {
+  addDescription,
+  selectDescripton
+} from "@components/CreatePost/Description/descriptionSlice";
 import { selectImages } from "@components/CreatePost/Images/imagesSlice";
 import { selectBuyPrice } from "@components/CreatePost/Pricing/buyPricingSlice";
 import {
@@ -49,6 +40,13 @@ import {
   selectAllRentalPricings
 } from "@components/CreatePost/Pricing/rentalPricingsSlice";
 import { PostWrapper } from "@components/CreatePost/Post";
+import {
+  ConfigurePrices,
+  ConfigurePriceTable,
+  DraftPrices,
+  DraftPricing
+} from "@components/CreatePost/Pricing/Pricing";
+import { InputRentalPriceButton } from "@components/CreatePost/Pricing/PriceButtons";
 
 const MAX_IMAGES = 5;
 const MAX_RENTAL_PRICES = 2;
@@ -64,7 +62,8 @@ const steps = [
   {
     stepTitle: "Set your price",
     stepContent:
-      "Set the price for your piece. You can choose to have customers rent it, buy it or both."
+      "Set the price for your piece. You can choose to have customers rent it, buy it, or both." +
+      " Add tags to your piece."
   },
   {
     stepTitle: "Summary",
@@ -239,7 +238,7 @@ function PostPricing(props: PostPricingProps) {
   );
 }
 
-function PostDraft(props: { accountName: string; uploadStep: number }) {
+function PostDraft2(props: { accountName: string; uploadStep: number }) {
   return (
     <PostWrapper
       Image={<PostImages uploadStep={props.uploadStep} />}
@@ -247,18 +246,111 @@ function PostDraft(props: { accountName: string; uploadStep: number }) {
       Title={<InputTitle />}
       Tags={<ConfigureTags />}
       Description={<InputDescription />}
-      Pricing={<div />}
+      Pricing={
+        <div>
+          <InputRentalPriceButton id="fpp" />
+        </div>
+      }
+    />
+  );
+}
+
+function PostDraft(props: { accountName: string; uploadStep: number }) {
+  const { title } = useSelector(selectTitle);
+  const { description } = useSelector(selectDescripton);
+  return (
+    <PostWrapper
+      Image={<PostImages uploadStep={props.uploadStep} />}
+      artistName={"Michael Fortunato"}
+      Title={<i>{title}</i>}
+      Tags={<DraftTags />}
+      Description={<Typography>{description}</Typography>}
+      Pricing={<DraftPricing />}
     />
   );
 }
 
 function ConfigureTitleAndDescription() {
-  return <div></div>;
+  const dispatch = useDispatch();
+  const { typography } = useTheme();
+  const { title } = useSelector(selectTitle);
+  const { description } = useSelector(selectDescripton);
+  return (
+    <Grid
+      container
+      direction="column"
+      justifyContent="space-evenly"
+      style={{ height: "100%" }}
+    >
+      <Grid item>
+        <InputBase
+          value={title}
+          multiline
+          style={{
+            fontSize: typography.h4.fontSize,
+            borderBottom: "1px solid #000000"
+          }}
+          placeholder="Type your title here"
+          onChange={e => dispatch(addTitle({ title: e.target.value }))}
+        />
+      </Grid>
+      <Grid item>
+        <InputBase
+          value={description}
+          multiline
+          fullWidth
+          style={{
+            fontSize: typography.h4.fontSize,
+            borderBottom: "1px solid #000000",
+            minWidth: "500px",
+            maxHeight: "200px",
+            overflowY: "auto"
+          }}
+          placeholder="Type your description here"
+          onChange={e =>
+            dispatch(addDescription({ description: e.target.value }))
+          }
+        />
+      </Grid>
+    </Grid>
+  );
 }
 
-function ConfigurePrices() {
-  return <div />;
+function ConfigurePricingAndTags() {
+  const { price: buyPrice, error: buyError } = useSelector(selectBuyPrice);
+  const rentalPrices = useSelector(selectAllRentalPricings);
+
+  const existsValidBuyPrice = buyPrice && buyError === undefined;
+  const existsValidRentalPrice = rentalPrices.some(
+    rentalPrice => rentalPrice.error === undefined
+  );
+  const showTags = existsValidBuyPrice || existsValidRentalPrice;
+  return (
+    <Grid
+      container
+      direction="column"
+      style={{ minHeight: "100%" }}
+      spacing={2}
+    >
+      <Grid item xs>
+        <ConfigurePrices />
+      </Grid>
+      <Grid item xs>
+        <S.RevealInputStep showBlur={!showTags} disableInteraction={!showTags}>
+          <Grid container justifyContent="center">
+            <Grid item xs="auto">
+              <Typography variant="h4"> Add tags</Typography>
+            </Grid>
+          </Grid>
+          <div>
+            <ConfigureTags />
+          </div>
+        </S.RevealInputStep>
+      </Grid>
+    </Grid>
+  );
 }
+
 function ConfigurePost(props: { uploadStep: number }) {
   switch (props.uploadStep) {
     case 0:
@@ -266,9 +358,7 @@ function ConfigurePost(props: { uploadStep: number }) {
     case 1:
       return <ConfigureImages />;
     case 2:
-      return <ConfigurePrices />;
-    case 3:
-      return <ConfigureTags />;
+      return <ConfigurePricingAndTags />;
     default:
       return null;
   }
@@ -288,6 +378,8 @@ export default function CreatePost() {
   const { price: buyPrice, error: buyPriceError } = useSelector(selectBuyPrice);
   const rentalPricings = useSelector(selectAllRentalPricings);
 
+  console.log(rentalPricings);
+  console.log(buyPriceError);
   const isButtonDisabled = (): boolean => {
     switch (uploadStep) {
       case 0:
@@ -302,10 +394,11 @@ export default function CreatePost() {
         return images.length < 2;
       case 2:
         return (
-          (typeof buyPrice === "number" && buyPriceError === undefined) ||
-          rentalPricings.every(
-            rentalPricing => typeof rentalPricing.error === "string"
-          )
+          buyPriceError !== undefined &&
+          (rentalPricings.length === 0 ||
+            rentalPricings.every(
+              rentalPricing => typeof rentalPricing.error === "string"
+            ))
         );
       default:
         return true;
@@ -353,17 +446,23 @@ export default function CreatePost() {
             container
             direction="row"
             justifyContent="space-evenly"
-            layout
+            layout={false}
           >
             <AnimateSharedLayout>
-              <Grid item xs="auto" component={motion.div} key="front" layout>
+              <Grid
+                item
+                xs="auto"
+                component={motion.div}
+                key="front"
+                layout={false}
+              >
                 <PostDraft
                   accountName={"Michael Fortunato"}
                   uploadStep={uploadStep}
                 />
               </Grid>
               <Grid
-                layout
+                layout={false}
                 component={motion.div}
                 ref={inputContainerRef}
                 item
@@ -376,7 +475,7 @@ export default function CreatePost() {
           </Grid>
           <Grid
             component={motion.div}
-            layout
+            layout={false}
             container
             item
             xs="auto"

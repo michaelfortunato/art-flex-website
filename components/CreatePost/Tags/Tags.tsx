@@ -1,10 +1,10 @@
 import { useState, ChangeEvent } from "react";
 import styled from "styled-components";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Grid, TextField, IconButton, Chip } from "@material-ui/core";
 import { Cancel } from "@material-ui/icons";
 import { Autocomplete } from "@material-ui/lab";
-import { setTags } from "./tagsSlice";
+import { selectTags, setTags } from "./tagsSlice";
 import { makeStyles } from "@material-ui/styles";
 
 type TagVariant = "period" | "social" | "prominence";
@@ -59,6 +59,23 @@ const TagLabels = {
   }
 };
 
+export function DraftTags() {
+  const { tags } = useSelector(selectTags);
+  return (
+    <Grid container spacing={1}>
+      {tags.map(tag => (
+        <Grid item key={tag}>
+          <Chip
+            color="primary"
+            label={tag}
+            style={{ fontSize: 14, fontWeight: 500 }}
+          />
+        </Grid>
+      ))}
+    </Grid>
+  );
+}
+
 export function Tag(props: {
   label: string;
   variant: TagVariant;
@@ -109,17 +126,17 @@ const useStyles = makeStyles({
   underline: {
     "&::before": {
       transition: "none",
-      borderBottom: "1px solid rgba(0, 0, 0, 0.42)"
+      borderBottom: "1px solid #000000"
     },
     "&::after": {
       transition: "none",
-      borderBottom: "1px solid rgba(0, 0, 0, 0.42)"
+      borderBottom: "1px solid #000000"
     },
     "&:hover:not(.Mui-disabled):before": {
-      borderBottom: "1px solid rgba(0, 0, 0, 0.42)"
+      borderBottom: "1px solid #000000"
     },
     "&:hover:not(.Mui-disabled):after": {
-      borderBottom: "1px solid rgba(0, 0, 0, 0.42)"
+      borderBottom: "1px solid #000000"
     }
   }
 });
@@ -137,7 +154,7 @@ export function ConfigureTags() {
         renderInput={params => (
           <TextField
             {...params}
-            style={{ maxWidth: 400 }}
+            style={{ maxWidth: 500 }}
             placeholder="Tag your artwork"
             variant="standard"
             InputProps={{

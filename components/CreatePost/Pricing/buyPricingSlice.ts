@@ -28,7 +28,10 @@ export const buyPricingSlice = createSlice({
         error
       };
     },
-    removeBuyPrice: () => ({ price: undefined, error: undefined })
+    removeBuyPrice: (): BuyPricingState => ({
+      price: undefined,
+      error: undefined
+    })
   }
 });
 

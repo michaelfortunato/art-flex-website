@@ -6,6 +6,14 @@ export interface RentalPricing {
   duration: number;
   price: number;
 }
+export const inputRentalPeriodOptions = [
+  "1 Month",
+  "3 Months",
+  "6 Months",
+  "9 Months",
+  "1 Year"
+] as const;
+
 export interface BuyPricing {
   price: number;
 }
@@ -49,8 +57,10 @@ export function validPeriod(period: string) {
 
 export function validBuyPricing(buyPrice: any): buyPrice is BuyPricing {
   try {
+    console.log(buyPrice);
     return validPrice(buyPrice.price);
   } catch (error) {
+    console.log(error);
     return false;
   }
 }
@@ -122,20 +132,18 @@ export function PostWrapper(props: PostWrapperProps) {
         <div>
           <Typography variant="h5">{props.artistName}</Typography>
         </div>
-        <S.InputContainer>{props.Title}</S.InputContainer>
-        <S.InputContainer style={{ borderBottomStyle: "none" }}>
-          {props.Tags}
-        </S.InputContainer>
-        <S.InputContainer style={{ maxHeight: 200, overflowY: "auto" }}>
+        <S.PostItem>{props.Title}</S.PostItem>
+        <S.PostItem>{props.Tags}</S.PostItem>
+        <S.PostItem style={{ maxHeight: 200, overflowY: "auto" }}>
           {props.Description}
-        </S.InputContainer>
-        <S.InputContainer
+        </S.PostItem>
+        <S.PostItem
           style={{
             borderBottomStyle: "none"
           }}
         >
           {props.Pricing}
-        </S.InputContainer>
+        </S.PostItem>
       </div>
     </Paper>
   );

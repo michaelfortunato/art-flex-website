@@ -1,32 +1,62 @@
+import React from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import PostPlaceHolderImg from "@public/create_post_placeholder.jpg";
 import { useDispatch, useSelector } from "react-redux";
+import { ClickAwayListener, Grid } from "@material-ui/core";
 import Dropzone from "./Dropzone";
-import { addImage, reorderImages, selectImages } from "./imagesSlice";
+import {
+  addImage,
+  getSelectedImageIndex,
+  removeImage,
+  reorderImages,
+  selectImages,
+  setSelectedImage
+} from "./imagesSlice";
 import { MAX_IMAGES } from "../Post";
 import DraggableMenu from "./DraggableMenu";
 
 export function ConfigureImages() {
   const dispatch = useDispatch();
-  const { images } = useSelector(selectImages);
+  const { images, selectedImage } = useSelector(selectImages);
   return images.length !== 0 ? (
-    <DraggableMenu
-      items={images.map(({ name }) => name)}
-      onReorder={(source: number, destination: number) =>
-        dispatch(
-          reorderImages({
-            sourceIndex: source,
-            destinationIndex: destination
-          })
-        )
-      }
-    />
+    <Grid container style={{ height: "100%" }} alignItems="center">
+      <Grid item>
+        <DraggableMenu
+          items={images.map(({ name }) => name)}
+          onReorder={(source: number, destination: number) =>
+            dispatch(
+              reorderImages({
+                sourceIndex: source,
+                destinationIndex: destination
+              })
+            )
+          }
+          selectedItem={selectedImage}
+          setSelectedItem={(newSelectedImage: string | undefined) =>
+            dispatch(setSelectedImage({ selectedImage: newSelectedImage }))
+          }
+          onRemove={(imageIndex: number) =>
+            dispatch(removeImage({ index: imageIndex }))
+          }
+          containerProps={{
+            item: true,
+            xs: 11,
+            direction: "column",
+            spacing: 3
+          }}
+          itemProps={{
+            marginTop: 20 // Watch out for margin collapse (do not add marginbottom)
+          }}
+        />
+      </Grid>
+    </Grid>
   ) : null;
 }
 
 export function Images(props: { uploadStep: number }) {
   const { images } = useSelector(selectImages);
+  const selectedImageIndex = useSelector(getSelectedImageIndex);
   const dispatch = useDispatch();
   function setImages(acceptedFiles: any[]) {
     const additionalImages = acceptedFiles.map((file: any) => ({
@@ -37,7 +67,6 @@ export function Images(props: { uploadStep: number }) {
       .slice(0, MAX_IMAGES)
       .forEach((image: any) => dispatch(addImage(image)));
   }
-  const selectedImage = 0;
   return (
     <AnimatePresence exitBeforeEnter>
       {props.uploadStep === 0 ? (
@@ -62,7 +91,7 @@ export function Images(props: { uploadStep: number }) {
             <div style={{ position: "relative", padding: 20, height: "100%" }}>
               {images.length !== 0 && (
                 <Image
-                  src={images[selectedImage].preview}
+                  src={images[selectedImageIndex || 0].preview}
                   alt=""
                   objectFit="contain"
                   layout="fill"
