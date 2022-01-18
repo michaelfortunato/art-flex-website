@@ -295,7 +295,9 @@ export function ConfigurePrices() {
             <TableHead>
               <TableRow>
                 <TableCell align="left"></TableCell>
-                <TableCell align="right">Buy or Rent</TableCell>
+                <TableCell align="right" width={"20%"}>
+                  Buy or Rent
+                </TableCell>
                 <TableCell align="center">Period</TableCell>
                 <TableCell align="right">Price</TableCell>
                 <TableCell align="left"></TableCell>

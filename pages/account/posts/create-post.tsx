@@ -239,11 +239,12 @@ function ConfigurePricingAndTags(props: { hideTags?: boolean }) {
       style={{ minHeight: "100%", maxWidth: 650 }}
       direction="column"
       justifyContent="space-around"
+      spacing={5}
     >
       <Grid item xs>
         <ConfigurePrices />
       </Grid>
-      <Grid item xs="auto">
+      <Grid item xs>
         <S.RevealInputStep
           showBlur={props.hideTags}
           disableInteraction={props.hideTags}
@@ -359,7 +360,6 @@ export default function CreatePost() {
           xs={12}
           direction="row"
           justifyContent="center"
-          alignItems="center"
         >
           <AnimateSharedLayout>
             <Grid
