@@ -76,25 +76,28 @@ export function Images(props: { uploadStep: number }) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           style={{
-            borderStyle: "solid",
-            borderColor: "#OOOOOO",
-            filter: "blur(.5rem)"
+            filter: "blur(.5rem)",
+            position: "relative"
           }}
         >
-          <Image src={PostPlaceHolderImg} alt="" placeholder="blur" />
+          <Image src={PostPlaceHolderImg} alt="" width={400} height={400} />
         </motion.div>
       ) : (
         <Dropzone
           items={images}
           setItems={setImages}
           PopulatedDropzone={
-            <div style={{ position: "relative", padding: 20, height: "100%" }}>
+            <div
+              style={{
+                position: "relative"
+              }}
+            >
               {images.length !== 0 && (
                 <Image
                   src={images[selectedImageIndex || 0].preview}
                   alt=""
-                  objectFit="contain"
-                  layout="fill"
+                  width={400}
+                  height={400}
                 />
               )}
             </div>

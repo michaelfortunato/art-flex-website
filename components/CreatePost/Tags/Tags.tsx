@@ -1,16 +1,17 @@
 import { useState, ChangeEvent } from "react";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
-import { Grid, TextField, IconButton, Chip } from "@material-ui/core";
+import { Grid, TextField, IconButton, Chip, useTheme } from "@material-ui/core";
 import { Cancel } from "@material-ui/icons";
 import { Autocomplete } from "@material-ui/lab";
 import { selectTags, setTags } from "./tagsSlice";
 import { makeStyles } from "@material-ui/styles";
+import { Tag as TagProps, TagCategory } from "../Post";
 
 type TagVariant = "period" | "social" | "prominence";
-
+/*
 export const TagContainer = styled(Grid)<{
-  variant?: TagVariant;
+  variant?: TagCategory;
   customBackgroundColor?: string;
   customColor?: string;
 }>`
@@ -28,54 +29,84 @@ export const TagContainer = styled(Grid)<{
       ? props.theme.tag[props.variant].textColor
       : props.customColor};
 `;
+*/
 
-const TagLabels = {
-  // Periods
-  Modernism: {
-    variant: "period"
+export const FakeTags: TagProps[] = [
+  {
+    category: "Period",
+    label: "Modernism"
   },
-  Surrealism: {
-    variant: "period"
+  {
+    category: "Period",
+    label: "Surrealism"
   },
-  Impressionism: {
-    variant: "period"
+  {
+    category: "Period",
+    label: "Impressionism"
   },
-  // Locations
-  "New York": {
-    variant: "social"
+  {
+    category: "Location",
+    label: "New York"
   },
-  "Los Angeles": {
-    variant: "social"
+  {
+    category: "Location",
+    label: "Los Angeles"
   },
-  Paris: {
-    variant: "social"
+  {
+    category: "Location",
+    label: "Paris"
   },
-  // Mediums
-  Pastel: {
-    variant: "prominence"
+  {
+    category: "Medium",
+    label: "Pastel"
   },
-  Drawing: {
-    variant: "prominence"
+  {
+    category: "Medium",
+    label: "Graphite"
   }
-};
+];
 
-export function DraftTags() {
-  const { tags } = useSelector(selectTags);
+const TagColors = {
+  Period: {
+    backgroundColor: "#673ab7",
+    textColor: "white"
+  },
+  Location: {
+    backgroundColor: "#ffea00",
+    textColor: "white"
+  },
+  Medium: {
+    backgroundColor: "#73a3f0",
+    textColor: "white"
+  }
+} as any;
+
+const Tag = styled(Chip)<{ category: string }>`
+  font-size: 14px;
+  font-weight: 500;
+  background-color: ${props =>
+    props.category in TagColors
+      ? TagColors[props.category].backgroundColor
+      : props.theme.palette.primary.main};
+  color: ${props =>
+    props.category in TagColors
+      ? TagColors[props.category].textColor
+      : "#FFFFFF"};
+`;
+
+export function PostTags(props: { tags: TagProps[] }) {
   return (
     <Grid container spacing={1}>
-      {tags.map(tag => (
-        <Grid item key={tag}>
-          <Chip
-            color="primary"
-            label={tag}
-            style={{ fontSize: 14, fontWeight: 500 }}
-          />
+      {props.tags.map(({ category, label }) => (
+        <Grid item key={label}>
+          <Tag category={category} label={label} />
         </Grid>
       ))}
     </Grid>
   );
 }
 
+/*
 export function Tag(props: {
   label: string;
   variant: TagVariant;
@@ -100,9 +131,9 @@ export function Tag(props: {
     </TagContainer>
   );
 }
-
+*/
 // type TagLabel = keyof typeof TagLabels;
-
+/*
 type InputTagProps = { label: string; variant: TagVariant };
 export function InputTag(props: InputTagProps) {
   const [showCancelButton, setShowCancelButton] = useState(false);
@@ -122,6 +153,7 @@ export function InputTag(props: InputTagProps) {
     </div>
   );
 }
+*/
 const useStyles = makeStyles({
   underline: {
     "&::before": {
@@ -147,9 +179,10 @@ export function ConfigureTags() {
     <div>
       <Autocomplete
         multiple
-        options={Object.keys(TagLabels)}
-        onChange={(event: ChangeEvent<{}>, value: string[]) =>
-          dispatch(setTags({ tags: value }))
+        options={FakeTags}
+        getOptionLabel={tags => tags.label}
+        onChange={(event: ChangeEvent<{}>, tags: TagProps[]) =>
+          dispatch(setTags({ tags }))
         }
         renderInput={params => (
           <TextField
@@ -165,12 +198,12 @@ export function ConfigureTags() {
           />
         )}
         renderTags={(value, getTagProps) =>
-          value.map((label, index) => (
-            <Chip
-              key={index}
+          value.map(({ label, category }, index) => (
+            <Tag
+              key={label}
               style={{ fontSize: 14, fontWeight: 500 }}
-              color="primary"
               label={label}
+              category={category}
               {...getTagProps({ index })}
             />
           ))

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useDispatch, useSelector } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import Appbar from "@components/Appbar/Appbar";
 import {
   Button,
@@ -21,25 +21,54 @@ import * as S from "@components/CreatePost/Post.styled";
 
 import {
   ConfigureTags,
-  DraftTags,
-  InputTag
+  PostTags,
+  InputTag,
+  FakeTags
 } from "@components/CreatePost/Tags/Tags";
-import { addTitle, selectTitle } from "@components/CreatePost/Title/titleSlice";
+import {
+  addTitle,
+  selectIsTitleValid,
+  selectIsValidTitle,
+  selectTitle
+} from "@components/CreatePost/Title/titleSlice";
 import {
   addDescription,
-  selectDescripton
+  selectDescripton,
+  selectIsDescriptionValid,
+  selectIsValidDescription
 } from "@components/CreatePost/Description/descriptionSlice";
-import { selectImages } from "@components/CreatePost/Images/imagesSlice";
-import { selectBuyPrice } from "@components/CreatePost/Pricing/buyPricingSlice";
+import {
+  selectAreImagesValid,
+  selectImages,
+  selectNumberOfImages
+} from "@components/CreatePost/Images/imagesSlice";
+import {
+  selectBuyPrice,
+  selectValidBuyPrice
+} from "@components/CreatePost/Pricing/buyPricingSlice";
 import {
   ConfigureImages,
   Images as PostImages
 } from "@components/CreatePost/Images/Images";
 import {
   selectAllRentalPricingIds,
-  selectAllRentalPricings
+  selectAllRentalPricings,
+  selectAllValidRentalPrices,
+  selectAllValidRentalPricings
 } from "@components/CreatePost/Pricing/rentalPricingsSlice";
-import { PostWrapper } from "@components/CreatePost/Post";
+import {
+  getDescriptionError,
+  getTitleError,
+  isTag,
+  PostProps,
+  PostWrapper,
+  validBuyPricing,
+  validDescription,
+  validImages,
+  validRentalPricing,
+  validTitle,
+  MAX_IMAGES
+} from "@components/CreatePost/Post";
 import {
   ConfigurePrices,
   ConfigurePriceTable,
@@ -47,9 +76,11 @@ import {
   DraftPricing
 } from "@components/CreatePost/Pricing/Pricing";
 import { InputRentalPriceButton } from "@components/CreatePost/Pricing/PriceButtons";
+import {
+  selectAreTagsValid,
+  selectTags
+} from "@components/CreatePost/Tags/tagsSlice";
 
-const MAX_IMAGES = 5;
-const MAX_RENTAL_PRICES = 2;
 const steps = [
   {
     stepTitle: "Name and description",
@@ -73,171 +104,6 @@ const steps = [
 
 function UploadStatus() {}
 
-interface RentalPricing {
-  period: "Month" | "Year";
-  duration: number;
-  price: number;
-}
-interface BuyPricing {
-  price: number;
-}
-interface Pricing {
-  rentalPricing: RentalPricing[] | undefined;
-  buyPrice: BuyPricing | undefined;
-}
-
-function isRentalPricing(
-  pricing: RentalPricing | undefined
-): pricing is RentalPricing {
-  return pricing
-    ? (pricing as RentalPricing).duration !== undefined &&
-        (pricing as RentalPricing).period !== undefined
-    : false;
-}
-
-function isBuyPricing(
-  pricing: RentalPricing | BuyPricing
-): pricing is BuyPricing {
-  return (
-    (pricing as BuyPricing).price !== undefined && !isRentalPricing(pricing)
-  );
-}
-
-interface PostImage extends File {
-  preview: string;
-}
-
-interface PostInterface {
-  title: string | undefined;
-  description: string | undefined;
-  images: PostImage[];
-  pricing: Pricing;
-}
-
-function InputTitle2(props: { setTitle: any }) {
-  return (
-    <S.InputForm
-      autoComplete="title"
-      autoFocus={true}
-      placeholder={"Type your title here"}
-      onChange={e =>
-        // Maybe we need value autoComplete in sign up form
-        props.setTitle(
-          e.target.value
-            .toLowerCase()
-            .split(" ")
-            .map(s => s.charAt(0).toUpperCase() + s.substring(1))
-            .join(" ")
-        )
-      }
-    ></S.InputForm>
-  );
-}
-function InputDescription2(props: { setDescription: any }) {
-  return (
-    <S.InputForm
-      fullWidth
-      multiline
-      spellCheck
-      autoComplete="title"
-      autoFocus={true}
-      placeholder={"Type your description here"}
-      onChange={e => props.setDescription(e.target.value)}
-    ></S.InputForm>
-  );
-}
-
-const TagLabels = {
-  // Periods
-  Modernism: {
-    variant: "period"
-  },
-  Surrealism: {
-    variant: "period"
-  },
-  Impressionism: {
-    variant: "period"
-  },
-  // Locations
-  "New York": {
-    variant: "social"
-  },
-  "Los Angeles": {
-    variant: "social"
-  },
-  Paris: {
-    variant: "social"
-  },
-  // Mediums
-  Pastel: {
-    variant: "prominence"
-  },
-  Drawing: {
-    variant: "prominence"
-  }
-};
-
-const emptyTagsConfig = [
-  ["Modernism", "period"],
-  ["New York", "social"],
-  ["Pastel", "prominence"]
-];
-
-function EmptyTags() {
-  return (
-    <S.RevealInputStep showBlur container spacing={3}>
-      {emptyTagsConfig.map(tagKey => (
-        <Grid key={tagKey[0]} item xs="auto">
-          <S.Tag variant={tagKey[1] as S.TagVariants}>{tagKey[0]}</S.Tag>
-        </Grid>
-      ))}
-    </S.RevealInputStep>
-  );
-}
-
-type PurchaseButtonProps = {
-  pricing: RentalPricing | BuyPricing;
-  onClick?: (e: MouseEventHandler<HTMLButtonElement>) => void;
-};
-
-export function PurchaseButton(props: PurchaseButtonProps) {
-  let color: "primary" | "secondary" | undefined;
-  let text: string;
-  if (isRentalPricing(props.pricing)) {
-    const period = `${props.pricing.period}${
-      props.pricing.duration > 1 && "s"
-    }`;
-    text = `Rent for $${props.pricing.price}} per ${props.pricing.duration} ${period}`;
-    color = "secondary";
-  } else if (isBuyPricing(props.pricing)) {
-    text = `Buy for $${props.pricing.price}`;
-    color = "primary";
-  } else {
-    throw new Error("Invalid prop type for props.pricing.");
-  }
-  return (
-    <Button variant="contained" color={color}>
-      {text}
-    </Button>
-  );
-}
-
-type PostPricingProps = {
-  pricing: Pricing;
-  setPricing: any;
-};
-function PostPricing(props: PostPricingProps) {
-  const { pricing, setPricing } = props;
-  return (
-    <S.RevealInputStep container spacing={2}>
-      <Grid item xs="auto">
-        <Button>Add Purchase Option</Button>
-      </Grid>
-      <Grid item xs="auto"></Grid>
-    </S.RevealInputStep>
-  );
-}
-
 function PostDraft2(props: { accountName: string; uploadStep: number }) {
   return (
     <PostWrapper
@@ -255,17 +121,73 @@ function PostDraft2(props: { accountName: string; uploadStep: number }) {
   );
 }
 
-function PostDraft(props: { accountName: string; uploadStep: number }) {
-  const { title } = useSelector(selectTitle);
-  const { description } = useSelector(selectDescripton);
+function DraftTitleWrapper() {
+  const title = useSelector(selectTitle);
+  return <i>{title !== "" ? title : "Type your title here"}</i>;
+}
+function DraftDescriptionWrapper() {
+  const description = useSelector(selectDescripton);
+  return (
+    <S.RevealInputStep>
+      <Typography>
+        {description !== "" && description !== undefined
+          ? description
+          : "Type your description here"}
+      </Typography>
+    </S.RevealInputStep>
+  );
+}
+
+function DraftTagsWrapper(props: { placeholder?: boolean }) {
+  const tags = useSelector(selectTags);
+  return (
+    <div style={{ minHeight: 40 }}>
+      {props.placeholder ? (
+        <S.RevealInputStep showBlur={true}>
+          <PostTags tags={[FakeTags[0], FakeTags[3], FakeTags[6]]} />
+        </S.RevealInputStep>
+      ) : (
+        <PostTags tags={tags} />
+      )}
+    </div>
+  );
+}
+
+function DraftPricingWrapper(props: { placeholder?: boolean }) {
+  const rentalPricings = useSelector(selectAllValidRentalPricings);
+  const buyPrice = useSelector(selectValidBuyPrice);
+
+  return (
+    <div style={{ minHeight: 120 }}>
+      {props.placeholder ? (
+        <S.RevealInputStep showBlur={true}>
+          <DraftPricing
+            buyPrice={{ price: 1000 }}
+            rentalPrices={[
+              { rentalPriceId: 0, price: 50, duration: 12, period: "Month" }
+            ]}
+          />
+        </S.RevealInputStep>
+      ) : (
+        <DraftPricing buyPrice={buyPrice} rentalPrices={rentalPricings} />
+      )}
+    </div>
+  );
+}
+
+function PostDraft(props: {
+  uploadStep: number;
+  tagPlaceholder?: boolean;
+  pricingPlaceholder?: boolean;
+}) {
   return (
     <PostWrapper
       Image={<PostImages uploadStep={props.uploadStep} />}
       artistName={"Michael Fortunato"}
-      Title={<i>{title}</i>}
-      Tags={<DraftTags />}
-      Description={<Typography>{description}</Typography>}
-      Pricing={<DraftPricing />}
+      Title={<DraftTitleWrapper />}
+      Tags={<DraftTagsWrapper placeholder={props.tagPlaceholder} />}
+      Description={<DraftDescriptionWrapper />}
+      Pricing={<DraftPricingWrapper placeholder={props.pricingPlaceholder} />}
     />
   );
 }
@@ -273,8 +195,6 @@ function PostDraft(props: { accountName: string; uploadStep: number }) {
 function ConfigureTitleAndDescription() {
   const dispatch = useDispatch();
   const { typography } = useTheme();
-  const { title } = useSelector(selectTitle);
-  const { description } = useSelector(selectDescripton);
   return (
     <Grid
       container
@@ -284,19 +204,17 @@ function ConfigureTitleAndDescription() {
     >
       <Grid item>
         <InputBase
-          value={title}
           multiline
           style={{
             fontSize: typography.h4.fontSize,
             borderBottom: "1px solid #000000"
           }}
           placeholder="Type your title here"
-          onChange={e => dispatch(addTitle({ title: e.target.value }))}
+          onChange={e => dispatch(addTitle(e.target.value))}
         />
       </Grid>
       <Grid item>
         <InputBase
-          value={description}
           multiline
           fullWidth
           style={{
@@ -307,36 +225,29 @@ function ConfigureTitleAndDescription() {
             overflowY: "auto"
           }}
           placeholder="Type your description here"
-          onChange={e =>
-            dispatch(addDescription({ description: e.target.value }))
-          }
+          onChange={e => dispatch(addDescription(e.target.value))}
         />
       </Grid>
     </Grid>
   );
 }
 
-function ConfigurePricingAndTags() {
-  const { price: buyPrice, error: buyError } = useSelector(selectBuyPrice);
-  const rentalPrices = useSelector(selectAllRentalPricings);
-
-  const existsValidBuyPrice = buyPrice && buyError === undefined;
-  const existsValidRentalPrice = rentalPrices.some(
-    rentalPrice => rentalPrice.error === undefined
-  );
-  const showTags = existsValidBuyPrice || existsValidRentalPrice;
+function ConfigurePricingAndTags(props: { hideTags?: boolean }) {
   return (
     <Grid
       container
+      style={{ minHeight: "100%", maxWidth: 650 }}
       direction="column"
-      style={{ minHeight: "100%" }}
-      spacing={2}
+      justifyContent="space-around"
     >
       <Grid item xs>
         <ConfigurePrices />
       </Grid>
-      <Grid item xs>
-        <S.RevealInputStep showBlur={!showTags} disableInteraction={!showTags}>
+      <Grid item xs="auto">
+        <S.RevealInputStep
+          showBlur={props.hideTags}
+          disableInteraction={props.hideTags}
+        >
           <Grid container justifyContent="center">
             <Grid item xs="auto">
               <Typography variant="h4"> Add tags</Typography>
@@ -351,14 +262,30 @@ function ConfigurePricingAndTags() {
   );
 }
 
-function ConfigurePost(props: { uploadStep: number }) {
+function ConfigurePost(props: {
+  uploadStep: number;
+  isTitleValid?: boolean;
+  isDescriptionValid?: boolean;
+  areImagesValid?: boolean;
+  areRentalPricingsValid?: boolean;
+  isBuyPriceValid?: boolean;
+  areTagsValid?: boolean;
+}) {
   switch (props.uploadStep) {
     case 0:
       return <ConfigureTitleAndDescription />;
     case 1:
       return <ConfigureImages />;
     case 2:
-      return <ConfigurePricingAndTags />;
+      return (
+        <ConfigurePricingAndTags
+          hideTags={
+            !props.areTagsValid &&
+            !props.isBuyPriceValid &&
+            !props.areRentalPricingsValid
+          }
+        />
+      );
     default:
       return null;
   }
@@ -370,35 +297,30 @@ export default function CreatePost() {
   // Define the attributes for the post
   const inputContainerRef = useRef<any>(null);
 
-  const { title } = useSelector(selectTitle);
-  const { description, error: descriptionError } =
-    useSelector(selectDescripton);
+  const isTitleValid = useSelector(selectIsTitleValid);
+  const isDescriptionValid = useSelector(selectIsDescriptionValid);
+  const areImagesValid = useSelector(selectAreImagesValid);
+  const validRentalPricings = useSelector(
+    selectAllValidRentalPricings,
+    shallowEqual
+  );
+  const validBuyPrice = useSelector(selectValidBuyPrice);
+  const areTagsValid = useSelector(selectAreTagsValid);
+  const numberOfImages = useSelector(selectNumberOfImages);
 
-  const { images } = useSelector(selectImages);
-  const { price: buyPrice, error: buyPriceError } = useSelector(selectBuyPrice);
-  const rentalPricings = useSelector(selectAllRentalPricings);
-
-  console.log(rentalPricings);
-  console.log(buyPriceError);
-  const isButtonDisabled = (): boolean => {
+  // console.log(validTitle(title) && validDescription(description));
+  // console.log(getTitleError(title));
+  // console.log(getDescriptionError(description));
+  const validStep = (): boolean => {
     switch (uploadStep) {
       case 0:
-        return (
-          title === undefined ||
-          title === "" ||
-          description === undefined ||
-          description === "" ||
-          typeof descriptionError === "string"
-        );
+        return isTitleValid && isDescriptionValid;
       case 1:
-        return images.length < 2;
+        return areImagesValid;
       case 2:
         return (
-          buyPriceError !== undefined &&
-          (rentalPricings.length === 0 ||
-            rentalPricings.every(
-              rentalPricing => typeof rentalPricing.error === "string"
-            ))
+          areTagsValid &&
+          (validRentalPricings.length > 0 || validBuyPrice !== undefined)
         );
       default:
         return true;
@@ -417,7 +339,7 @@ export default function CreatePost() {
     setUploadStep(uploadStep - 1);
   };
   return (
-    <Grid container direction="column" spacing={8}>
+    <Grid container direction="row" spacing={8} justifyContent="center">
       <AnimateSharedLayout>
         <Grid item xs="auto">
           <Stepper activeStep={uploadStep} alternativeLabel>
@@ -431,24 +353,24 @@ export default function CreatePost() {
           </Stepper>
         </Grid>
         <Grid
-          layout
           component={motion.div}
           container
           item
-          direction="column"
+          xs={12}
+          direction="row"
+          justifyContent="center"
           alignItems="center"
-          spacing={8}
         >
-          <Grid
-            item
-            xs="auto"
-            component={motion.div}
-            container
-            direction="row"
-            justifyContent="space-evenly"
-            layout={false}
-          >
-            <AnimateSharedLayout>
+          <AnimateSharedLayout>
+            <Grid
+              container
+              item
+              xs={6}
+              justifyContent="center"
+              layout={uploadStep < 2}
+              component={motion.div}
+              key="front"
+            >
               <Grid
                 item
                 xs="auto"
@@ -457,22 +379,44 @@ export default function CreatePost() {
                 layout={false}
               >
                 <PostDraft
-                  accountName={"Michael Fortunato"}
                   uploadStep={uploadStep}
+                  tagPlaceholder={
+                    !areTagsValid &&
+                    validBuyPrice === undefined &&
+                    validRentalPricings.length < 1
+                  }
+                  pricingPlaceholder={
+                    uploadStep < 2 &&
+                    validBuyPrice === undefined &&
+                    validRentalPricings.length < 1
+                  }
                 />
               </Grid>
+            </Grid>
+            {(numberOfImages > 0 || uploadStep !== 1) && (
               <Grid
-                layout={false}
+                container
+                justifyContent="center"
                 component={motion.div}
                 ref={inputContainerRef}
                 item
-                xs="auto"
+                xs={6}
                 key="configure"
               >
-                <ConfigurePost uploadStep={uploadStep} />
+                <Grid item xs="auto">
+                  <ConfigurePost
+                    uploadStep={uploadStep}
+                    isTitleValid={isTitleValid}
+                    isDescriptionValid={isDescriptionValid}
+                    areImagesValid={areImagesValid}
+                    areRentalPricingsValid={validRentalPricings.length > 0}
+                    isBuyPriceValid={validBuyPrice !== undefined}
+                    areTagsValid={areTagsValid}
+                  />
+                </Grid>
               </Grid>
-            </AnimateSharedLayout>
-          </Grid>
+            )}
+          </AnimateSharedLayout>
           <Grid
             component={motion.div}
             layout={false}
@@ -490,7 +434,7 @@ export default function CreatePost() {
             </Grid>
             <Grid item xs="auto">
               <Button
-                disabled={isButtonDisabled()}
+                disabled={!validStep()}
                 variant="contained"
                 color="primary"
                 onClick={handleNext}

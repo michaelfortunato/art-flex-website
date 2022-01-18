@@ -1,44 +1,48 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 // eslint-disable-next-line import/no-cycle
 import { RootState } from "@redux-store/store";
-import { BuyPricing, validBuyPricing } from "../CreatePost.api";
+import { BuyPricing } from "../CreatePost.api";
+import { validBuyPricing } from "../Post";
 
-type ErrorType = { error: string };
-type BuyPricingState = Partial<BuyPricing & ErrorType>;
-
-const initialState: BuyPricingState = {
+const initialState: Partial<BuyPricing> & { isDraft?: boolean } = {
   price: undefined,
-  error: undefined
+  isDraft: undefined
 };
 export const buyPricingSlice = createSlice({
   name: "buyPricing",
   initialState,
 
   reducers: {
-    setBuyPrice: (
-      _state,
-      action: PayloadAction<Partial<BuyPricing>>
-    ): BuyPricingState => {
+    setEmptyBuyPrice: () => ({ price: undefined, isDraft: true }),
+    setBuyPrice: (_state, action: PayloadAction<BuyPricing>) => {
       const { price } = action.payload;
-      const error = !validBuyPricing({ price })
-        ? "Invalid buy price configuration"
-        : undefined;
       return {
         price,
-        error
+        isDraft: undefined
       };
     },
-    removeBuyPrice: (): BuyPricingState => ({
-      price: undefined,
-      error: undefined
+    removeBuyPrice: () => ({
+      isDraft: undefined,
+      price: undefined
     })
   }
 });
 
 // Export actions
-export const { setBuyPrice, removeBuyPrice } = buyPricingSlice.actions;
+export const { setEmptyBuyPrice, setBuyPrice, removeBuyPrice } =
+  buyPricingSlice.actions;
 
 // Export selectors
+export const selectValidBuyPrice = (
+  state: RootState
+): BuyPricing | undefined => {
+  const { price } = state.createPost.pricing.buyPricing;
+  const buyPricing = { price };
+  if (validBuyPricing(buyPricing)) {
+    return buyPricing;
+  }
+  return undefined;
+};
 export const selectBuyPrice = (state: RootState) =>
   state.createPost.pricing.buyPricing;
 

@@ -37,5 +37,5 @@ export const RevealInputStep = styled.div<{
   disableInteraction?: boolean;
 }>`
   pointer-events: ${props => (props.disableInteraction ? "none" : "auto")};
-  filter: ${props => (props.showBlur ? "blur(.2rem)" : "none")};
+  filter: ${props => (props.showBlur ? "blur(.4rem)" : "none")};
 `;

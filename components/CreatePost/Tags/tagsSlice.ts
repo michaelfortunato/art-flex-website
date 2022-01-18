@@ -1,39 +1,33 @@
+// eslint-disable-next-line import/no-cycle
 import { RootState } from "@redux-store/store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { isTag, Tag as TagProps } from "../Post";
 
-type TagsState = {
-  tags: string[];
-  error: string | undefined;
-};
-const initialState: TagsState = {
-  tags: [],
-  error: undefined
-};
+const initialState: TagProps[] = [];
 
 export const tagsSlice = createSlice({
   name: "postTags",
   initialState,
   reducers: {
-    upsertTag: (state, action: PayloadAction<{ tag: string }>) => {
+    upsertTag: (state, action: PayloadAction<{ tag: TagProps }>) => {
       const { tag } = action.payload;
-      if (!state.tags.includes(tag)) {
-        state.tags.push(tag);
+      if (!state.some(currentTags => currentTags.label === tag.label)) {
+        state.push(tag);
       }
     },
-    removeTag: (state, action: PayloadAction<{ tag: string }>) => {
+    removeTag: (state, action: PayloadAction<{ tag: TagProps }>) => {
       const { tag } = action.payload;
-      const filteredTags = state.tags.filter(stateTag => stateTag !== tag);
+      const filteredTags = state.filter(
+        stateTag => stateTag.label !== tag.label
+      );
       return {
         ...state,
         tags: filteredTags
       };
     },
-    setTags: (state, action: PayloadAction<{ tags: string[] }>) => {
+    setTags: (state, action: PayloadAction<{ tags: TagProps[] }>) => {
       const { tags } = action.payload;
-      return {
-        tags,
-        error: undefined
-      };
+      return tags;
     }
   }
 });
@@ -43,6 +37,8 @@ export const { upsertTag, removeTag, setTags } = tagsSlice.actions;
 
 // Export selectors
 export const selectTags = (state: RootState) => state.createPost.tags;
-
+export const selectAreTagsValid = (state: RootState) =>
+  state.createPost.tags.length > 0 &&
+  state.createPost.tags.every(tag => isTag(tag));
 // Export the reducer
 export default tagsSlice.reducer;

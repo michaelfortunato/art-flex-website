@@ -1,7 +1,7 @@
 /* eslint-disable import/no-cycle */
 import { RootState } from "@redux-store/store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { MAX_IMAGES, PostImage } from "../Post";
+import { areImagesValid, MAX_IMAGES, PostImage } from "../Post";
 
 type ImagesSlice = { images: PostImage[]; selectedImage: string | undefined };
 
@@ -74,14 +74,10 @@ export const imagesSlice = createSlice({
     removeImage: (state, action: PayloadAction<{ index: number }>) => {
       const { index } = action.payload;
       if (!state.images || index > state.images.length - 1) {
-        console.log("here");
         return state;
       }
-      console.log("there");
       const topSlice = state.images.slice(0, index);
       const bottomSlice = state.images.slice(index + 1);
-      console.log(topSlice);
-      console.log(bottomSlice);
       return {
         ...state,
         images: topSlice.concat(bottomSlice)
@@ -107,11 +103,14 @@ export const { addImage, reorderImages, removeImage, setSelectedImage } =
 // Export selectors
 export const selectImage = (state: ImagesSlice, index: number) =>
   state.images?.[index];
-export const selectImages = (state: RootState) => state.createPost.images;
-
+export const selectImages = (state: RootState) => state.createPost.inputImages;
+export const selectAreImagesValid = (state: RootState) =>
+  areImagesValid(state.createPost.inputImages.images);
+export const selectNumberOfImages = (state: RootState) =>
+  state.createPost.inputImages.images.length;
 export const getSelectedImageIndex = (state: RootState) => {
-  const { selectedImage } = state.createPost.images;
-  const { images } = state.createPost.images;
+  const { selectedImage } = state.createPost.inputImages;
+  const { images } = state.createPost.inputImages;
   if (selectedImage !== undefined) {
     return images.findIndex(image => image.name === selectedImage);
   }
