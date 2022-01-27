@@ -239,7 +239,7 @@ function ConfigurePricingAndTags(props: { hideTags?: boolean }) {
       style={{ minHeight: "100%", maxWidth: 650 }}
       direction="column"
       justifyContent="space-around"
-      spacing={5}
+      spacing={0}
     >
       <Grid item xs>
         <ConfigurePrices />
