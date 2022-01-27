@@ -158,15 +158,10 @@ function DraftPricingWrapper(props: { placeholder?: boolean }) {
   const buyPrice = useSelector(selectValidBuyPrice);
 
   return (
-    <div style={{ minHeight: 120 }}>
+    <div style={{ minHeight: 60 }}>
       {props.placeholder ? (
         <S.RevealInputStep showBlur={true}>
-          <DraftPricing
-            buyPrice={{ price: 1000 }}
-            rentalPrices={[
-              { rentalPriceId: 0, price: 50, duration: 12, period: "Month" }
-            ]}
-          />
+          <DraftPricing buyPrice={{ price: 1000 }} />
         </S.RevealInputStep>
       ) : (
         <DraftPricing buyPrice={buyPrice} rentalPrices={rentalPricings} />
@@ -340,18 +335,21 @@ export default function CreatePost() {
     setUploadStep(uploadStep - 1);
   };
   return (
-    <Grid container direction="row" spacing={8} justifyContent="center">
+    <Grid container direction="row" spacing={0} justifyContent="center">
       <AnimateSharedLayout>
         <Grid item xs="auto">
-          <Stepper activeStep={uploadStep} alternativeLabel>
-            {steps.map(({ stepTitle, stepContent }) => (
-              <Step key={stepTitle}>
-                <StepLabel>
-                  <Typography>{stepContent}</Typography>
-                </StepLabel>
-              </Step>
-            ))}
-          </Stepper>
+          {" "}
+          {
+            // <Stepper activeStep={uploadStep} alternativeLabel>
+            // {steps.map(({ stepTitle, stepContent }) => (
+            // <Step key={stepTitle}>
+            // <StepLabel>
+            // <Typography>{stepContent}</Typography>
+            // </StepLabel>
+            // </Step>
+            // ))}
+            // </Stepper>
+          }
         </Grid>
         <Grid
           component={motion.div}
@@ -422,10 +420,10 @@ export default function CreatePost() {
             layout={false}
             container
             item
-            xs="auto"
+            xs={12}
             justifyContent="center"
             direction="row"
-            spacing={5}
+            spacing={2}
           >
             <Grid item xs="auto">
               <Button disabled={uploadStep === 0} onClick={handlePrevious}>

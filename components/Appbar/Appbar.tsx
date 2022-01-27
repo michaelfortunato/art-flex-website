@@ -26,7 +26,7 @@ const pages = [
 
 export default function Appbar() {
   return (
-    <div style={{ paddingTop: 10, marginBottom: 40, backgroundColor: "white" }}>
+    <div style={{ paddingTop: 10, marginBottom: 0, backgroundColor: "white" }}>
       <Grid container alignItems="center">
         <Grid container item xs={12} alignItems="center" spacing={3}>
           <Grid item xs="auto">

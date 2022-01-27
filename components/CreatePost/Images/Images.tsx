@@ -80,7 +80,7 @@ export function Images(props: { uploadStep: number }) {
             position: "relative"
           }}
         >
-          <Image src={PostPlaceHolderImg} alt="" width={400} height={400} />
+          <Image src={PostPlaceHolderImg} alt="" width={300} height={300} />
         </motion.div>
       ) : (
         <Dropzone
@@ -96,8 +96,8 @@ export function Images(props: { uploadStep: number }) {
                 <Image
                   src={images[selectedImageIndex || 0].preview}
                   alt=""
-                  width={400}
-                  height={400}
+                  width={300}
+                  height={300}
                 />
               )}
             </div>

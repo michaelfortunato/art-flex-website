@@ -195,6 +195,7 @@ export function PostWrapper(props: PostWrapperProps) {
       elevation={3}
       style={{
         padding: 60,
+        paddingTop: 60,
         borderRadius: 10,
         display: "inline-block"
       }}
@@ -205,8 +206,9 @@ export function PostWrapper(props: PostWrapperProps) {
             <div
               style={{
                 display: "inline-block",
-                height: 440,
-                width: 400,
+                height: 320,
+                width: 300,
+                marginTop: 0,
                 marginBottom: 20
               }}
             >

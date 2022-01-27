@@ -88,7 +88,7 @@ function EmptyDropzone() {
     >
       <Grid item xs="auto" style={{ paddingTop: 50 }}>
         <div>
-          <div style={{ textAlign: "center", fontSize: "6rem" }}>
+          <div style={{ textAlign: "center", fontSize: "1rem" }}>
             <SystemUpdateAltOutlinedIcon fontSize="inherit" />
           </div>
           <div style={{ paddingTop: 5 }}>
@@ -96,11 +96,11 @@ function EmptyDropzone() {
               Drag and drop your files here
             </Typography>
           </div>
-          <div style={{ paddingTop: 20, paddingBottom: 20 }}></div>
+          <div style={{ paddingTop: 10, paddingBottom: 10 }}></div>
           <div
             style={{
               textAlign: "center",
-              paddingBottom: 40
+              paddingBottom: 20
             }}
           >
             <Button variant="outlined">Browse</Button>

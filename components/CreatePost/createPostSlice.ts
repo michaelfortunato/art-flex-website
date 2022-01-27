@@ -1,11 +1,11 @@
-/* eslint-disable-next-line import/no-cycle */
+/* eslint-disable import/no-cycle */
 import { combineReducers } from "@reduxjs/toolkit";
+import { RootState } from "@redux-store/store";
 import titleReducer from "./Title/titleSlice";
 import descriptionReducer from "./Description/descriptionSlice";
 import tagsReducer from "./Tags/tagsSlice";
 import imagesReducer from "./Images/imagesSlice";
 import pricingReducer from "./Pricing/pricingSlice";
-import { RootState } from "@redux-store/store";
 
 export default combineReducers({
   title: titleReducer,
