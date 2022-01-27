@@ -336,113 +336,112 @@ export default function CreatePost() {
   };
   return (
     <Grid container direction="row" spacing={0} justifyContent="center">
-      <AnimateSharedLayout>
-        <Grid item xs="auto">
-          {" "}
-          {
-            // <Stepper activeStep={uploadStep} alternativeLabel>
-            // {steps.map(({ stepTitle, stepContent }) => (
-            // <Step key={stepTitle}>
-            // <StepLabel>
-            // <Typography>{stepContent}</Typography>
-            // </StepLabel>
-            // </Step>
-            // ))}
-            // </Stepper>
-          }
-        </Grid>
-        <Grid
-          component={motion.div}
-          container
-          item
-          xs={12}
-          direction="row"
-          justifyContent="center"
-        >
-          <AnimateSharedLayout>
+      <Grid item xs="auto">
+        {" "}
+        {
+          // <Stepper activeStep={uploadStep} alternativeLabel>
+          // {steps.map(({ stepTitle, stepContent }) => (
+          // <Step key={stepTitle}>
+          // <StepLabel>
+          // <Typography>{stepContent}</Typography>
+          // </StepLabel>
+          // </Step>
+          // ))}
+          // </Stepper>
+        }
+      </Grid>
+      <Grid
+        component={motion.div}
+        container
+        item
+        xs={12}
+        direction="row"
+        justifyContent="center"
+      >
+        <AnimateSharedLayout>
+          <Grid
+            container
+            item
+            xs={6}
+            justifyContent="center"
+            layout={uploadStep < 2}
+            component={motion.div}
+            key="front"
+          >
             <Grid
-              container
               item
-              xs={6}
-              justifyContent="center"
-              layout={uploadStep < 2}
+              xs="auto"
               component={motion.div}
               key="front"
+              layout={false}
             >
-              <Grid
-                item
-                xs="auto"
-                component={motion.div}
-                key="front"
-                layout={false}
-              >
-                <PostDraft
+              <PostDraft
+                uploadStep={uploadStep}
+                tagPlaceholder={
+                  !areTagsValid &&
+                  validBuyPrice === undefined &&
+                  validRentalPricings.length < 1
+                }
+                pricingPlaceholder={
+                  uploadStep < 2 &&
+                  validBuyPrice === undefined &&
+                  validRentalPricings.length < 1
+                }
+              />
+            </Grid>
+          </Grid>
+          {(numberOfImages > 0 || uploadStep !== 1) && (
+            <Grid
+              container
+              justifyContent="center"
+              component={motion.div}
+              ref={inputContainerRef}
+              item
+              xs={6}
+              key="configure"
+            >
+              <Grid item xs="auto">
+                <ConfigurePost
                   uploadStep={uploadStep}
-                  tagPlaceholder={
-                    !areTagsValid &&
-                    validBuyPrice === undefined &&
-                    validRentalPricings.length < 1
-                  }
-                  pricingPlaceholder={
-                    uploadStep < 2 &&
-                    validBuyPrice === undefined &&
-                    validRentalPricings.length < 1
-                  }
+                  isTitleValid={isTitleValid}
+                  isDescriptionValid={isDescriptionValid}
+                  areImagesValid={areImagesValid}
+                  areRentalPricingsValid={validRentalPricings.length > 0}
+                  isBuyPriceValid={validBuyPrice !== undefined}
+                  areTagsValid={areTagsValid}
                 />
               </Grid>
             </Grid>
-            {(numberOfImages > 0 || uploadStep !== 1) && (
-              <Grid
-                container
-                justifyContent="center"
-                component={motion.div}
-                ref={inputContainerRef}
-                item
-                xs={6}
-                key="configure"
-              >
-                <Grid item xs="auto">
-                  <ConfigurePost
-                    uploadStep={uploadStep}
-                    isTitleValid={isTitleValid}
-                    isDescriptionValid={isDescriptionValid}
-                    areImagesValid={areImagesValid}
-                    areRentalPricingsValid={validRentalPricings.length > 0}
-                    isBuyPriceValid={validBuyPrice !== undefined}
-                    areTagsValid={areTagsValid}
-                  />
-                </Grid>
-              </Grid>
-            )}
-          </AnimateSharedLayout>
-          <Grid
-            component={motion.div}
-            layout={false}
-            container
-            item
-            xs={12}
-            justifyContent="center"
-            direction="row"
-            spacing={2}
-          >
-            <Grid item xs="auto">
-              <Button disabled={uploadStep === 0} onClick={handlePrevious}>
-                Back
-              </Button>
-            </Grid>
-            <Grid item xs="auto">
-              <Button
-                disabled={!validStep()}
-                variant="contained"
-                color="primary"
-                onClick={handleNext}
-              >
-                {uploadStep < steps.length - 1 ? "Next" : "Submit"}
-              </Button>
-            </Grid>
+          )}
+        </AnimateSharedLayout>
+        <Grid
+          style={{ marginTop: 20 }}
+          component={motion.div}
+          layout={false}
+          container
+          item
+          xs={12}
+          justifyContent="center"
+          direction="row"
+          spacing={2}
+        >
+          <Grid item xs="auto">
+            <Button disabled={uploadStep === 0} onClick={handlePrevious}>
+              Back
+            </Button>
+          </Grid>
+          <Grid item xs="auto">
+            <Button
+              disabled={!validStep()}
+              variant="contained"
+              color="primary"
+              onClick={handleNext}
+            >
+              {uploadStep < steps.length - 1 ? "Next" : "Submit"}
+            </Button>
           </Grid>
         </Grid>
-      </AnimateSharedLayout>
+      </Grid>
     </Grid>
   );
 }

@@ -82,30 +82,24 @@ function EmptyDropzone() {
     <Grid
       container
       justifyContent="center"
-      alignItems="center"
       style={{ height: "100%" }}
       direction="row"
+      alignItems="center"
     >
-      <Grid item xs="auto" style={{ paddingTop: 50 }}>
-        <div>
-          <div style={{ textAlign: "center", fontSize: "1rem" }}>
-            <SystemUpdateAltOutlinedIcon fontSize="inherit" />
-          </div>
-          <div style={{ paddingTop: 5 }}>
-            <Typography variant={"h5"}>
-              Drag and drop your files here
-            </Typography>
-          </div>
-          <div style={{ paddingTop: 10, paddingBottom: 10 }}></div>
-          <div
-            style={{
-              textAlign: "center",
-              paddingBottom: 20
-            }}
-          >
-            <Button variant="outlined">Browse</Button>
-          </div>
-        </div>
+      <Grid
+        container
+        item
+        xs="auto"
+        justifyContent="center"
+        style={{ fontSize: "4rem" }}
+      >
+        <Grid item xs="auto">
+          <SystemUpdateAltOutlinedIcon fontSize="inherit" />
+        </Grid>
+        <Typography variant={"h6"}>Drag and drop your files here</Typography>
+      </Grid>
+      <Grid item xs="auto">
+        <Button variant="outlined">Browse</Button>
       </Grid>
     </Grid>
   );
