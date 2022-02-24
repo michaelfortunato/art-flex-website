@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-import styled from "styled-components";
 import {
   DragDropContext,
   Droppable,
@@ -7,32 +5,17 @@ import {
   DropResult
 } from "react-beautiful-dnd";
 import {
-  Grid,
-  GridProps,
   IconButton,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Paper
+  Paper,
+  useTheme
 } from "@material-ui/core";
 import { Cancel, Image } from "@material-ui/icons";
 import { forwardRef } from "react";
 import mergeRefs from "react-merge-refs";
-const DragAndDropMenuContainer = styled.div`
-  color: #ffffff;
-  background-color: rgb(18, 18, 18);
-`;
-
-const DragAndDropItemContainer = styled.div`
-  padding: 20px;
-`;
-
-const MenuItem = styled(Paper)`
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding: 4px;
-`;
 
 // eslint-disable-next-line prefer-arrow-callback
 const DraggableMenu = forwardRef(function DraggableMenu(
@@ -52,10 +35,11 @@ const DraggableMenu = forwardRef(function DraggableMenu(
       props.onReorder(result.source.index, result.destination.index);
     }
   }
+  const theme = useTheme();
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="droppable">
-        {(provided, snapshot) => (
+        {provided => (
           <List
             {...props.containerProps}
             {...provided.droppableProps}
@@ -63,19 +47,24 @@ const DraggableMenu = forwardRef(function DraggableMenu(
           >
             {props.items.map((item, index) => (
               <Draggable key={item} draggableId={`item-${item}`} index={index}>
-                {(provided, snapshot) => (
+                {providedDrag => (
                   <ListItem
                     component={Paper}
-                    selected={props.selectedItem === item}
-                    onClick={() => props.setSelectedItem(item)}
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
+                    onMouseDown={() => props.setSelectedItem(item)}
+                    ref={providedDrag.innerRef}
+                    {...providedDrag.draggableProps}
+                    {...providedDrag.dragHandleProps}
                     style={{
-                      ...provided.draggableProps.style,
+                      ...providedDrag.draggableProps.style,
                       ...props.itemProps,
                       width: "fit-content",
-                      overflowWrap: "break-word"
+                      overflowWrap: "break-word",
+                      backgroundColor: `${
+                        props.selectedItem === item
+                          ? "#ebebeb" // mimicking selected behavior
+                          : // but using the rgb (solid) conversion of its rgba
+                            theme.palette.background.paper // use paper bg
+                      }`
                     }}
                   >
                     <ListItemIcon>
@@ -84,7 +73,11 @@ const DraggableMenu = forwardRef(function DraggableMenu(
                         <Image />
                       }
                     </ListItemIcon>
-                    <ListItemText primary={item} />
+                    <ListItemText
+                      primary={
+                        item.length > 30 ? `${item.slice(0, 30)} ...` : item
+                      }
+                    />
                     {props.selectedItem === item && (
                       <IconButton
                         edge="end"

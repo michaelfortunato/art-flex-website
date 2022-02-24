@@ -20,6 +20,8 @@ import * as BaseForm from "@components/Library/FormField/BaseFormField.styled";
 import { DropdownSelection } from "@components/Dropdowns";
 import BlackTooltip from "@components/BlackTooltip";
 import {
+  InputBuyPricing,
+  markBuyPriceNotConfirmed,
   removeBuyPrice,
   selectBuyPrice,
   setBuyPrice,
@@ -30,7 +32,9 @@ import {
   validRentalPricing,
   validBuyPricing,
   BuyPricing,
-  getPriceError
+  getPriceError,
+  MAX_NUM_RENTAL_PRICINGS,
+  MAX_RENTAL_PRICES
 } from "../Post";
 import {
   addEmptyRentalPrice,
@@ -38,21 +42,80 @@ import {
   removeManyRentalPrices,
   removeOneRentalPrice,
   selectAllRentalPricingIds,
+  selectAllRentalPricings,
   selectRentalPriceIdsWithDurationAndPeriod,
+  selectRentalPricingById,
   upsertOneRentalPrice
 } from "./rentalPricingsSlice";
 import { PriceButtonText, PriceButtonWrapper } from "./PriceButtons";
+import { RootState } from "@redux-store/store";
 
 type ConfigPriceRowProps = {
   priceType: "Rent" | "Buy";
+  rentalPricing?: InputRentalPricing;
+  buyPricing?: InputBuyPricing;
+  initialPrice?: number;
+  initialPeriod?: string;
+  initialDuration?: number;
   rentalPriceId?: number | string;
+  confirmed?: boolean;
 };
 
+function getInitialPrice(
+  priceType: "Rent" | "Buy",
+  rentalPricing?: InputRentalPricing,
+  buyPricing?: InputBuyPricing
+): number | undefined {
+  if (priceType === "Rent") {
+    return rentalPricing?.price;
+  }
+  return buyPricing?.price;
+}
+function getInitialPeriod(
+  rentalPricing?: InputRentalPricing
+): string | undefined {
+  return rentalPricing?.period;
+}
+function getInitialDuration(
+  rentalPricing?: InputRentalPricing
+): number | undefined {
+  return rentalPricing?.duration;
+}
+function isPricingConfirmed(
+  priceType: "Rent" | "Buy",
+  rentalPricing?: InputRentalPricing,
+  buyPricing?: InputBuyPricing
+): boolean {
+  if (priceType === "Rent") {
+    return rentalPricing?.confirmed === true;
+  }
+  return buyPricing?.confirmed === true;
+}
+
 function ConfigPriceRow(props: ConfigPriceRowProps) {
-  const [price, setPrice] = useState<number | undefined>(undefined);
-  const [period, setPeriod] = useState<string | undefined>(undefined);
-  const [duration, setDuration] = useState<number | undefined>(undefined);
-  const [confirmed, setConfirmed] = useState<boolean>(false);
+  // This is a complex component that needs describing/refactoring
+  // 1. When a person creates an empty row,
+  // a new entry is put into the redux store, therefore,
+  // any changes to that row will be linked to the redux store.
+  // However, we only want the redux store to reflect the change
+  // after a consumer hits confirm. As a result, we store what is in
+  // the row in temp variables. The state of these temp variables
+  // can either be undefined or the value of teh redux store.
+
+  const [price, setPrice] = useState<number | undefined>(
+    getInitialPrice(props.priceType, props.rentalPricing, props.buyPricing)
+  );
+  const [period, setPeriod] = useState<string | undefined>(
+    getInitialPeriod(props.rentalPricing)
+  );
+  const [duration, setDuration] = useState<number | undefined>(
+    getInitialDuration(props.rentalPricing)
+  );
+  const confirmed = isPricingConfirmed(
+    props.priceType,
+    props.rentalPricing,
+    props.buyPricing
+  );
 
   const dispatch = useDispatch();
 
@@ -86,33 +149,58 @@ function ConfigPriceRow(props: ConfigPriceRowProps) {
   }
 
   function confirmPricing() {
-    if (props.priceType === "Rent" && props.rentalPriceId !== undefined) {
+    if (
+      props.priceType === "Rent" &&
+      props.rentalPricing?.rentalPriceId !== undefined
+    ) {
       dispatch(
         upsertOneRentalPrice({
-          rentalPriceId: props.rentalPriceId,
+          rentalPriceId: props.rentalPricing.rentalPriceId,
           price,
           duration,
-          period
+          period,
+          confirmed: true
         } as InputRentalPricing)
       );
       dispatch(
         removeManyRentalPrices(
           duplicateRentalPriceIds.filter(
-            rentalPriceId => rentalPriceId !== props.rentalPriceId
+            rentalPriceId =>
+              rentalPriceId !==
+              (props.rentalPricing as InputRentalPricing).rentalPriceId
           )
         )
       );
-      setConfirmed(true);
     }
     if (props.priceType === "Buy") {
-      dispatch(setBuyPrice({ price } as BuyPricing));
-      setConfirmed(true);
+      dispatch(
+        setBuyPrice({ price, isDraft: false, confirmed: true } as BuyPricing)
+      );
+    }
+  }
+  function unConfirmPricing() {
+    if (
+      props.priceType === "Rent" &&
+      props.rentalPricing?.rentalPriceId !== undefined
+    ) {
+      dispatch(
+        upsertOneRentalPrice({
+          rentalPriceId: props.rentalPricing.rentalPriceId,
+          confirmed: false
+        })
+      );
+    }
+    if (props.priceType === "Buy") {
+      dispatch(markBuyPriceNotConfirmed());
     }
   }
 
   function onRowDelete() {
-    if (props.priceType === "Rent" && props.rentalPriceId !== undefined) {
-      dispatch(removeOneRentalPrice(props.rentalPriceId));
+    if (
+      props.priceType === "Rent" &&
+      props.rentalPricing?.rentalPriceId !== undefined
+    ) {
+      dispatch(removeOneRentalPrice(props.rentalPricing.rentalPriceId));
     }
     if (props.priceType === "Buy") {
       dispatch(removeBuyPrice());
@@ -200,7 +288,7 @@ function ConfigPriceRow(props: ConfigPriceRowProps) {
           <IconButton
             disabled={!validatePrice()}
             color="primary"
-            onClick={() => setConfirmed(false)}
+            onClick={unConfirmPricing}
           >
             <Edit />
           </IconButton>
@@ -224,40 +312,24 @@ function ConfigPriceRow(props: ConfigPriceRowProps) {
 }
 
 export function ConfigurePrices() {
-  const { price: buyPrice, isDraft: isBuyPriceDraft } =
-    useSelector(selectBuyPrice);
-  const hasBuyRow = buyPrice !== undefined || isBuyPriceDraft;
-  const rentalPriceIds = useSelector(selectAllRentalPricingIds);
+  const buyPricing = useSelector(selectBuyPrice);
+  const allRentalPricings = useSelector(selectAllRentalPricings);
+  const hasBuyRow = buyPricing.price !== undefined || buyPricing.isDraft;
+
+  const hideBuyPriceButton =
+    buyPricing.price !== undefined || buyPricing.isDraft;
+  const prevHideBuyPriceButton = useRef(hideBuyPriceButton);
+  const hideRentalPriceButton = allRentalPricings.length >= MAX_RENTAL_PRICES;
+  const prevHideRentalPriceButton = useRef(hideRentalPriceButton);
+
+  useEffect(() => {
+    prevHideBuyPriceButton.current = hideBuyPriceButton;
+  }, [hideBuyPriceButton]);
+  useEffect(() => {
+    prevHideRentalPriceButton.current = hideRentalPriceButton;
+  }, [hideRentalPriceButton]);
+
   const dispatch = useDispatch();
-
-  // function onConfirmBuyPrice(buyPrice: BuyPricing) {
-  // dispatch(setBuyPrice(buyPrice));
-  // }
-
-  // function onBuyRowDelete() {
-  // dispatch(removeBuyPrice);
-  // setHasBuyPrice(false);
-  // }
-
-  // function onConfirmRentalPrice(rentalPrice: InputRentalPricing) {
-  // const removeRentalPriceIds = findRentalPricesWithDurationAndPeriod(
-  // rentalPrice.duration,
-  // rentalPrice.period,
-  // rentalPricings
-  // ).map(({ rentalPriceId }) => rentalPriceId);
-  // dispatch(removeManyRentalPrices(removeRentalPriceIds));
-  // dispatch(upsertOneRentalPrice(rentalPrice));
-  // }
-
-  // function onRentalRowDelete(deleteId: number) {
-  // setRentalPriceIds((oldRentalPriceIds: number[]) => {
-  // const newRentalPriceIds = oldRentalPriceIds.filter(
-  // oldRentalPriceId => oldRentalPriceId !== deleteId
-  // );
-  // return [...newRentalPriceIds];
-  // });
-  // dispatch(removeRentalPrice(deleteId));
-  // }
 
   function addBuyRow() {
     dispatch(setEmptyBuyPrice());
@@ -270,17 +342,34 @@ export function ConfigurePrices() {
     <Grid container spacing={2} direction="column">
       <Grid item container justifyContent="space-evenly">
         <Grid item xs="auto">
+          <BlackTooltip
+            title={
+              hasBuyRow ? "You can only configure at most one buy price." : ""
+            }
+            placement="top"
+          >
+            {
+              // See MUI documentation for Tooltop to know why span is included.
+              <span style={{ display: "inline-block" }}>
+                <Button
+                  disabled={hasBuyRow}
+                  onClick={addBuyRow}
+                  variant="contained"
+                  color="primary"
+                >
+                  Add Buy Price
+                </Button>
+              </span>
+            }
+          </BlackTooltip>
+        </Grid>
+        <Grid item xs="auto">
           <Button
-            disabled={hasBuyRow}
-            onClick={addBuyRow}
+            onClick={onAddRentalRow}
+            disabled={hideRentalPriceButton}
             variant="contained"
             color="primary"
           >
-            Add Buy Price
-          </Button>
-        </Grid>
-        <Grid item xs="auto">
-          <Button onClick={onAddRentalRow} variant="contained" color="primary">
             Add Rental Price
           </Button>
         </Grid>
@@ -305,12 +394,18 @@ export function ConfigurePrices() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {hasBuyRow && <ConfigPriceRow key="buy" priceType="Buy" />}
-              {rentalPriceIds.map(rentalPriceId => (
+              {hasBuyRow && (
                 <ConfigPriceRow
-                  key={rentalPriceId}
+                  key="buy"
+                  priceType="Buy"
+                  buyPricing={buyPricing}
+                />
+              )}
+              {allRentalPricings.map(rentalPricing => (
+                <ConfigPriceRow
+                  key={rentalPricing.rentalPriceId}
                   priceType="Rent"
-                  rentalPriceId={rentalPriceId}
+                  rentalPricing={rentalPricing}
                 />
               ))}
             </TableBody>

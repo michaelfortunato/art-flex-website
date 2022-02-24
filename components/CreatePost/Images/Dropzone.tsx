@@ -21,62 +21,6 @@ const DragAndDropItemContainer = styled.div`
   padding: 20px;
 `;
 
-// eslint-disable-next-line react/display-name
-const DragAndDropMenu = forwardRef<any, any>((props, containerRef) => {
-  const onDragEnd = result => {
-    if (!result.destination) {
-      return;
-    }
-    const items = reorder(
-      result.source.index,
-      result.destination.index,
-      props.items
-    );
-    props.setItems(items);
-  };
-  const setRef = (ref, provided) => {
-    containerRef(ref);
-    provided.innerRef(ref);
-  };
-
-  return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="droppable">
-        {(provided, snapshot) => {
-          provided.innerRef(containerRef.current);
-          return (
-            <DragAndDropMenuContainer
-              {...provided.droppableProps}
-              ref={ref => setRef(ref, provided)}
-              isDraggingOver={snapshot.isDraggingOver}
-            >
-              {props.items.map((item, index) => (
-                <Draggable
-                  key={index}
-                  draggableId={`item-${index}`}
-                  index={index}
-                >
-                  {(provided, snapshot) => (
-                    <DragAndDropItemContainer
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      style={{ ...provided.draggableProps.style }}
-                    >
-                      {item.name}
-                    </DragAndDropItemContainer>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </DragAndDropMenuContainer>
-          );
-        }}
-      </Droppable>
-    </DragDropContext>
-  );
-});
-
 function EmptyDropzone() {
   return (
     <Grid
@@ -126,6 +70,7 @@ export default function Dropzone(props: {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      showDashedBorder={props.items.length === 0}
       {...getRootProps({ isDragActive, isDragAccept, isDragReject })}
     >
       {props.items.length === 0 && <EmptyDropzone />}

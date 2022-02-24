@@ -181,6 +181,7 @@ export function ConfigureTags() {
         multiple
         options={FakeTags}
         getOptionLabel={tags => tags.label}
+        groupBy={option => option.category}
         onChange={(event: ChangeEvent<{}>, tags: TagProps[]) =>
           dispatch(setTags({ tags }))
         }

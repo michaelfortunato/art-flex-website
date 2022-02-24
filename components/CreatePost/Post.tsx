@@ -41,6 +41,11 @@ export interface PostProps {
 }
 
 const MAX_PRICE = 15000;
+export const MAX_TITLE_LEN = 100;
+export const MAX_DESCRIPTION_LEN = 400;
+export const MIN_IMAGES = 2;
+export const MAX_IMAGES = 5;
+export const MAX_RENTAL_PRICES = 2;
 
 export function isRentalPricing(pricing: any): pricing is RentalPricing {
   return pricing
@@ -98,11 +103,6 @@ export function validRentalPricing(
     return false;
   }
 }
-export const MAX_TITLE_LEN = 100;
-export const MAX_DESCRIPTION_LEN = 400;
-export const MIN_IMAGES = 2;
-export const MAX_IMAGES = 5;
-export const MAX_RENTAL_PRICES = 2;
 
 /**
  * Here we do client side validation of description
@@ -200,7 +200,7 @@ export function PostWrapper(props: PostWrapperProps) {
         display: "inline-block"
       }}
     >
-      <div>
+      <div style={{ width: 300 }}>
         <Grid container justifyContent="center">
           <Grid item xs="auto">
             <div

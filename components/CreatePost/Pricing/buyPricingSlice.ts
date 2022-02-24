@@ -4,9 +4,12 @@ import { RootState } from "@redux-store/store";
 import { BuyPricing } from "../CreatePost.api";
 import { validBuyPricing } from "../Post";
 
-const initialState: Partial<BuyPricing> & { isDraft?: boolean } = {
-  price: undefined,
-  isDraft: undefined
+export type InputBuyPricing = Partial<BuyPricing> & {
+  confirmed?: boolean;
+  isDraft?: boolean;
+};
+const initialState: InputBuyPricing = {
+  price: undefined
 };
 export const buyPricingSlice = createSlice({
   name: "buyPricing",
@@ -14,23 +17,31 @@ export const buyPricingSlice = createSlice({
 
   reducers: {
     setEmptyBuyPrice: () => ({ price: undefined, isDraft: true }),
-    setBuyPrice: (_state, action: PayloadAction<BuyPricing>) => {
-      const { price } = action.payload;
+    setBuyPrice: (_state, action: PayloadAction<InputBuyPricing>) => {
+      const { price, confirmed, isDraft } = action.payload;
       return {
         price,
-        isDraft: undefined
+        isDraft,
+        confirmed
       };
     },
     removeBuyPrice: () => ({
-      isDraft: undefined,
       price: undefined
+    }),
+    markBuyPriceNotConfirmed: state => ({
+      ...state,
+      confirmed: false
     })
   }
 });
 
 // Export actions
-export const { setEmptyBuyPrice, setBuyPrice, removeBuyPrice } =
-  buyPricingSlice.actions;
+export const {
+  setEmptyBuyPrice,
+  setBuyPrice,
+  removeBuyPrice,
+  markBuyPriceNotConfirmed
+} = buyPricingSlice.actions;
 
 // Export selectors
 export const selectValidBuyPrice = (

@@ -5,10 +5,44 @@ import { RentalPricing, validRentalPricing } from "../Post";
 
 export type InputRentalPricing = {
   rentalPriceId: number;
+  confirmed?: boolean;
 } & Partial<RentalPricing>;
 
+function calculatePeriodCardinality(period?: string): number {
+  if (period === "Month") {
+    return 1;
+  }
+  if (period === "Months") {
+    return 2;
+  }
+  if (period === "Year") {
+    return 3;
+  }
+  if (period === "Years") {
+    return 4;
+  }
+  return 0;
+}
+function calculateDurationCardinality(duration?: number): number {
+  return duration !== undefined ? duration : -1;
+}
+
+function sortByRentalPeriod(a: InputRentalPricing, b: InputRentalPricing) {
+  const periodACardinality = calculatePeriodCardinality(a.period);
+  const periodBCardinality = calculatePeriodCardinality(b.period);
+
+  const durationACardinality = calculateDurationCardinality(a.duration);
+  const durationBCardinality = calculateDurationCardinality(b.duration);
+
+  if (periodACardinality === periodBCardinality) {
+    return durationACardinality - durationBCardinality;
+  }
+  return periodACardinality - periodBCardinality;
+}
+
 const rentalPricingAdapter = createEntityAdapter<InputRentalPricing>({
-  selectId: rentalPricing => rentalPricing.rentalPriceId
+  selectId: rentalPricing => rentalPricing.rentalPriceId,
+  sortComparer: sortByRentalPeriod
 });
 
 export const rentalPricingSlice = createSlice({
@@ -44,7 +78,6 @@ export const {
 } = rentalPricingAdapter.getSelectors(
   (state: RootState) => state.createPost.pricing.rentalPricing
 );
-
 export const selectRentalPriceIdsWithDurationAndPeriod =
   (duration?: number, period?: string) =>
   (state: RootState): EntityId[] =>

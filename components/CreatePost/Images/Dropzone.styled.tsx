@@ -18,8 +18,21 @@ function getBorderColorOnDrop(
   return "#eeeeee";
 }
 
-export const DropzoneContainer = styled(motion.div)<any>`
-  border-style: dashed;
+export const DropzoneContainer = styled(motion.div)<{
+  isDragAccept: boolean;
+  isDragReject: boolean;
+  isDragActive: boolean;
+  showDashedBorder: boolean;
+}>`
+  border-style: ${({
+    showDashedBorder,
+    isDragAccept,
+    isDragReject,
+    isDragActive
+  }) =>
+    showDashedBorder || isDragAccept || isDragReject || isDragActive
+      ? `dashed`
+      : `none`};
   border-width: 2px;
   border-color: ${({ isDragAccept, isDragReject, isDragActive }) =>
     getBorderColorOnDrop(isDragAccept, isDragReject, isDragActive)};

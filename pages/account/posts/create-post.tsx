@@ -12,8 +12,8 @@ import {
   useTheme
 } from "@material-ui/core";
 import Image from "next/image";
-import { useState, useRef, ReactElement, MouseEventHandler } from "react";
-import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
+import { useState, useRef, ReactElement } from "react";
+import { AnimateSharedLayout, motion } from "framer-motion";
 import uploadFile from "@utils/chunked-upload";
 import InputTitle from "@components/CreatePost/Title/Title";
 import InputDescription from "@components/CreatePost/Description/Description";

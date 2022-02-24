@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import PostPlaceHolderImg from "@public/create_post_placeholder.jpg";
@@ -19,36 +19,46 @@ import DraggableMenu from "./DraggableMenu";
 export function ConfigureImages() {
   const dispatch = useDispatch();
   const { images, selectedImage } = useSelector(selectImages);
+  const [showItemSelection, setShowItemSelection] = useState(true);
   return images.length !== 0 ? (
     <Grid container style={{ height: "100%" }} alignItems="center">
       <Grid item>
-        <DraggableMenu
-          items={images.map(({ name }) => name)}
-          onReorder={(source: number, destination: number) =>
-            dispatch(
-              reorderImages({
-                sourceIndex: source,
-                destinationIndex: destination
-              })
-            )
-          }
-          selectedItem={selectedImage}
-          setSelectedItem={(newSelectedImage: string | undefined) =>
-            dispatch(setSelectedImage({ selectedImage: newSelectedImage }))
-          }
-          onRemove={(imageIndex: number) =>
-            dispatch(removeImage({ index: imageIndex }))
-          }
-          containerProps={{
-            item: true,
-            xs: 11,
-            direction: "column",
-            spacing: 3
+        <ClickAwayListener
+          onClickAway={() => {
+            dispatch(setSelectedImage({ selectedImage: images[0].name }));
+            setShowItemSelection(false);
           }}
-          itemProps={{
-            marginTop: 20 // Watch out for margin collapse (do not add marginbottom)
-          }}
-        />
+          mouseEvent="onMouseDown"
+        >
+          <DraggableMenu
+            items={images.map(({ name }) => name)}
+            onReorder={(source: number, destination: number) => {
+              dispatch(
+                reorderImages({
+                  sourceIndex: source,
+                  destinationIndex: destination
+                })
+              );
+            }}
+            selectedItem={showItemSelection ? selectedImage : ""}
+            setSelectedItem={(newSelectedImage: string | undefined) => {
+              dispatch(setSelectedImage({ selectedImage: newSelectedImage }));
+              setShowItemSelection(true);
+            }}
+            onRemove={(imageIndex: number) =>
+              dispatch(removeImage({ index: imageIndex }))
+            }
+            containerProps={{
+              item: true,
+              xs: 11,
+              direction: "column",
+              spacing: 3
+            }}
+            itemProps={{
+              marginTop: 20 // Watch out for margin collapse (do not add marginbottom)
+            }}
+          />
+        </ClickAwayListener>
       </Grid>
     </Grid>
   ) : null;
