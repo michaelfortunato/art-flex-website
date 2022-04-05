@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "paths": {
+    "/products/drafted": {
+      "name": "/products/drafted",
+      "lambdaFunction": "productsService",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ]
+      }
+    }
+  }
+}
