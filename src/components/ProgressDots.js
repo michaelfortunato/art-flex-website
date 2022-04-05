@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { CSSTransition } from "react-transition-group";
 import { Grid, useTheme } from "@material-ui/core";
 import { motion } from "framer-motion";
+
 const DotsContainer = styled(motion.span)``;
 const Dot = styled(motion.div)`
   ${({ theme }) => `

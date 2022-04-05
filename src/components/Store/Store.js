@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react'
 import Grid from '@material-ui/core/Grid';
 import styled from 'styled-components'
 import Filter from '@components/Filterbar'
-import StoreBody from './StoreBody'
 import Divider from '@material-ui/core/Divider'
 import {useInView} from 'react-intersection-observer';
+import StoreBody from './StoreBody'
 
-let counter = 0;
+const counter = 0;
 export default function Store() {
     const [pages, setPages] = useState([20])
     const [priceFilter, setPriceFilter] = useState('');

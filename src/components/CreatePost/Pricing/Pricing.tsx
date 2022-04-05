@@ -19,6 +19,7 @@ import { useSelector, useDispatch } from "react-redux";
 import * as BaseForm from "@components/Library/FormField/BaseFormField.styled";
 import { DropdownSelection } from "@components/Dropdowns";
 import BlackTooltip from "@components/BlackTooltip";
+import { RootState } from "@redux-store/store";
 import {
   InputBuyPricing,
   markBuyPriceNotConfirmed,
@@ -48,7 +49,6 @@ import {
   upsertOneRentalPrice
 } from "./rentalPricingsSlice";
 import { PriceButtonText, PriceButtonWrapper } from "./PriceButtons";
-import { RootState } from "@redux-store/store";
 
 type ConfigPriceRowProps = {
   priceType: "Rent" | "Buy";

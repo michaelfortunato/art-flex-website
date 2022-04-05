@@ -1,6 +1,4 @@
-import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
-import Appbar from "@components/Appbar/Appbar";
 import {
   Button,
   Grid,
@@ -11,9 +9,8 @@ import {
   InputBase,
   useTheme
 } from "@material-ui/core";
-import Image from "next/image";
-import { useState, useRef, ReactElement, MouseEventHandler } from "react";
-import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
+import { useState, useRef, MouseEventHandler } from "react";
+import { AnimateSharedLayout, motion } from "framer-motion";
 import uploadFile from "@utils/chunked-upload";
 import InputTitle from "@components/CreatePost/Title/Title";
 import InputDescription from "@components/CreatePost/Description/Description";
@@ -22,7 +19,6 @@ import * as S from "@components/CreatePost/Post.styled";
 import {
   ConfigureTags,
   PostTags,
-  InputTag,
   FakeTags
 } from "@components/CreatePost/Tags/Tags";
 import { addTitle, selectTitle } from "@components/CreatePost/Title/titleSlice";
@@ -36,15 +32,10 @@ import {
   ConfigureImages,
   Images as PostImages
 } from "@components/CreatePost/Images/Images";
-import {
-  selectAllRentalPricingIds,
-  selectAllRentalPricings
-} from "@components/CreatePost/Pricing/rentalPricingsSlice";
+import { selectAllRentalPricings } from "@components/CreatePost/Pricing/rentalPricingsSlice";
 import { PostProps, PostWrapper } from "@components/CreatePost/Post";
 import {
   ConfigurePrices,
-  ConfigurePriceTable,
-  DraftPrices,
   DraftPricing
 } from "@components/CreatePost/Pricing/Pricing";
 import { InputRentalPriceButton } from "@components/CreatePost/Pricing/PriceButtons";

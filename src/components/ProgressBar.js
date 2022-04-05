@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "@styles/ProgressBar.module.css";
 import { ProgressBar as fuiwProgressBar } from "@ramonak/react-progress-bar";
 import LinearProgress from "@material-ui/core/LinearProgress";
@@ -7,7 +7,6 @@ import {
   StylesProvider,
   withStyles,
 } from "@material-ui/core/styles";
-import React from "react";
 import { Typography } from "@material-ui/core";
 
 const BorderLinearProgress = withStyles((theme) => ({
@@ -25,9 +24,7 @@ const BorderLinearProgress = withStyles((theme) => ({
   },
 }))(LinearProgress);
 
-const easeInOutSine = (x) => {
-  return 1 - Math.cos((x * Math.PI) / 2);
-};
+const easeInOutSine = (x) => 1 - Math.cos((x * Math.PI) / 2);
 
 const duration = 70;
 export default function ProgressBar(props) {

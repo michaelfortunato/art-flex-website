@@ -13,7 +13,7 @@ import { validPrice } from "../Post";
 import { setBuyPrice, selectBuyPrice } from "./buyPricingSlice";
 import {
   selectRentalPricingById,
-  upsertRentalPrice
+  upsertOneRentalPrice
 } from "./rentalPricingsSlice";
 
 export function PriceButtonWrapper(props: {
@@ -138,7 +138,7 @@ function InputRentalPeriod(props: {
       itemNumber !== null ? inputRentalPeriodOptions[itemNumber] : null;
     if (typeof props.id === "string") {
       dispatch(
-        upsertRentalPrice({
+        upsertOneRentalPrice({
           rentalPriceId: props.id,
           period: newRentalPeriod?.split(" ")[1] as any,
           duration: newRentalPeriod?.split(" ")[0] as any
@@ -244,7 +244,7 @@ export function InputRentalPriceButton(props: InputRentalPriceButtonProps) {
     const inputPrice = parseInt(event.target.value as string, 10);
     if (typeof props.id === "string") {
       dispatch(
-        upsertRentalPrice({
+        upsertOneRentalPrice({
           rentalPriceId: props.id,
           price: !Number.isNaN(inputPrice) ? inputPrice : undefined
         })

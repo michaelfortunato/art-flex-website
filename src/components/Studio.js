@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import StoreTile, { StyledTile as StoreStyledTile } from "./Store/StoreTile";
 import { Grid, Divider, Typography, Paper } from "@material-ui/core";
 import styled from "styled-components";
 import useSWR from "swr";
 import { AnimatePresence, motion } from "framer-motion";
+import StoreTile, { StyledTile as StoreStyledTile } from "./Store/StoreTile";
+
 const StudioStyledTile = styled(motion(StoreStyledTile))``;
 
 const AddIcon = (props) => (
@@ -22,7 +23,7 @@ const AnimatedGrid = motion(Grid);
 const AnimatedPaper = motion(Paper);
 const tiles = [...Array(10).keys()];
 export default function Studio() {
-  //const { data, error } = useSWR("/account/studio/upload");
+  // const { data, error } = useSWR("/account/studio/upload");
   const [leavingPage, setLeavingPage] = useState(false);
   console.log(tiles);
   return (

@@ -23,6 +23,13 @@
       "@redux-store/*": ["redux-store/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.jsx", "**/*.js"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.jsx",
+    "**/*.js",
+    "jsconfig.json"
+  ],
   "exclude": ["node_modules"]
 }

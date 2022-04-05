@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { Grid, Button, ButtonBase, Typography } from '@material-ui/core'
 import { EmailOutlined } from '@material-ui/icons'
 import SignInButton from './SignInButton'
+
 const StyledButton = styled(ButtonBase)`
     && {
         width: 60%;

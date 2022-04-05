@@ -69,9 +69,7 @@ const PasswordField = (props) => {
   );
 };
 
-const checkPasswordLength = (password) => {
-  return password.length >= 8;
-};
+const checkPasswordLength = (password) => password.length >= 8;
 
 // Check for an uppercase character
 const checkPasswordUppercase = (password) => {

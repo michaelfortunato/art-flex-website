@@ -1,7 +1,7 @@
 import { ReactElement, ChangeEventHandler } from "react";
 import CSS from "csstype";
-import * as Styled from "./Button.styled";
 import { ButtonBaseProps } from "@material-ui/core";
+import * as Styled from "./Button.styled";
 
 interface AFButtonProps extends ButtonBaseProps {
   children: ReactElement;

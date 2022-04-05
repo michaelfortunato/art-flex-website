@@ -52,8 +52,7 @@ const StyledGridline = styled.span`
 `;
 
 
-const Gridline = (props) => {
-    return(
+const Gridline = (props) => (
         <CSSTransition
         in
         appear
@@ -62,7 +61,6 @@ const Gridline = (props) => {
             <StyledGridline {...props}/>
         </CSSTransition>   
     );
-};
 
 
 export default Gridline;

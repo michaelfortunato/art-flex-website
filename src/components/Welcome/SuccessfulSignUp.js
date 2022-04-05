@@ -1,9 +1,10 @@
 import { Typography, useTheme } from "@material-ui/core";
 import React, { useEffect, useRef } from "react";
-import CheckCircleGreen from "../../public/check-circle-green.svg";
 import gsap from "gsap";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
+import CheckCircleGreen from "../../public/check-circle-green.svg";
+
 export default function SuccessfulSignUp(props) {
   const router = useRouter();
   const theme = useTheme();

@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Grid, TextField, IconButton, Chip, useTheme } from "@material-ui/core";
 import { Cancel } from "@material-ui/icons";
 import { Autocomplete } from "@material-ui/lab";
-import { selectTags, setTags } from "./tagsSlice";
 import { makeStyles } from "@material-ui/styles";
+import { selectTags, setTags } from "./tagsSlice";
 import { Tag as TagProps, TagCategory } from "../Post";
 
 type TagVariant = "period" | "social" | "prominence";
